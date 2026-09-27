@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Billiard Traveller — Τουρνουά</title>
+<meta name="description" content="Τα τουρνουά μπιλιάρδου Billiard Traveller: πρόγραμμα, αποτελέσματα και ζωντανή ενημέρωση.">
+<style>
+  :root{
+    --bg:#eef2f7; --surface:#ffffff; --surface-2:#f5f7fa; --border:#d7dee8;
+    --text:#1a2432; --muted:#5a6778; --heading:#0f2a44;
+    --header:#0f2a44; --gold:#c9a227; --accent:#1f5fa8;
+    --live:#1e9e5a; --live-soft:#e6f4ec; --soon:#1f5fa8; --soon-soft:#e3edf9; --done:#6b7280; --done-soft:#eef0f3;
+    --fb:#1877f2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1117; --surface:#161b22; --surface-2:#1b222c; --border:#2b3440;
+      --text:#e8edf3; --muted:#a3b0bf; --heading:#ffffff;
+      --header:#010409; --gold:#e3b341; --accent:#58a6ff;
+      --live:#3fb950; --live-soft:#0f2e1c; --soon:#58a6ff; --soon-soft:#132a45; --done:#9aa4b2; --done-soft:#1f2630;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  header{background:var(--header);border-bottom:3px solid var(--gold);color:#fff}
+  .hwrap{max-width:1000px;margin:0 auto;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .ball{font-size:30px}
+  .brand h1{margin:0;font-size:22px;letter-spacing:.2px}
+  .brand p{margin:2px 0 0;font-size:13px;opacity:.8}
+  .hbtns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none;border:1px solid rgba(255,255,255,.25);color:#fff;background:rgba(255,255,255,.08);cursor:pointer;font-family:inherit}
+  .btn:hover{border-color:var(--gold)}
+  .btn.fb{background:var(--fb);border-color:var(--fb)}
+  main{max-width:1000px;margin:0 auto;padding:18px 16px 40px}
+  .search{width:100%;padding:12px 14px;font-size:16px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:6px}
+  h2{font-size:14px;text-transform:uppercase;letter-spacing:.8px;color:var(--heading);margin:24px 0 10px;padding-left:10px;border-left:4px solid var(--gold)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;transition:transform .12s, box-shadow .12s}
+  a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:999px;text-transform:uppercase}
+  .b-live{background:var(--live-soft);color:var(--live)} .b-soon{background:var(--soon-soft);color:var(--soon)} .b-done{background:var(--done-soft);color:var(--done)}
+  .b-live::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--live);margin-right:6px;animation:pulse 1.2s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+  .card h3{margin:8px 0 4px;font-size:17px;color:var(--heading);line-height:1.3}
+  .meta{font-size:13px;color:var(--muted);line-height:1.6}
+  .champ{margin-top:6px;font-weight:700;font-size:14px}
+  .empty,.msg{background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:18px;text-align:center;color:var(--muted)}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+  /* QR */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modal.hidden{display:none}
+  .mbox{background:var(--surface);border-radius:14px;padding:18px;max-width:640px;width:100%;color:var(--text)}
+  .qrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+  .qrc{display:flex;flex-direction:column;align-items:center;gap:8px;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+  .qrb{background:#fff;padding:10px;border-radius:8px;min-width:240px;min-height:240px;display:flex;align-items:center;justify-content:center}
+  .qrc small{word-break:break-all;color:var(--muted)}
+  .mact{display:flex;justify-content:flex-end;gap:8px}
+  .mact .btn{color:var(--text);border-color:var(--border);background:var(--surface-2)}
+  @media print{ body *{visibility:hidden} #qrModal,#qrModal *{visibility:visible} #qrModal{position:absolute;inset:0;background:#fff} .mact{display:none} }
+</style>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="brand">
+      <span class="ball">🎱</span>
+      <div><h1>Billiard Traveller</h1><p>Τουρνουά μπιλιάρδου — πρόγραμμα & ζωντανά αποτελέσματα</p></div>
+    </div>
+    <div class="hbtns">
+      <a class="btn fb" href="https://www.facebook.com/billiardtravellers/" target="_blank" rel="noopener">👍 Facebook</a>
+      <button class="btn" id="qrBtn" type="button">🔳 QR</button>
+      <a class="btn" href="app.html" title="Για τον διοργανωτή">⚙ Admin</a>
+    </div>
+  </div>
+</header>
+<main>
+  <input class="search" id="q" type="search" placeholder="🔍 Αναζήτηση τουρνουά" autocomplete="off">
+  <div id="status" class="msg">Φόρτωση τουρνουά…</div>
+  <section id="sLive"><h2>🟢 Σε εξέλιξη</h2><div class="grid" id="gLive"></div></section>
+  <section id="sSoon"><h2>📅 Προσεχώς</h2><div class="grid" id="gSoon"></div></section>
+  <section id="sDone"><h2>🏁 Ολοκληρωμένα</h2><div class="grid" id="gDone"></div></section>
+</main>
+<footer>Billiard Traveller · <a href="https://www.facebook.com/billiardtravellers/" target="_blank" rel="noopener" style="color:inherit">facebook.com/billiardtravellers</a></footer>
+
+<div id="qrModal" class="modal hidden">
+  <div class="mbox">
+    <strong>Billiard Traveller</strong>
+    <div class="qrs">
+      <div class="qrc"><b>🏆 Όλα τα τουρνουά</b><div class="qrb" id="qrH"></div><small id="qrHU"></small></div>
+      <div class="qrc"><b>👍 Facebook</b><div class="qrb" id="qrF"></div><small>facebook.com/billiardtravellers</small></div>
+    </div>
+    <div class="mact"><button class="btn" id="qrPrint" type="button">🖨 Εκτύπωση</button><button class="btn" id="qrClose" type="button">Κλείσιμο</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const FB_CONFIG = {
+    apiKey: "AIzaSyAJmOe7Woh92qMCDTy0HtepvJJDcrFgSfE",
+    authDomain: "billiard-traveller.firebaseapp.com",
+    projectId: "billiard-traveller",
+    storageBucket: "billiard-traveller.firebasestorage.app",
+    messagingSenderId: "481554679650",
+    appId: "1:481554679650:web:d9d13e5d21ca89b11ace3b"
+  };
+  const $ = s => document.querySelector(s);
+  const DAYS = ['Κυρ','Δευ','Τρί','Τετ','Πέμ','Παρ','Σάβ'];
+  let all = [];
+
+  function dateRange(start, days){
+    if(!start) return '';
+    const [y,m,d] = start.split('-').map(Number); if(!y) return '';
+    const a = new Date(y,m-1,d), b = new Date(y,m-1,d+Math.max(1,days||3)-1);
+    const f = x => DAYS[x.getDay()]+' '+x.getDate()+'/'+(x.getMonth()+1);
+    return (days||3)>1 ? f(a)+' – '+f(b)+' '+b.getFullYear() : f(a)+' '+a.getFullYear();
+  }
+  const norm = x => String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  function card(t){
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = 'app.html?t='+encodeURIComponent(t.id)+'&s='+(t.size||32);
+    const badge = t.status==='live' ? '<span class="badge b-live">Ζωντανά</span>' : t.status==='finished' ? '<span class="badge b-done">Ολοκληρώθηκε</span>' : '<span class="badge b-soon">Προσεχώς</span>';
+    const upd = t.updatedAt && t.updatedAt.toDate ? t.updatedAt.toDate() : null;
+    const h3 = document.createElement('h3'); h3.textContent = t.title || t.id;
+    const meta = document.createElement('div'); meta.className='meta';
+    meta.textContent = [dateRange(t.startDate, t.days), (t.entries?t.entries+' παίκτες':''), 'ταμπλό '+(t.size||32)].filter(Boolean).join(' · ');
+    a.innerHTML = badge;
+    a.append(h3, meta);
+    if(t.champion){ const c=document.createElement('div'); c.className='champ'; c.textContent='🏆 Νικητής: '+t.champion; a.appendChild(c); }
+    if(upd){ const u=document.createElement('div'); u.className='meta'; u.textContent='Ενημέρωση: '+upd.getDate()+'/'+(upd.getMonth()+1)+' '+String(upd.getHours()).padStart(2,'0')+':'+String(upd.getMinutes()).padStart(2,'0'); a.appendChild(u); }
+    return a;
+  }
+  function render(){
+    const q = norm($('#q').value.trim());
+    const list = all.filter(t => !q || norm((t.title||'')+' '+t.id+' '+(t.champion||'')).includes(q));
+    const groups = {live:[], upcoming:[], finished:[]};
+    list.forEach(t => (groups[t.status]||groups.upcoming).push(t));
+    groups.live.sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||''));
+    groups.upcoming.sort((a,b)=>(a.startDate||'').localeCompare(b.startDate||''));
+    groups.finished.sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||''));
+    [['live','#gLive','#sLive'],['upcoming','#gSoon','#sSoon'],['finished','#gDone','#sDone']].forEach(([k,g,sec])=>{
+      const box = $(g); box.innerHTML='';
+      groups[k].forEach(t=>box.appendChild(card(t)));
+      $(sec).style.display = groups[k].length ? '' : 'none';
+    });
+    const st = $('#status');
+    if(!all.length){ st.style.display=''; st.textContent='Δεν υπάρχουν ακόμα δημοσιευμένα τουρνουά.'; }
+    else if(!list.length){ st.style.display=''; st.textContent='Κανένα τουρνουά δεν ταιριάζει στην αναζήτηση.'; }
+    else st.style.display='none';
+  }
+  function drawQR(el, text){
+    el.innerHTML='';
+    try{ if(typeof QRCode!=='undefined'){ new QRCode(el,{text,width:220,height:220}); return; } }catch(e){}
+    const img=document.createElement('img'); img.width=220; img.height=220; img.alt='QR';
+    img.src='https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data='+encodeURIComponent(text);
+    el.appendChild(img);
+  }
+  function start(){
+    ['#sLive','#sSoon','#sDone'].forEach(s=>$(s).style.display='none');
+    $('#q').addEventListener('input', render);
+    $('#qrBtn').addEventListener('click', ()=>{
+      const url = location.href.split('?')[0].split('#')[0];
+      drawQR($('#qrH'), url); $('#qrHU').textContent = url;
+      drawQR($('#qrF'), 'https://www.facebook.com/billiardtravellers/');
+      $('#qrModal').classList.remove('hidden');
+    });
+    $('#qrClose').addEventListener('click', ()=>$('#qrModal').classList.add('hidden'));
+    $('#qrPrint').addEventListener('click', ()=>window.print());
+    if(typeof firebase==='undefined'){ $('#status').textContent='⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.'; return; }
+    try{
+      if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+      firebase.firestore().collection('tournaments').onSnapshot(qs=>{
+        all = []; qs.forEach(d=>{ const x=d.data(); all.push({id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size, startDate:x.startDate, days:x.days, updatedAt:x.updatedAt}); });
+        render();
+      }, err=>{ $('#status').textContent='⚠ Δεν ήταν δυνατή η ανάγνωση ('+(err.code||'σφάλμα')+').'; });
+    }catch(e){ $('#status').textContent='⚠ Σφάλμα σύνδεσης.'; }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+</body>
+</html>
