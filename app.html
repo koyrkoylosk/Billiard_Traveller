@@ -1,6 +1,13 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v34 (28/09/2026)
+    - ☁ Πολλοί διοργανωτές στην ίδια σελίδα: άδεια δημοσίευσης σε όσα Gmail έχει ορίσει ο ιδιοκτήτης
+      (Firestore publishers/{email}: name, facebook, active)· ο καθένας αλλάζει μόνο τα δικά του τουρνουά
+    - Κάθε τουρνουά κρατά ιδιοκτήτη, «Διοργάνωση» και Facebook του διοργανωτή (σελίδα παικτών, QR, κεντρική σελίδα)
+  v33 (28/09/2026)
+    - Μοναδικές συμμετοχές: το ίδιο όνομα δεν μπαίνει σε 2η θέση (χωρίς διάκριση κεφαλαίων/τόνων),
+      κόκκινη ένδειξη, μήνυμα με τη θέση, μπλοκάρισμα κλήρωσης με διπλά, έλεγχος και στα ονόματα του 1ου γύρου
   v32 (27/09/2026)
     - ☁ Online (Firebase): σύνδεση admin με Google, «Δημοσίευση online» με όνομα & κωδικό τουρνουά,
       αυτόματο ανέβασμα κάθε αλλαγής (app.html?t=κωδικός)
@@ -93,7 +100,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Billiard Traveller 32 PRO v32 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v34 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1174,6 +1181,9 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   :root[data-theme] .btn.lock-btn.on{background:#b45309;border-color:#b45309;color:#fff}
   :root[data-theme] .btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.3)}
   #form32.entries-locked .row input[type=text]{background:var(--t-input-disabled) !important;cursor:not-allowed}
+  /* v33: διπλή συμμετοχή */
+  #form32 .row input[type=text].dup-name, :root[data-theme] #form32 .row input[type=text].dup-name{
+    border:2px solid #dc2626 !important; background:#fee2e2 !important; color:#7f1d1d !important}
   /* ===== v32: online (Firebase) ===== */
   .viewer-bar{display:none}
   :root.cloud-mode .viewer-bar{display:block;position:sticky;top:58px;z-index:9}
@@ -1191,6 +1201,8 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .cloud-badge{display:inline-block;font-size:12px;font-weight:700;color:var(--t-muted,#5a6778)}
   .cloud-badge.ok{color:var(--t-win-border,#2e9a5a)} .cloud-badge.err{color:var(--t-stop,#d64545)} .cloud-badge.busy{color:#b45309}
   .viewer-bar .cloud-badge{margin-top:6px}
+  .viewer-bar .vb-org:empty{display:none}
+  .viewer-bar .vb-org{font-weight:700}
   /* σελίδα παικτών (όχι admin): κρύβονται τα εργαλεία διαχείρισης */
   :root.cloud-mode:not(.is-admin) .sec-participants,
   :root.cloud-mode:not(.is-admin) .debug-section,
@@ -1225,7 +1237,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v32</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v34</span>
     </div>
     <div class="topbar-right">
       <button id="adminBtn" class="toggle">Admin</button>
@@ -1278,6 +1290,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
         <div class="vb-top">
           <div>
             <div class="vb-title" id="viewerTitle">Τουρνουά</div>
+            <div class="vb-upd vb-org" id="viewerOrg"></div>
             <div class="vb-upd" id="viewerUpdated">Φόρτωση…</div>
           </div>
           <div class="vb-links">
@@ -1470,7 +1483,7 @@ Handicap	 -  No handicap
       <div class="qr-grid">
         <div class="qr-card"><div class="qr-h">📊 Το τουρνουά — πότε παίζω</div><div id="qrT" class="qr-box"></div><small id="qrTUrl"></small></div>
         <div class="qr-card"><div class="qr-h">🏆 Όλα τα τουρνουά</div><div id="qrH" class="qr-box"></div><small id="qrHUrl"></small></div>
-        <div class="qr-card"><div class="qr-h">👍 Facebook</div><div id="qrF" class="qr-box"></div><small>facebook.com/billiardtravellers</small></div>
+        <div class="qr-card"><div class="qr-h">👍 Facebook</div><div id="qrF" class="qr-box"></div><small id="qrFUrl">facebook.com/billiardtravellers</small></div>
       </div>
       <div class="qr-actions"><button type="button" id="qrPrint" class="btn">🖨 Εκτύπωση</button><button type="button" id="qrClose" class="btn">Κλείσιμο</button></div>
     </div>
@@ -1936,13 +1949,61 @@ Handicap	 -  No handicap
     messagingSenderId: "481554679650",
     appId: "1:481554679650:web:d9d13e5d21ca89b11ace3b"
   };
-  const OWNER_EMAILS = ['kostas.koyrkoyloss@gmail.com'];          // ποιοι μπορούν να περνούν σκορ online
+  const SUPER_EMAILS = ['kostas.koyrkoyloss@gmail.com'];          // ιδιοκτήτης πλατφόρμας: αλλάζει τα πάντα
+  // Διοργανωτές με άδεια: έγγραφα Firestore publishers/{email} {name, facebook, active}
   const FB_PAGE_URL = 'https://www.facebook.com/billiardtravellers/';
   const HOSTED = /^https?:$/.test(location.protocol);
   let fbAuth = null, fbDb = null, cloudUser = null, cloudApplying = false, cloudPushTimer = null;
   let cloudTitle = '';                                             // όνομα τουρνουά για τη δημόσια σελίδα
   const cloudReady = ()=> !!fbDb;
-  const isOwnerUser = u => !!u && OWNER_EMAILS.includes(String(u.email||'').toLowerCase());
+  const emailOf = u => String((u && u.email) || '').toLowerCase();
+  const isSuperUser = u => !!u && SUPER_EMAILS.includes(emailOf(u));
+  let cloudRole = {super:false, publisher:false, name:'', facebook:''};
+  let cloudRoleReady = Promise.resolve();
+  let cloudDoc = {loaded:false, owner:'', organizer:'', facebook:''};   // στοιχεία του online τουρνουά
+  let cloudOwnerWarned = false;
+  const canPublishRole = ()=> !!cloudUser && (cloudRole.super || cloudRole.publisher);
+  // Ποιος γράφει: ο ιδιοκτήτης πλατφόρμας παντού, ο διοργανωτής μόνο στα δικά του τουρνουά
+  function cloudCanEdit(){
+    if(!canPublishRole()) return false;
+    if(cloudRole.super || !CLOUD_TID) return true;
+    return cloudDoc.loaded && !!cloudDoc.owner && cloudDoc.owner === emailOf(cloudUser);
+  }
+  async function resolveRole(u){
+    const r = {super:false, publisher:false, name:'', facebook:''};
+    if(!u) return r;
+    if(isSuperUser(u)){ r.super = true; r.name = 'Billiard Traveller'; r.facebook = FB_PAGE_URL; }
+    try{
+      const ds = await fbDb.collection('publishers').doc(emailOf(u)).get();
+      if(ds.exists){
+        const d = ds.data() || {};
+        if(d.active !== false) r.publisher = true;
+        if(d.name) r.name = String(d.name);
+        if(d.facebook) r.facebook = String(d.facebook);
+      }
+    }catch(e){ /* χωρίς άδεια ανάγνωσης = δεν είναι διοργανωτής */ }
+    return r;
+  }
+  function cloudRecomputeAdmin(){
+    const wasAdmin = ADMIN;
+    ADMIN = cloudCanEdit();
+    const ab = $('#adminBtn'); if(ab) ab.textContent = ADMIN ? 'Admin (ON)' : 'Admin';
+    if(wasAdmin!==ADMIN) applyAdminState();
+    refreshCloudPanel();
+    if(ADMIN && CLOUD_TID) setCloudBadge('☁ Online','ok');
+    if(canPublishRole() && CLOUD_TID && cloudDoc.loaded && !ADMIN && !cloudOwnerWarned){
+      cloudOwnerWarned = true;
+      alert('ℹ Αυτό το τουρνουά ανήκει σε άλλον διοργανωτή — το βλέπεις μόνο ως θεατής.');
+    }
+  }
+  function applyDocInfo(d){
+    cloudDoc = {loaded:true, owner:String(d.owner||'').toLowerCase(), organizer:String(d.organizer||''), facebook:String(d.facebook||'')};
+    const org = $('#viewerOrg'); if(org) org.textContent = cloudDoc.organizer ? ('🎱 Διοργάνωση: '+cloudDoc.organizer) : '';
+    const fb = cloudFacebook();
+    document.querySelectorAll('.fb-link').forEach(a=>{ if(fb){ a.href = fb; a.style.display=''; } else a.style.display='none'; });
+  }
+  // Facebook του διοργανωτή (παλιά τουρνουά χωρίς ιδιοκτήτη → Billiard Traveller)
+  const cloudFacebook = ()=> CLOUD_TID ? (cloudDoc.facebook || (cloudDoc.owner ? '' : FB_PAGE_URL)) : (cloudRole.facebook || FB_PAGE_URL);
   const baseDir = ()=> location.href.split('?')[0].split('#')[0].replace(/[^\/]*$/,'');
   const tournamentUrl = tid => baseDir()+'app.html?t='+encodeURIComponent(tid)+'&s='+SIZE;
   const hubUrl = ()=> baseDir()+'index.html';
@@ -1968,6 +2029,9 @@ Handicap	 -  No handicap
       startDate: scheduleCfg.date || '', days: scheduleCfg.days || 3,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       updatedBy: cloudUser ? cloudUser.email : '',
+      owner: cloudDoc.owner || emailOf(cloudUser),
+      organizer: cloudDoc.organizer || cloudRole.name || (cloudUser && cloudUser.displayName) || emailOf(cloudUser).split('@')[0],
+      facebook: cloudDoc.owner ? cloudDoc.facebook : (cloudRole.facebook || ''),
       state: JSON.stringify(snap)
     };
   }
@@ -1975,13 +2039,13 @@ Handicap	 -  No handicap
     document.querySelectorAll('.cloud-badge').forEach(b=>{ b.textContent = txt; b.className = 'cloud-badge '+(cls||''); });
   }
   function cloudSchedulePush(){
-    if(!CLOUD_TID || !cloudReady() || cloudApplying || !ADMIN || !isOwnerUser(cloudUser)) return;
+    if(!CLOUD_TID || !cloudReady() || cloudApplying || !ADMIN || !cloudCanEdit()) return;
     setCloudBadge('☁ Αποθήκευση…','busy');
     clearTimeout(cloudPushTimer);
     cloudPushTimer = setTimeout(cloudPushNow, 1200);
   }
   async function cloudPushNow(){
-    if(!CLOUD_TID || !cloudReady() || !ADMIN || !isOwnerUser(cloudUser)) return;
+    if(!CLOUD_TID || !cloudReady() || !ADMIN || !cloudCanEdit()) return;
     try{
       await fbDb.collection('tournaments').doc(CLOUD_TID).set(cloudPayload(), {merge:true});
       const t = new Date();
@@ -2023,27 +2087,31 @@ Handicap	 -  No handicap
     }
     fbAuth.onAuthStateChanged(u=>{
       cloudUser = u || null;
-      if(u && !isOwnerUser(u)){
-        alert('Ο λογαριασμός '+u.email+' δεν έχει δικαίωμα admin.');
-        fbAuth.signOut(); return;
-      }
-      const wasAdmin = ADMIN;
-      ADMIN = isOwnerUser(u);
-      const ab = $('#adminBtn'); if(ab) ab.textContent = ADMIN ? 'Admin (ON)' : 'Admin';
-      if(wasAdmin!==ADMIN) applyAdminState();
-      refreshCloudPanel();
-      if(ADMIN && CLOUD_TID) setCloudBadge('☁ Online','ok');
+      cloudRoleReady = resolveRole(u).then(r=>{
+        if(cloudUser !== (u||null)) return;
+        cloudRole = r;
+        if(u && !canPublishRole()){
+          alert('Ο λογαριασμός '+u.email+' δεν έχει άδεια δημοσίευσης τουρνουά.\n\nΓια άδεια επικοινώνησε με το Billiard Traveller.');
+          fbAuth.signOut(); return;
+        }
+        cloudRecomputeAdmin();
+      });
     });
     if(CLOUD_TID){
       let first = true;
       fbDb.collection('tournaments').doc(CLOUD_TID).onSnapshot(ds=>{
+        const wasLoaded = cloudDoc.loaded;
         if(!ds.exists){
+          cloudDoc = {loaded:true, owner:'', organizer:'', facebook:''};
           const vu=$('#viewerUpdated'); if(vu) vu.textContent='⚠ Το τουρνουά «'+CLOUD_TID+'» δεν βρέθηκε.';
+          if(!wasLoaded) cloudRecomputeAdmin();
           return;
         }
+        applyDocInfo(ds.data());
         // ο admin φορτώνει μία φορά (για να μη χάνει ό,τι γράφει)· οι παίκτες βλέπουν κάθε αλλαγή ζωντανά
         if(first || !ADMIN){ cloudApplyRemote(ds.data()); }
         first = false;
+        if(!wasLoaded) cloudRecomputeAdmin();
       }, err=>{
         console.warn('cloud read failed', err);
         const vu=$('#viewerUpdated'); if(vu) vu.textContent='⚠ Δεν ήταν δυνατή η ανάγνωση ('+(err.code||'σφάλμα')+')';
@@ -2073,8 +2141,10 @@ Handicap	 -  No handicap
         'ℹ Για online δημοσίευση άνοιξε την εφαρμογή από τη σελίδα σου στο internet (όχι από αρχείο).';
       pubBtn.disabled = true; return;
     }
-    who.textContent = cloudUser ? ('✔ Συνδεδεμένος ως '+cloudUser.email) : 'Δεν είσαι συνδεδεμένος — πάτα «Admin» για σύνδεση με Google.';
-    pubBtn.disabled = !isOwnerUser(cloudUser);
+    who.textContent = cloudUser
+      ? ('✔ Συνδεδεμένος ως '+cloudUser.email+(canPublishRole() && cloudRole.name ? ' · Διοργανωτής: '+cloudRole.name : ''))
+      : 'Δεν είσαι συνδεδεμένος — πάτα «Admin» για σύνδεση με Google.';
+    pubBtn.disabled = CLOUD_TID ? !cloudCanEdit() : !canPublishRole();
     if(tIn && !tIn.value) tIn.value = cloudTitle;
     if(CLOUD_TID){
       sIn.value = CLOUD_TID; sIn.disabled = true;
@@ -2088,17 +2158,29 @@ Handicap	 -  No handicap
   }
   async function cloudPublish(){
     if(!cloudReady()) return;
-    if(!isOwnerUser(cloudUser)){ if(!(await cloudSignIn())) return; }
-    if(!isOwnerUser(cloudUser)) return;
+    if(!cloudUser){ if(!(await cloudSignIn())) return; }
+    await new Promise(r=>setTimeout(r,50));
+    try{ await cloudRoleReady; }catch(e){}
+    if(!canPublishRole()) return;
     cloudTitle = ($('#cloudTitleIn').value||'').trim();
     if(!cloudTitle){ alert('❗ Γράψε ένα όνομα για το τουρνουά (θα φαίνεται στη δημόσια σελίδα).'); return; }
-    if(CLOUD_TID){ await cloudPushNow(); refreshCloudPanel(); return; }
+    if(CLOUD_TID){
+      if(!cloudCanEdit()){ alert('❗ Αυτό το τουρνουά ανήκει σε άλλον διοργανωτή.'); return; }
+      await cloudPushNow(); refreshCloudPanel(); return;
+    }
     const tid = slugify($('#cloudSlugIn').value);
     if(tid.length<3){ alert('❗ Ο κωδικός πρέπει να έχει τουλάχιστον 3 λατινικούς χαρακτήρες ή αριθμούς.'); return; }
     try{
       const ref = fbDb.collection('tournaments').doc(tid);
       const ex = await ref.get();
-      if(ex.exists && !confirm('Υπάρχει ήδη online τουρνουά με κωδικό «'+tid+'». Να αντικατασταθεί;')) return;
+      if(ex.exists){
+        const xd = ex.data() || {}, exOwner = String(xd.owner||'').toLowerCase();
+        if(!cloudRole.super && exOwner !== emailOf(cloudUser)){
+          alert('❗ Ο κωδικός «'+tid+'» χρησιμοποιείται ήδη από άλλο τουρνουά. Γράψε άλλον κωδικό.'); return;
+        }
+        if(!confirm('Υπάρχει ήδη online τουρνουά με κωδικό «'+tid+'». Να αντικατασταθεί;')) return;
+        if(exOwner) cloudDoc = {loaded:true, owner:exOwner, organizer:String(xd.organizer||''), facebook:String(xd.facebook||'')};
+      }
       await ref.set(Object.assign(cloudPayload(), {createdAt: firebase.firestore.FieldValue.serverTimestamp()}));
       // μεταφορά σε λειτουργία online για αυτό το τουρνουά
       try{ localStorage.setItem('BTC_'+tid, JSON.stringify(buildAutosaveSnapshot())); }catch(e){}
@@ -2127,7 +2209,9 @@ Handicap	 -  No handicap
     $('#qrT').parentElement.style.display = tUrl ? '' : 'none';
     if(tUrl){ drawQR($('#qrT'), tUrl); $('#qrTUrl').textContent = tUrl; }
     drawQR($('#qrH'), hubUrl()); $('#qrHUrl').textContent = hubUrl();
-    drawQR($('#qrF'), FB_PAGE_URL);
+    const fb = cloudFacebook();
+    $('#qrF').parentElement.style.display = fb ? '' : 'none';
+    if(fb){ drawQR($('#qrF'), fb); $('#qrFUrl').textContent = fb.replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,''); }
     m.classList.remove('hidden');
   }
 
@@ -2218,6 +2302,13 @@ Handicap	 -  No handicap
     const entries = participants
       .map((x,i)=>({name:(x||'').trim(), seed:!!seeded[i]}))
       .filter(e=>isRealName(e.name));
+    const dups = participantDupGroups();
+    if(dups.length){
+      alert('❗ Υπάρχουν διπλές συμμετοχές — διόρθωσέ τες πριν την κλήρωση:\n\n'+
+        dups.map(g=>'• «'+g.name+'» στις θέσεις '+g.pos.join(', ')).join('\n'));
+      markParticipantDups();
+      return;
+    }
     const real = entries.map(e=>e.name);
     const seedNames  = entries.filter(e=>e.seed).map(e=>e.name);
     const otherNames = entries.filter(e=>!e.seed).map(e=>e.name);
@@ -2291,6 +2382,50 @@ Handicap	 -  No handicap
     recomputeFinalAndStats();
   }
 
+  // ---- Μοναδικές συμμετοχές: το ίδιο όνομα δεν μπαίνει σε δεύτερη θέση ----
+  // Σύγκριση χωρίς κεφαλαία/τόνους/διπλά κενά (Κώστας = ΚΩΣΤΑΣ = κωστας).
+  const nameKey = x => String(x||'').trim().replace(/\s+/g,' ').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ς/g,'σ');
+  function dupParticipantOf(i){
+    const n = (participants[i]||'').trim();
+    if(!isRealName(n)) return -1;
+    const k = nameKey(n);
+    for(let j=0;j<participants.length;j++){
+      if(j!==i && isRealName((participants[j]||'').trim()) && nameKey(participants[j])===k) return j;
+    }
+    return -1;
+  }
+  function participantDupGroups(){
+    const seen = {}, out = [];
+    participants.forEach((p,i)=>{
+      const n=(p||'').trim(); if(!isRealName(n)) return;
+      const k=nameKey(n); (seen[k]=seen[k]||{name:n,pos:[]}).pos.push(i+1);
+    });
+    Object.values(seen).forEach(g=>{ if(g.pos.length>1) out.push(g); });
+    return out;
+  }
+  function markParticipantDups(){
+    document.querySelectorAll('#form32 .row').forEach((r,i)=>{
+      const inp = r.querySelector('input[type=text]'); if(!inp) return;
+      const j = dupParticipantOf(i);
+      inp.classList.toggle('dup-name', j>=0);
+      inp.title = j>=0 ? ('⚠ Το όνομα υπάρχει ήδη στη θέση '+(j+1)) : '';
+    });
+  }
+  // Όνομα σε αγώνα 1ου γύρου: να μην υπάρχει ήδη σε άλλη θέση του 1ου γύρου
+  function dupInFirstRound(m, side){
+    if(!(m.id>=1 && m.id<=N1)) return 0;
+    const n = (side==='A'?m.playerA.name:m.playerB.name)||'';
+    if(!isRealName(n.trim())) return 0;
+    const k = nameKey(n);
+    for(let i=0;i<N1;i++){
+      const o = matches[i];
+      if(o!==m && (nameKey(o.playerA.name)===k || nameKey(o.playerB.name)===k)) return o.id;
+      if(o===m && nameKey(side==='A'?o.playerB.name:o.playerA.name)===k) return o.id;
+    }
+    return 0;
+  }
+
   function renderForm(){
     const wrap = $('#form32'); wrap.innerHTML='';
     for(let i=0;i<SIZE;i++){
@@ -2300,6 +2435,18 @@ Handicap	 -  No handicap
       inp.type='text'; inp.value = participants[i]; inp.maxLength=20;
       inp.addEventListener('input',()=>{
         participants[i] = inp.value.trim();
+        markParticipantDups();
+      });
+      inp.addEventListener('change',()=>{
+        participants[i] = inp.value.trim();
+        const j = dupParticipantOf(i);
+        if(j>=0){
+          alert('❗ Ο παίκτης «'+participants[i]+'» υπάρχει ήδη στη θέση '+(j+1)+'.\n\nΚάθε συμμετοχή πρέπει να είναι μοναδική.');
+          participants[i] = ''; inp.value = '';
+          markParticipantDups();
+          setTimeout(()=>inp.focus(),0);
+        }
+        saveAutosaveSnapshot();
       });
       const sb = document.createElement('button');
       sb.type='button'; sb.className='seedBtn'+(seeded[i]?' on':'');
@@ -2317,6 +2464,7 @@ Handicap	 -  No handicap
       r.append(lab,inp,sb);
       wrap.appendChild(r);
     }
+    markParticipantDups();
     applyAdminState();
   }
 
@@ -2557,6 +2705,13 @@ Handicap	 -  No handicap
           alert('❗ Δεν επιτρέπεται αγώνας με 2 παίκτες BYE.');
           m.playerA.name = ''; inA.value = '';
           recomputeFinalAndStats();
+          return;
+        }
+        const d = dupInFirstRound(m,'A');
+        if(d){
+          alert('❗ Ο παίκτης «'+m.playerA.name+'» υπάρχει ήδη στον αγώνα #'+d+'.\n\nΚάθε συμμετοχή πρέπει να είναι μοναδική.');
+          m.playerA.name = ''; inA.value = '';
+          recomputeFinalAndStats();
         }
       });
       inA.addEventListener('click',(ev)=>{
@@ -2613,6 +2768,13 @@ Handicap	 -  No handicap
       inB.addEventListener('change',()=>{
         if(isByeName(m.playerB.name) && isByeName(m.playerA.name)){
           alert('❗ Δεν επιτρέπεται αγώνας με 2 παίκτες BYE.');
+          m.playerB.name = ''; inB.value = '';
+          recomputeFinalAndStats();
+          return;
+        }
+        const d = dupInFirstRound(m,'B');
+        if(d){
+          alert('❗ Ο παίκτης «'+m.playerB.name+'» υπάρχει ήδη στον αγώνα #'+d+'.\n\nΚάθε συμμετοχή πρέπει να είναι μοναδική.');
           m.playerB.name = ''; inB.value = '';
           recomputeFinalAndStats();
         }
@@ -4033,7 +4195,7 @@ function syncFinal16ToKO(seeds){
   }
 
 
-  const APP_VERSION = '32';
+  const APP_VERSION = '34';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -4436,8 +4598,9 @@ function syncFinal16ToKO(seeds){
       adminBtn.addEventListener('click', async ()=>{
         // Online (σελίδα στο internet): σύνδεση μόνο με Google — ο κωδικός δεν ισχύει
         if(cloudReady() && HOSTED){
-          if(!ADMIN){ await cloudSignIn(); }
-          else if(confirm('Αποσύνδεση από admin;')){ await fbAuth.signOut(); }
+          if(!cloudUser){ await cloudSignIn(); }
+          else if(ADMIN){ if(confirm('Αποσύνδεση από admin;')) await fbAuth.signOut(); }
+          else if(confirm('Είσαι συνδεδεμένος ως '+cloudUser.email+' χωρίς δικαίωμα αλλαγών σε αυτό το τουρνουά.\n\nΑποσύνδεση;')){ await fbAuth.signOut(); }
           return;
         }
         if(!ADMIN){
@@ -4679,7 +4842,7 @@ function syncFinal16ToKO(seeds){
     const qc = $('#qrClose'); if(qc) qc.addEventListener('click', ()=>$('#qrModal').classList.add('hidden'));
     const qp = $('#qrPrint'); if(qp) qp.addEventListener('click', ()=>window.print());
     const cti = $('#cloudTitleIn'); if(cti) cti.addEventListener('input', ()=>{ cloudTitle = cti.value.trim(); });
-    const fbl = document.querySelectorAll('.fb-link'); fbl.forEach(a=>a.href = FB_PAGE_URL);
+    const fbl = document.querySelectorAll('.fb-link'); fbl.forEach(a=>a.href = FB_PAGE_URL);   // αλλάζει όταν φορτώσει το τουρνουά
     const hbl = document.querySelectorAll('.hub-link'); hbl.forEach(a=>a.href = hubUrl());
     cloudBoot();
     markEmptyInfo();

@@ -46,6 +46,7 @@
   .card h3{margin:8px 0 4px;font-size:17px;color:var(--heading);line-height:1.3}
   .meta{font-size:13px;color:var(--muted);line-height:1.6}
   .champ{margin-top:6px;font-weight:700;font-size:14px}
+  .org{font-size:13.5px;font-weight:700;margin:2px 0 2px;color:var(--text)}
   .empty,.msg{background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:18px;text-align:center;color:var(--muted)}
   footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
   /* QR */
@@ -79,7 +80,7 @@
   </div>
 </header>
 <main>
-  <input class="search" id="q" type="search" placeholder="🔍 Αναζήτηση τουρνουά" autocomplete="off">
+  <input class="search" id="q" type="search" placeholder="🔍 Αναζήτηση τουρνουά ή διοργανωτή" autocomplete="off">
   <div id="status" class="msg">Φόρτωση τουρνουά…</div>
   <section id="sLive"><h2>🟢 Σε εξέλιξη</h2><div class="grid" id="gLive"></div></section>
   <section id="sSoon"><h2>📅 Προσεχώς</h2><div class="grid" id="gSoon"></div></section>
@@ -130,14 +131,16 @@
     const meta = document.createElement('div'); meta.className='meta';
     meta.textContent = [dateRange(t.startDate, t.days), (t.entries?t.entries+' παίκτες':''), 'ταμπλό '+(t.size||32)].filter(Boolean).join(' · ');
     a.innerHTML = badge;
-    a.append(h3, meta);
+    a.append(h3);
+    if(t.organizer){ const o=document.createElement('div'); o.className='org'; o.textContent='🎱 '+t.organizer; a.appendChild(o); }
+    a.append(meta);
     if(t.champion){ const c=document.createElement('div'); c.className='champ'; c.textContent='🏆 Νικητής: '+t.champion; a.appendChild(c); }
     if(upd){ const u=document.createElement('div'); u.className='meta'; u.textContent='Ενημέρωση: '+upd.getDate()+'/'+(upd.getMonth()+1)+' '+String(upd.getHours()).padStart(2,'0')+':'+String(upd.getMinutes()).padStart(2,'0'); a.appendChild(u); }
     return a;
   }
   function render(){
     const q = norm($('#q').value.trim());
-    const list = all.filter(t => !q || norm((t.title||'')+' '+t.id+' '+(t.champion||'')).includes(q));
+    const list = all.filter(t => !q || norm((t.title||'')+' '+t.id+' '+(t.champion||'')+' '+(t.organizer||'')).includes(q));
     const groups = {live:[], upcoming:[], finished:[]};
     list.forEach(t => (groups[t.status]||groups.upcoming).push(t));
     groups.live.sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||''));
@@ -175,7 +178,7 @@
     try{
       if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
       firebase.firestore().collection('tournaments').onSnapshot(qs=>{
-        all = []; qs.forEach(d=>{ const x=d.data(); all.push({id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size, startDate:x.startDate, days:x.days, updatedAt:x.updatedAt}); });
+        all = []; qs.forEach(d=>{ const x=d.data(); all.push({id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size, startDate:x.startDate, days:x.days, updatedAt:x.updatedAt, organizer:x.organizer||''}); });
         render();
       }, err=>{ $('#status').textContent='⚠ Δεν ήταν δυνατή η ανάγνωση ('+(err.code||'σφάλμα')+').'; });
     }catch(e){ $('#status').textContent='⚠ Σφάλμα σύνδεσης.'; }
