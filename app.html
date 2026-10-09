@@ -1,6 +1,12 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v37 (09/10/2026)
+    - ⏱ Παράταση: κουμπί σε κάθε αγώνα (admin) — πόντοι παράτασης π.χ. 3-2, +1 στεκιά και στους δύο·
+      ξανά σε νέα ισοπαλία (π.χ. 35-36 σε 55 στεκιές), μετά κλείσιμο αγώνα με νικητή/ηττημένο
+  v36 (09/10/2026)
+    - 🎱 Όριο στεκιών ανά φάση (π.χ. 30 πόντοι – 50 στεκιές) και «τελευταία στεκιά ισοφάρισης» για τον 2ο παίκτη·
+      στέλνονται στο Scoreboard μαζί με την απόσταση (χρειάζεται Scoreboard v31.22)
   v35 (09/10/2026)
     - 🎱 Σύνδεση με το Billiard Traveller SCOREBOARD: τα τραπέζια μπαίνουν στο τουρνουά με κωδικό + κλειδί,
       αυτόματη ανάθεση του επόμενου αγώνα στο πρώτο ελεύθερο τραπέζι, ζωντανό σκορ από τα τραπέζια,
@@ -105,7 +111,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Billiard Traveller 32 PRO v35 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v37 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -554,6 +560,8 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .tbl-cfg{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:6px 0}
   .tbl-cfg label{display:flex;gap:6px;align-items:center;font-size:14px}
   .tbl-cfg input[type=number]{width:64px}
+  .tbl-ph{display:flex;gap:8px;align-items:center;border:1px solid var(--t-input-border,#cfd9ea);border-radius:8px;padding:4px 8px}
+  .tbl-ph b{font-size:13px}
   .tbl-msg{display:block;min-height:1.2em;opacity:.8}
   .tbl-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:8px}
   .tbl-card{border:1px solid var(--t-input-border,#cfd9ea);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:var(--t-input-bg,#fff)}
@@ -1186,6 +1194,8 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .icon.early{background:var(--t-surface-3,#e9eef5);color:var(--t-heading,#0f2a44);border:1px solid var(--t-border-strong,#b7c3d3)}
   .icon.early.on{background:#7c3aed;color:#fff;border-color:#7c3aed}
   :root:not(.is-admin) .icon.early{display:none}
+  .icon.ot{background:#fff1d6;color:#8a5a00;border:1px solid #e2a31b;font-weight:800}
+  :root:not(.is-admin) .icon.ot{display:none}
   .lv .m-rcell{gap:6px}
   .early-tag{display:none;margin-left:4px;padding:1px 7px;border-radius:999px;background:#7c3aed;color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px}
   .match.early .early-tag{display:inline-block}
@@ -1265,7 +1275,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v35</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v37</span>
     </div>
     <div class="topbar-right">
       <button id="adminBtn" class="toggle">Admin</button>
@@ -1414,9 +1424,11 @@ Handicap	 -  No handicap
           </div>
           <div class="tbl-cfg">
             <label><input type="checkbox" id="tblAuto" checked> Αυτόματη ανάθεση αγώνων</label>
-            <label>Απόσταση πρόκρισης<input type="number" id="tblDistQ" min="1" max="999" value="25"></label>
-            <label>Απόσταση Knock Out<input type="number" id="tblDistKO" min="1" max="999" value="30"></label>
-            <label>Απόσταση τελικού<input type="number" id="tblDistF" min="1" max="999" value="30"></label>
+            <span class="tbl-ph"><b>Πρόκριση</b><label>πόντοι<input type="number" id="tblDistQ" min="1" max="999" value="25"></label><label>στεκιές<input type="number" id="tblInnQ" min="0" max="999" value="0"></label></span>
+            <span class="tbl-ph"><b>Knock Out</b><label>πόντοι<input type="number" id="tblDistKO" min="1" max="999" value="30"></label><label>στεκιές<input type="number" id="tblInnKO" min="0" max="999" value="0"></label></span>
+            <span class="tbl-ph"><b>Τελικός</b><label>πόντοι<input type="number" id="tblDistF" min="1" max="999" value="30"></label><label>στεκιές<input type="number" id="tblInnF" min="0" max="999" value="0"></label></span>
+            <label><input type="checkbox" id="tblEq" checked> Τελευταία στεκιά ισοφάρισης</label>
+            <small style="width:100%;opacity:.75">Στεκιές 0 = χωρίς όριο στεκιών.</small>
             <button type="button" class="btn" id="tblNewKey">🔑 Νέο κλειδί</button>
           </div>
           <small id="tblMsg" class="tbl-msg"></small>
@@ -2728,6 +2740,8 @@ Handicap	 -  No handicap
       idb.append(btnYT,btnPlay,idSpan,btnStop);
       // ⏩ Αγώνας που παίζεται νωρίτερα (πριν την έναρξη του τουρνουά) — επιλογή του admin
       const btnEarly = el('button','icon early'); btnEarly.type='button'; btnEarly.textContent='⏩';
+      const btnOT = el('button','icon ot'); btnOT.type='button'; btnOT.textContent='⏱'; btnOT.title='Παράταση (σε ισοπαλία)';
+      btnOT.addEventListener('click',(e)=>{ e.stopPropagation(); otMain(m); });
       btnEarly.title='Ο αγώνας παίζεται νωρίτερα (εκτός προγράμματος)';
       const earlyTag = el('span','early-tag'); earlyTag.textContent='Νωρίτερα';
       const syncEarly = ()=>{ row.classList.toggle('early', !!m.early); btnEarly.classList.toggle('on', !!m.early); };
@@ -2935,7 +2949,7 @@ Handicap	 -  No handicap
       leftValues.appendChild(aRunX.w);
       rightValues.appendChild(bRunX.w);
       aRun = aRunX.r; bRun = bRunX.r;
-      idb.appendChild(btnEarly);
+      idb.appendChild(btnEarly); idb.appendChild(btnOT);
       row.append(idb,left,right,dt);
       }else{
       // ---- ΣΕΡΙ (μεγαλύτερη σειρά του παίκτη στον αγώνα) ----
@@ -2973,7 +2987,7 @@ Handicap	 -  No handicap
       const panel = el('div','m-panel');
       const fld = (label, node)=>{ const w=el('label','pf'); const t=el('span','pf-l'); t.textContent=label; w.append(t,node); return w; };
       const pA = el('div','pp pa'); pA.append(fld('Πόντοι',aPts), fld('Σερί',aRun), fld('Μ.Ο.',aMoy));
-      const pC = el('div','pp pc'); pC.append(fld('Στεκιές',aInn)); const ctr=el('div','pbtns'); ctr.append(btnPlay,btnStop,btnYT,btnEarly); pC.append(ctr);
+      const pC = el('div','pp pc'); pC.append(fld('Στεκιές',aInn)); const ctr=el('div','pbtns'); ctr.append(btnPlay,btnStop,btnYT,btnEarly,btnOT); pC.append(ctr);
       const pB = el('div','pp pb'); pB.append(fld('Πόντοι',bPts), fld('Σερί',bRun), fld('Μ.Ο.',bMoy));
       bInn.classList.add('inn-mirror');                    // κοινές στεκιές: το 2ο πεδίο μένει κρυφό
       panel.append(pA,pC,pB,hint,bInn);
@@ -3737,13 +3751,15 @@ Handicap	 -  No handicap
     const root = el('div','koMatch');
     root.id = 'ko-match-'+id;
 
+    const btnOTk = el('button','icon ot'); btnOTk.type='button'; btnOTk.textContent='⏱'; btnOTk.title='Παράταση (σε ισοπαλία)';
+    btnOTk.addEventListener('click',(e)=>{ e.stopPropagation(); otKO(id); });
     let btnStart=null, btnStop=null, num=null, btnYT=null, ptsA=null, innA=null, avgA=null, runA=null, ptsB=null, innB=null, avgB=null, runB=null, pA=null, pB=null, pATitle=null, pBTitle=null, nameA=null, nameB=null, pABox=null, pBBox=null, scA=null, scB=null, dateA=null, timeB=null;
     if(LAYOUT==='cards'){
     const leftbox = el('div','koLeftbox');
     btnStart = el('button','koBtn koStart'); btnStart.textContent='▶';
     btnStop  = el('button','koBtn koStop'); btnStop.textContent='⛔';
     num = el('div','koMatchnum'); num.textContent='#'+koNo(id);
-    leftbox.append(btnStart,btnStop,num);
+    leftbox.append(btnStart,btnStop,num,btnOTk);
 
     const mid = el('div','koMid');
 
@@ -3865,7 +3881,7 @@ Handicap	 -  No handicap
     const panel = el('div','m-panel');
     const fld = (label, node)=>{ const w=el('label','pf'); const t=el('span','pf-l'); t.textContent=label; w.append(t,node); return w; };
     const ppA = el('div','pp pa'); ppA.append(fld('Πόντοι',ptsA), fld('Σερί',runA), fld('Μ.Ο.',avgA));
-    const ppC = el('div','pp pc'); ppC.append(fld('Στεκιές',innA)); const ctr=el('div','pbtns'); ctr.append(btnStart,btnStop,btnYT); ppC.append(ctr);
+    const ppC = el('div','pp pc'); ppC.append(fld('Στεκιές',innA)); const ctr=el('div','pbtns'); ctr.append(btnStart,btnStop,btnYT,btnOTk); ppC.append(ctr);
     const ppB = el('div','pp pb'); ppB.append(fld('Πόντοι',ptsB), fld('Σερί',runB), fld('Μ.Ο.',avgB));
     innB.classList.add('inn-mirror');
     panel.append(ppA,ppC,ppB,innB);
@@ -4249,6 +4265,55 @@ function syncFinal16ToKO(seeds){
   }
 
 
+  // ================= ⏱ v37: ΠΑΡΑΤΑΣΗ =================
+  // Σε ισοπαλία οι παίκτες παίζουν από μία στεκιά: προστίθενται οι πόντοι της παράτασης και +1 στεκιά και στους δύο.
+  // Μπορεί να επαναληφθεί σε διαδοχικές ισοπαλίες (π.χ. 30-30 → 32-33 σε 51 στεκιές, ή 35-36 σε 55).
+  function otParse(v){
+    const m = String(v||'').match(/(\d+)\s*[-–:\/ ,]\s*(\d+)/);
+    return m ? [parseInt(m[1],10), parseInt(m[2],10)] : null;
+  }
+  function otAsk(no, a, b, pa, pb, inn){
+    const v = prompt('⏱ Παράταση — αγώνας #'+no+'\nΣκορ τώρα: '+a+' '+pa+' – '+pb+' '+b+' ('+inn+' στεκιές)\n\nΠόντοι ΠΑΡΑΤΑΣΗΣ '+a+' – '+b+' (π.χ. 3-2):', '');
+    if(v===null) return null;
+    const r = otParse(v);
+    if(!r){ alert('Γράψτε τους πόντους της παράτασης με παύλα, π.χ. 3-2'); return null; }
+    return r;
+  }
+  function otMain(m){
+    if(!ADMIN) return;
+    if(m.done){ alert('Ο αγώνας #'+m.id+' έχει κλείσει. Για διόρθωση αλλάξτε τους πόντους/στεκιές με το χέρι.'); return; }
+    if(!isRealName(m.playerA.name) || !isRealName(m.playerB.name)) return;
+    const r = otAsk(m.id, m.playerA.name, m.playerB.name, +m.playerA.points||0, +m.playerB.points||0, +m.playerA.innings||0);
+    if(!r) return;
+    m.playerA.points = clampInt((+m.playerA.points||0)+r[0],0,999);
+    m.playerB.points = clampInt((+m.playerB.points||0)+r[1],0,999);
+    const inn = clampInt((+m.playerA.innings||0)+1,0,99); setBothInnings(m, inn);
+    if(m.dom){
+      m.dom.aPts.value = m.playerA.points; m.dom.bPts.value = m.playerB.points; m.dom.aInn.value = inn; m.dom.bInn.value = inn;
+      m.dom.aMoy.textContent = fmt4(moy(m.playerA)); m.dom.bMoy.textContent = fmt4(moy(m.playerB));
+      updateWinStyles(m, m.dom.row);
+    }
+    recomputeFinalAndStats(); saveAutosaveSnapshot();
+    const w = winnerSide(m);
+    if(!w){ alert('Ισοπαλία ξανά ('+m.playerA.points+'–'+m.playerB.points+'). Πατήστε ⏱ για νέα παράταση.'); return; }
+    const wn = w==='A' ? m.playerA.name : m.playerB.name;
+    if(confirm('Νικητής: '+wn+'\n'+m.playerA.points+' – '+m.playerB.points+' σε '+inn+' στεκιές\n\nΚλείσιμο αγώνα #'+m.id+';') && m.dom) m.dom.btnStop.click();
+  }
+  function otKO(id){
+    if(!ADMIN) return;
+    const k = koMatches[id]; if(!k) return;
+    if(k.root.classList.contains('stopped')){ alert('Ο αγώνας #'+koNo(id)+' έχει κλείσει.'); return; }
+    const a = k.nameA.value.trim(), b = k.nameB.value.trim(); if(!a || !b) return;
+    const pa = Number(k.ptsA.value||0), pb = Number(k.ptsB.value||0), inn0 = Number(k.innA.value||0);
+    const r = otAsk(koNo(id), a, b, pa, pb, inn0); if(!r) return;
+    k.ptsA.value = pa + r[0]; k.ptsB.value = pb + r[1]; k.innA.value = inn0 + 1; k.innB.value = inn0 + 1;
+    if(k.ptsA.oninput) k.ptsA.oninput(); if(k.ptsB.oninput) k.ptsB.oninput(); if(k.innA.oninput) k.innA.oninput();
+    saveAutosaveSnapshot();
+    if(Number(k.ptsA.value)===Number(k.ptsB.value)){ alert('Ισοπαλία ξανά ('+k.ptsA.value+'–'+k.ptsB.value+'). Πατήστε ⏱ για νέα παράταση.'); return; }
+    const wn = Number(k.ptsA.value) > Number(k.ptsB.value) ? a : b;
+    if(confirm('Νικητής: '+wn+'\n'+k.ptsA.value+' – '+k.ptsB.value+' σε '+k.innA.value+' στεκιές\n\nΚλείσιμο αγώνα #'+koNo(id)+';')) k.btnStop.onclick();
+  }
+
   // ================= 🎱 v35: ΤΡΑΠΕΖΙΑ — σύνδεση με Billiard Traveller SCOREBOARD =================
   // Firestore (κάτω από tournaments/{tid}):
   //   private/tablekey {code}                 κλειδί τραπεζιών (το βλέπει μόνο ο διοργανωτής)
@@ -4260,7 +4325,7 @@ function syncFinal16ToKO(seeds){
   const TBL_ONLINE_MS = 3*60*1000;
   function tblInit(){
     if(TBL) return;
-    TBL = {cfg:{auto:true, distQ:25, distKO:30, distF:30}, key:'', tables:{}, assign:{}, live:{}, unsub:[], on:false, view:[], seen:{}, timer:null};
+    TBL = {cfg:{auto:true, distQ:25, distKO:30, distF:30, innQ:0, innKO:0, innF:0, eq:true}, key:'', tables:{}, assign:{}, live:{}, unsub:[], on:false, view:[], seen:{}, timer:null};
   }
   tblInit();
   const tblRef = ()=> fbDb.collection('tournaments').doc(CLOUD_TID);
@@ -4280,6 +4345,7 @@ function syncFinal16ToKO(seeds){
             running:k.root.classList.contains('running'), ff:!!(k.ffA||k.ffB), date:k.dateA.value||'', time:k.timeB.value||''};
   }
   function tblDist(no){ if(no<=NQ) return +TBL.cfg.distQ||25; return (no-KOFF)===55 ? (+TBL.cfg.distF||30) : (+TBL.cfg.distKO||30); }
+  function tblInn(no){ const c=TBL.cfg; const v = no<=NQ ? c.innQ : ((no-KOFF)===55 ? c.innF : c.innKO); return Math.max(0, +v||0); }
   function tblPhase(no){
     if(no<=NQ) return 'Πρόκριση';
     const id = no-KOFF; return id===55 ? 'Τελικός' : id>=53 ? 'Ημιτελικός' : id>=49 ? 'Προημιτελικός' : 'Final 16';
@@ -4330,7 +4396,7 @@ function syncFinal16ToKO(seeds){
     if(!tblRealPlayer(x.a) || !tblRealPlayer(x.b)){ tblMsg('⚠ Ο αγώνας #'+mno+' δεν έχει ακόμα και τους δύο παίκτες'); return; }
     // ο ίδιος αγώνας δεν μένει σε δύο τραπέζια
     for(const t of Object.keys(TBL.assign)){ if(+t!==+tno && tblAssignedMatch(t)===+mno) await tblClear(+t, true); }
-    const a = {match:+mno, a:x.a, b:x.b, dist:tblDist(+mno), phase:tblPhase(+mno), title:cloudTitle||'', seq:Date.now()};
+    const a = {match:+mno, a:x.a, b:x.b, dist:tblDist(+mno), inn:tblInn(+mno), eq:TBL.cfg.eq!==false, phase:tblPhase(+mno), title:cloudTitle||'', seq:Date.now()};
     TBL.assign[tno] = a;
     try{ await tblRef().collection('assign').doc(String(tno)).set(a); tblMsg('✔ #'+mno+' → Τραπέζι '+tno); }
     catch(e){ tblMsg('⚠ Η ανάθεση δεν έγινε ('+(e.code||e.message)+')'); }
@@ -4358,6 +4424,9 @@ function syncFinal16ToKO(seeds){
       tblMsg('⚠ Τραπέζι '+d.table+': τα ονόματα δεν ταιριάζουν με τον αγώνα #'+mno+' — δεν καταχωρίστηκε'); return;
     }
     if(d.status==='aborted'){ tblSetRunning(x,false); if(owner) tblClear(+owner); saveAutosaveSnapshot(); return; }
+    // ο διοργανωτής έχει ήδη περάσει παράταση (περισσότερες στεκιές από το τραπέζι) → δεν ξαναγράφεται
+    const curInn = x.kind==='q' ? (+x.m.playerA.innings||0) : (+x.k.innA.value||0);
+    if(curInn > Math.max(+A.inn||0, +B.inn||0)) return;
     tblWrite(x, A, B);
     if(d.status==='done') tblClose(x, d.table);
     else saveAutosaveSnapshot();
@@ -4395,7 +4464,7 @@ function syncFinal16ToKO(seeds){
   function tblClose(x, tno){
     if(x.kind==='q'){
       const m = x.m;
-      if(!winnerSide(m)){ tblMsg('⚠ Αγώνας #'+x.no+' (τραπέζι '+tno+'): ισοπαλία ή χωρίς σκορ — κλείστε τον με ⛔ μετά τη διόρθωση'); saveAutosaveSnapshot(); return; }
+      if(!winnerSide(m)){ tblMsg('⚠ Αγώνας #'+x.no+' (τραπέζι '+tno+'): ισοπαλία '+m.playerA.points+'–'+m.playerB.points+' — πατήστε ⏱ Παράταση στον αγώνα'); saveAutosaveSnapshot(); return; }
       m.running = false; m.done = true; entriesOverride = false;
       if(m.dom) updateWinStyles(m, m.dom.row);
       propagateFromMatch(m.id);
@@ -4403,7 +4472,7 @@ function syncFinal16ToKO(seeds){
       if(m.early) autoReplan();
     }else{
       const k = x.k;
-      if(!koGetWinner(x.id)){ tblMsg('⚠ Αγώνας #'+x.no+' (τραπέζι '+tno+'): χωρίς νικητή — κλείστε τον με ⛔'); saveAutosaveSnapshot(); return; }
+      if(!koGetWinner(x.id)){ tblMsg('⚠ Αγώνας #'+x.no+' (τραπέζι '+tno+'): ισοπαλία — πατήστε ⏱ Παράταση στον αγώνα'); saveAutosaveSnapshot(); return; }
       k.btnStop.onclick();
     }
     tblMsg('✔ Τέλος #'+x.no+' (τραπέζι '+tno+')');
@@ -4467,6 +4536,7 @@ function syncFinal16ToKO(seeds){
       const v = {no, st, label:(t && t.label) || ('Τραπέζι '+no)};
       if(x && !x.done){
         v.match = mno; v.a = x.a; v.b = x.b; v.phase = tblPhase(mno);
+        v.lim = tblDist(mno)+' πόντοι'+(tblInn(mno) ? ' – '+tblInn(mno)+' στεκιές' : '');
         if(st==='play'){
           if(x.kind==='q'){ v.sa = +x.m.playerA.points||0; v.sb = +x.m.playerB.points||0; v.inn = +x.m.playerA.innings||0; }
           else { v.sa = +x.k.ptsA.value||0; v.sb = +x.k.ptsB.value||0; v.inn = +x.k.innA.value||0; }
@@ -4487,7 +4557,7 @@ function syncFinal16ToKO(seeds){
       list.innerHTML = TBL.view.map(v=>{
         const cls = v.st==='off' ? 'off' : (v.st==='play'||v.st==='wait'||v.st==='other') ? 'busy' : '';
         let h = '<div class="tbl-card '+cls+'"><div class="tc-h"><span>🎱 '+esc(v.label)+'</span><span class="tc-st">'+tblStTxt[v.st]+(v.st==='play'?' #'+v.match:'')+'</span></div>';
-        if(v.match) h += '<div class="tc-m">#'+v.match+' · '+esc(v.phase)+'<br><b>'+esc(v.a)+'</b> – <b>'+esc(v.b)+'</b></div>';
+        if(v.match) h += '<div class="tc-m">#'+v.match+' · '+esc(v.phase)+(v.lim ? ' · '+esc(v.lim) : '')+'<br><b>'+esc(v.a)+'</b> – <b>'+esc(v.b)+'</b></div>';
         if(v.st==='play') h += '<div class="tc-sc">'+v.sa+' – '+v.sb+' <small style="font-size:12px;font-weight:600">στεκ. '+(v.inn||0)+'</small></div>';
         if(ADMIN && TBL.on){
           h += '<div class="tc-btns">';
@@ -4523,12 +4593,16 @@ function syncFinal16ToKO(seeds){
     if(!TBL.on && Array.isArray(d.view)) TBL.view = d.view;
     const set = (id,v)=>{ const e=$(id); if(e){ if(e.type==='checkbox') e.checked=!!v; else e.value=v; } };
     set('#tblAuto', TBL.cfg.auto); set('#tblDistQ', TBL.cfg.distQ); set('#tblDistKO', TBL.cfg.distKO); set('#tblDistF', TBL.cfg.distF);
+    set('#tblInnQ', TBL.cfg.innQ||0); set('#tblInnKO', TBL.cfg.innKO||0); set('#tblInnF', TBL.cfg.innF||0); set('#tblEq', TBL.cfg.eq!==false);
     const sec = $('#tblSection'); if(sec) sec.style.display = (CLOUD_TID && (TBL.on || TBL.view.length)) ? '' : 'none';
     tblRender();
   }
   function tblBindUi(){
     const num = (id,key)=>{ const e=$(id); if(e) e.addEventListener('change',()=>{ TBL.cfg[key] = clampInt(e.value,1,999)||TBL.cfg[key]; e.value = TBL.cfg[key]; saveAutosaveSnapshot(); }); };
     num('#tblDistQ','distQ'); num('#tblDistKO','distKO'); num('#tblDistF','distF');
+    const inn = (id,key)=>{ const e=$(id); if(e) e.addEventListener('change',()=>{ TBL.cfg[key] = clampInt(e.value,0,999); e.value = TBL.cfg[key]; saveAutosaveSnapshot(); }); };
+    inn('#tblInnQ','innQ'); inn('#tblInnKO','innKO'); inn('#tblInnF','innF');
+    const eqc = $('#tblEq'); if(eqc) eqc.addEventListener('change',()=>{ TBL.cfg.eq = eqc.checked; saveAutosaveSnapshot(); });
     const au = $('#tblAuto'); if(au) au.addEventListener('change',()=>{ TBL.cfg.auto = au.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
     const nk = $('#tblNewKey'); if(nk) nk.addEventListener('click',()=>{
       if(!tblActive()) return;
@@ -4546,7 +4620,7 @@ function syncFinal16ToKO(seeds){
     });
   }
 
-  const APP_VERSION = '35';
+  const APP_VERSION = '37';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
