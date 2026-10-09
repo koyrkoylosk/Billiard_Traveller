@@ -1,6 +1,10 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v40 (09/10/2026)
+    - «Χωρίς σύνδεση» διορθώθηκε: το τραπέζι θεωρείται συνδεδεμένο με βάση την ώρα που έφτασε το σήμα του
+      (όχι το ρολόι του tablet, που μπορεί να πηγαίνει λάθος)
+    - Σκορ από τραπέζι με την ίδια ανάθεση καταχωρίζεται ακόμα κι αν τα ονόματα διαφέρουν λίγο (κεφαλαία/τόνοι/κενά)
   v39 (09/10/2026)
     - ▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ: οι αγώνες στέλνονται στα τραπέζια μόνο αφού πατηθεί (⏸ για παύση αποστολής)
     - Σειρά αγώνων: αριθμοί 1, 2, 3… (η «τήρηση ωραρίου» είναι πλέον επιλογή, κλειστή από προεπιλογή)
@@ -120,7 +124,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Billiard Traveller 32 PRO v39 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v40 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1297,7 +1301,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v39</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v40</span>
     </div>
     <div class="topbar-right">
       <button id="adminBtn" class="toggle">Admin</button>
@@ -4386,7 +4390,7 @@ function syncFinal16ToKO(seeds){
     if(no<=NQ) return 'Πρόκριση';
     const id = no-KOFF; return id===55 ? 'Τελικός' : id>=53 ? 'Ημιτελικός' : id>=49 ? 'Προημιτελικός' : 'Final 16';
   }
-  const tblOnline = t => !!t && (Date.now() - (+t.seen||0)) < TBL_ONLINE_MS;
+  const tblOnline = t => !!t && (Date.now() - (+t._rx||0)) < TBL_ONLINE_MS;   // ώρα λήψης σε αυτόν τον υπολογιστή
   function tblAssignedMatch(tno){ const a = TBL.assign[tno]; return a && a.match ? +a.match : 0; }
   function tblFree(tno){
     const t = TBL.tables[tno];
@@ -4460,11 +4464,13 @@ function syncFinal16ToKO(seeds){
     if(owner && +owner!==+d.table){ tblMsg('ℹ Το τραπέζι '+d.table+' έστειλε σκορ για #'+mno+', που είναι στο τραπέζι '+owner+' — αγνοήθηκε'); return; }
     const sig = [d.status,d.seq,d.a&&d.a.pts,d.b&&d.b.pts,d.a&&d.a.inn,d.b&&d.b.inn,d.a&&d.a.run,d.b&&d.b.run].join('|');
     if(TBL.seen[mno]===sig) return; TBL.seen[mno] = sig;
-    const norm = s=>String(s||'').trim().toLowerCase();
+    const norm = s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
     let A = d.a||{}, B = d.b||{};
-    if(norm(A.name)===norm(x.b) && norm(B.name)===norm(x.a)){ const t=A; A=B; B=t; }
+    const sameSeq = owner && TBL.assign[owner] && +TBL.assign[owner].seq === +d.seq;
+    if(norm(A.name)===norm(x.b) && norm(B.name)===norm(x.a) && norm(x.a)!==norm(x.b)){ const t=A; A=B; B=t; }
     else if(norm(A.name)!==norm(x.a) || norm(B.name)!==norm(x.b)){
-      tblMsg('⚠ Τραπέζι '+d.table+': τα ονόματα δεν ταιριάζουν με τον αγώνα #'+mno+' — δεν καταχωρίστηκε'); return;
+      // ίδια ανάθεση (ίδιο seq) → ο παίκτης Α του τραπεζιού είναι ο Α του αγώνα, ακόμα κι αν το όνομα γράφτηκε αλλιώς
+      if(!sameSeq){ tblMsg('⚠ Τραπέζι '+d.table+': τα ονόματα δεν ταιριάζουν με τον αγώνα #'+mno+' — δεν καταχωρίστηκε'); return; }
     }
     if(d.status==='aborted'){ tblSetRunning(x,false); if(owner) tblClear(+owner); saveAutosaveSnapshot(); return; }
     // ο διοργανωτής έχει ήδη περάσει παράταση (περισσότερες στεκιές από το τραπέζι) → δεν ξαναγράφεται
@@ -4532,7 +4538,11 @@ function syncFinal16ToKO(seeds){
       const r = tblRef();
       tblLoadKey();
       TBL.unsub.push(r.collection('tables').onSnapshot(sn=>{
-        sn.docChanges().forEach(ch=>{ const n = +ch.doc.id; if(ch.type==='removed') delete TBL.tables[n]; else TBL.tables[n] = ch.doc.data(); });
+        sn.docChanges().forEach(ch=>{ const n = +ch.doc.id; if(ch.type==='removed'){ delete TBL.tables[n]; return; }
+          const d = ch.doc.data()||{};
+          // κάθε σήμα ζωής που φτάνει = συνδεδεμένο τώρα· στην αρχική φόρτωση μόνο αν είναι πρόσφατο (το επόμενο σήμα, ≤45″, το διορθώνει)
+          d._rx = (ch.type==='modified' || (Date.now()-(+d.seen||0)) < TBL_ONLINE_MS*2) ? Date.now() : 0;
+          TBL.tables[n] = d; });
         // τραπέζι σε ελεύθερο παιχνίδι (παύση): ο αγώνας που περίμενε (δεν ξεκίνησε) επιστρέφει
         Object.keys(TBL.tables).forEach(n=>{ const t=TBL.tables[n]; if(!t || !t.paused) return;
           const mno = tblAssignedMatch(n); if(!mno) return; const x = tblMatchInfo(mno);
@@ -4723,7 +4733,7 @@ function syncFinal16ToKO(seeds){
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
-  const APP_VERSION = '39';
+  const APP_VERSION = '40';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
