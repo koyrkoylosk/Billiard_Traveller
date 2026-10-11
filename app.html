@@ -1,6 +1,9 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v49 (11/10/2026)
+    - PIN: το κλαμπ του τουρνουά βρίσκεται και όταν είναι γραμμένο με άλλα κεφαλαία (π.χ. «BILLIArd center» → «Billiard Center»)
+    - Όταν ο ιδιοκτήτης/διοργανωτής ανοίγει τουρνουά, το κλαμπ διορθώνεται αυτόματα στο όνομα της άδειας
   v48 (11/10/2026)
     - 🔑 Admin κλαμπ με PIN (χωρίς Google): Admin → κλαμπ + PIN. Ένας υπολογιστής κάθε φορά — όταν μπει από άλλον,
       ο προηγούμενος βγαίνει αυτόματα. Δουλεύει και από υπολογιστή τραπεζιού. Το PIN το ορίζει ο ιδιοκτήτης στο BT Setup
@@ -170,7 +173,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v48 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v49 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1382,7 +1385,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v48</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v49</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -2155,7 +2158,7 @@ Handicap	 -  No handicap
   function cloudCanEdit(){
     if(!canPublishRole()) return false;
     if(cloudRole.super || !CLOUD_TID) return true;
-    if(cloudRole.pin) return cloudDoc.loaded && !!cloudDoc.club && cloudDoc.club === cloudRole.pin;   // v48: admin κλαμπ με PIN
+    if(cloudRole.pin) return cloudDoc.loaded && !!cloudDoc.club && cloudDoc.club.toLocaleLowerCase('el') === cloudRole.pin.toLocaleLowerCase('el');   // v48/v49: admin κλαμπ με PIN
     return cloudDoc.loaded && !!cloudDoc.owner && cloudDoc.owner === emailOf(cloudUser);
   }
   async function resolveRole(u){
@@ -2175,9 +2178,19 @@ Handicap	 -  No handicap
     }catch(e){ /* χωρίς άδεια ανάγνωσης = δεν είναι διοργανωτής */ }
     return r;
   }
+  // v49: ο ιδιοκτήτης/διοργανωτής ανοίγει τουρνουά με κλαμπ γραμμένο με λάθος κεφαλαία → διορθώνεται αυτόματα στο όνομα της άδειας
+  let clubFixDone = false;
+  async function clubAutoFix(){
+    if(clubFixDone || !ADMIN || cloudRole.pin || !CLOUD_TID || !cloudDoc.loaded) return;
+    clubFixDone = true;
+    const cur = (TBL && TBL.cfg.club) || cloudDoc.club || ''; if(!cur) return;
+    const ex = await clubExact(cur);
+    if(ex && ex !== cur){ if(TBL) TBL.cfg.club = ex; const cl = $('#tblClub'); if(cl) cl.value = ex; cloudDoc.club = ex; saveAutosaveSnapshot(); tblLinkSoon(); setCloudBadge('✔ Κλαμπ διορθώθηκε: '+ex,'ok'); }
+  }
   function cloudRecomputeAdmin(){
     const wasAdmin = ADMIN;
     ADMIN = cloudCanEdit();
+    setTimeout(()=>{ try{ clubAutoFix(); }catch(e){} }, 1500);
     const ab = $('#adminBtn'); if(ab) ab.textContent = ADMIN ? 'Admin (ON)' : 'Admin';
     if(wasAdmin!==ADMIN) applyAdminState();
     refreshCloudPanel();
@@ -2454,7 +2467,7 @@ Handicap	 -  No handicap
     pinWire();
     const box = $('#pinBox'), sel = $('#pinClub'), err = $('#pinErr'), code = $('#pinCode');
     err.textContent = ''; code.value = '';
-    const fixed = CLOUD_TID && cloudDoc.loaded && cloudDoc.club ? cloudDoc.club : '';
+    const fixed = CLOUD_TID && cloudDoc.loaded && cloudDoc.club ? ((await clubExact(cloudDoc.club)) || cloudDoc.club) : '';
     if(fixed){ sel.innerHTML = '<option>'+fixed.replace(/</g,'&lt;')+'</option>'; sel.disabled = true; }
     else { sel.disabled = false; sel.innerHTML = '<option>Φόρτωση…</option>'; const list = await clubsLoad();
       let last=''; try{ last = localStorage.getItem('bt_pin_last')||''; }catch(e){}
@@ -2483,6 +2496,7 @@ Handicap	 -  No handicap
       pinBusy = false;
       pinWatch(); cloudRecomputeAdmin();
       if(CLOUD_TID && !ADMIN) alert('ℹ Συνδεθήκατε ως admin του «'+club+'», αλλά αυτό το τουρνουά ανήκει σε άλλο κλαμπ — μόνο προβολή.');
+      else if(CLOUD_TID && cloudDoc.club && cloudDoc.club !== club) alert('ℹ Το κλαμπ του τουρνουά είναι γραμμένο «'+cloudDoc.club+'» αντί «'+club+'».\nΓια να γίνονται αλλαγές, ο Billiard Traveller πρέπει να ανοίξει μία φορά το τουρνουά (διορθώνεται αυτόματα).');
     }catch(e){
       pinBusy = false;
       err.textContent = '⚠ '+(e.code==='auth/operation-not-allowed' ? 'Η ανώνυμη σύνδεση δεν είναι ενεργή στο Firebase (Authentication → Anonymous)' : (e.code||e.message));
@@ -5082,7 +5096,7 @@ function syncFinal16ToKO(seeds){
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
-  const APP_VERSION = '48';
+  const APP_VERSION = '49';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
