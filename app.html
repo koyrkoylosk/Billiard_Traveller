@@ -1,6 +1,9 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v45 (11/10/2026)
+    - Διαγραφή χωρίς κωδικό (μόνο «OK»), αφού τα δεδομένα σώζονται και γίνεται επαναφορά
+    - Λίστα τουρνουά (index): σύνδεση admin και 🗑 / ↩ πάνω σε κάθε τουρνουά (Προσεχώς, Σε εξέλιξη, Ολοκληρωμένα, Διαγραμμένα)
   v44 (11/10/2026)
     - 🗑 Η διαγραφή ΑΠΟΘΗΚΕΥΕΙ πάντα: το τουρνουά κρύβεται και τα τραπέζια αποσυνδέονται, αλλά τα δεδομένα μένουν στη βάση,
       σε αρχείο backup (Λήψεις) και τοπικά. «↩ ΕΠΑΝΑΦΟΡΑ» για συνέχεια· «✖ Οριστική διαγραφή» μόνο με ξεχωριστή επιβεβαίωση
@@ -155,7 +158,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v44 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v45 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1344,7 +1347,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v44</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v45</span>
     </div>
     <div class="topbar-right">
       <button id="installAppBtn" class="toggle" type="button" style="display:none" title="Εγκατάσταση σαν εφαρμογή">⬇ Εφαρμογή</button>
@@ -2384,9 +2387,7 @@ Handicap	 -  No handicap
   async function cloudDeleteTournament(){
     if(!CLOUD_TID || !cloudReady() || !ADMIN || !cloudCanEdit()){ alert('❗ Τη διαγραφή την κάνει μόνο ο διοργανωτής του τουρνουά (σύνδεση με Admin).'); return; }
     const title = cloudTitle || CLOUD_TID;
-    const v = prompt('🗑 ΔΙΑΓΡΑΦΗ ΤΟΥΡΝΟΥΑ «'+title+'»\n\nΤο τουρνουά κρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται (ελεύθερο παιχνίδι).\nΤΑ ΔΕΔΟΜΕΝΑ ΑΠΟΘΗΚΕΥΟΝΤΑΙ: μένουν στη βάση + κατεβαίνει αρχείο backup.\nΜπορείτε να το συνεχίσετε όποτε θέλετε με «↩ ΕΠΑΝΑΦΟΡΑ».\n\nΓια επιβεβαίωση γράψτε τον κωδικό:  '+CLOUD_TID, '');
-    if(v===null) return;
-    if(v.trim().toLowerCase() !== CLOUD_TID){ alert('Ο κωδικός δεν ταιριάζει — δεν έγινε διαγραφή.'); return; }
+    if(!confirm('🗑 Διαγραφή του τουρνουά «'+title+'»;\n\nΤα τραπέζια αποσυνδέονται και το τουρνουά κρύβεται από τη λίστα.\nΤα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ (βάση + αρχείο backup) — επαναφορά όποτε θέλετε.')) return;
     setCloudBadge('🗑 Αποθήκευση & διαγραφή…','busy');
     clearTimeout(cloudPushTimer);
     try{ await cloudPushNow(); }catch(e){}                       // τελευταία κατάσταση στη βάση
@@ -4908,7 +4909,7 @@ function syncFinal16ToKO(seeds){
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
-  const APP_VERSION = '44';
+  const APP_VERSION = '45';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){

@@ -44,6 +44,10 @@
   .search{width:100%;padding:12px 14px;font-size:16px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;margin-bottom:6px}
   h2{font-size:14px;text-transform:uppercase;letter-spacing:.8px;color:var(--heading);margin:24px 0 10px;padding-left:10px;border-left:4px solid var(--gold)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .cardAct{float:right;margin:-4px -6px 0 6px;font-size:16px;line-height:1;padding:6px 9px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer}
+  .cardAct:hover{background:#fee2e2;border-color:#ef4444}
+  .cardAct.rs:hover{background:#dcfce7;border-color:#22c55e}
+  #who{font-size:12px;color:#cbd5e1;align-self:center}
   a.card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;transition:transform .12s, box-shadow .12s}
   a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
   .badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:999px;text-transform:uppercase}
@@ -69,6 +73,7 @@
   @media print{ body *{visibility:hidden} #qrModal,#qrModal *{visibility:visible} #qrModal{position:absolute;inset:0;background:#fff} .mact{display:none} }
 </style>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -83,6 +88,7 @@
       <a class="btn fb" href="https://www.facebook.com/billiardtravellers/" target="_blank" rel="noopener">👍 Facebook</a>
       <button class="btn" id="qrBtn" type="button">🔳 QR</button>
       <a class="btn" href="app.html" title="Για τον διοργανωτή">⚙ Admin</a>
+      <button class="btn" id="loginBtn" type="button" title="Σύνδεση διοργανωτή για διαγραφή / επαναφορά">👤 Σύνδεση</button>
     </div>
   </div>
 </header>
@@ -140,6 +146,7 @@
     const meta = document.createElement('div'); meta.className='meta';
     meta.textContent = [dateRange(t.startDate, t.days), (t.entries?t.entries+' παίκτες':''), 'ταμπλό '+(t.size||32)].filter(Boolean).join(' · ');
     a.innerHTML = badge;
+    if(canAdmin(t)) a.prepend(actBtn('🗑','Διαγραφή (με αποθήκευση — επαναφορά όποτε θέλετε)', ()=>softDelete(t), false));
     a.append(h3);
     if(t.organizer){ const o=document.createElement('div'); o.className='org'; o.textContent='🎱 '+t.organizer; a.appendChild(o); }
     a.append(meta);
@@ -165,6 +172,56 @@
     else if(!list.length){ st.style.display=''; st.textContent='Κανένα τουρνουά δεν ταιριάζει στην αναζήτηση.'; }
     else st.style.display='none';
   }
+  // ---- v45: διαχείριση από τη λίστα (σύνδεση Google: ιδιοκτήτης πλατφόρμας ή διοργανωτής του τουρνουά) ----
+  const SUPER_EMAILS = ['kostas.koyrkoyloss@gmail.com'];
+  const SB_FB = {apiKey:"AIzaSyCHDtqdWyvW5vaYTIbtxreuAAwYlgFF08E", authDomain:"cue-club-corfu.firebaseapp.com", projectId:"cue-club-corfu",
+    storageBucket:"cue-club-corfu.firebasestorage.app", messagingSenderId:"177703674870", appId:"1:177703674870:web:f694ca6b9c6f47114addd7"};
+  let me = '';
+  const isSuper = () => !!me && SUPER_EMAILS.includes(me);
+  const canAdmin = t => !!me && (isSuper() || (t.owner && t.owner===me));
+  function actBtn(txt, title, fn, rs){
+    const b = document.createElement('button'); b.type='button'; b.className='cardAct'+(rs?' rs':''); b.textContent=txt; b.title=title;
+    b.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); });
+    return b;
+  }
+  function dlJson(obj, name){
+    try{ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const u=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); }catch(e){}
+  }
+  async function softDelete(t){
+    if(!confirm('🗑 Διαγραφή του τουρνουά «'+(t.title||t.id)+'»;\n\nΚρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται.\nΤα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».')) return;
+    const db = firebase.firestore(), ref = db.collection('tournaments').doc(t.id);
+    try{
+      const ds = await ref.get(); const x = ds.exists ? ds.data() : null;
+      if(x && x.state){ let st=null; try{ st=JSON.parse(x.state); }catch(e){}
+        const d=new Date(), p=n=>(n<10?'0':'')+n;
+        if(st) dlJson(st, 'billiard_traveller_'+t.id+'_diagrafi_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+'.json'); }
+      const club = String((x && x.club) || t.club || '').trim();
+      if(club){ try{ const sb=((firebase.apps||[]).find(a=>a.name==='btsb')||firebase.initializeApp(SB_FB,'btsb')).firestore();
+        const up=club.toLocaleUpperCase('el'); for(const n of (up!==club?[club,up]:[club])){ try{ await sb.collection('clubs').doc(n).collection('tour').doc('current').set({tid:t.id, active:false, at:Date.now()}); }catch(e){} } }catch(e){} }
+      for(const col of ['assign','live','tables']){ try{ const sn=await ref.collection(col).get(); for(const c of sn.docs){ try{ await ref.collection(col).doc(c.id).delete(); }catch(e){} } }catch(e){} }
+      await ref.set({deleted:true, deletedAt:Date.now(), deletedBy:me}, {merge:true});
+    }catch(e){ alert('❗ Η διαγραφή δεν έγινε: '+(e.code||e.message)); }
+  }
+  async function restoreTour(t){
+    if(!confirm('↩ Επαναφορά του τουρνουά «'+(t.title||t.id)+'»;')) return;
+    try{ await firebase.firestore().collection('tournaments').doc(t.id).set({deleted:false, restoredAt:Date.now()}, {merge:true});
+      if(confirm('✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια);')) location.href='app.html?t='+encodeURIComponent(t.id)+'&s='+(t.size||32);
+    }catch(e){ alert('❗ Η επαναφορά δεν έγινε: '+(e.code||e.message)); }
+  }
+  function authStart(){
+    const lb = $('#loginBtn'); if(!lb) return;
+    if(!firebase.auth){ lb.style.display='none'; return; }
+    firebase.auth().onAuthStateChanged(u=>{
+      me = u && u.email ? String(u.email).toLowerCase() : '';
+      lb.textContent = me ? '👤 '+me.split('@')[0]+' · Έξοδος' : '👤 Σύνδεση';
+      render(); renderDels();
+    });
+    lb.addEventListener('click', async ()=>{
+      if(me){ await firebase.auth().signOut(); return; }
+      try{ await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert('Η σύνδεση δεν έγινε: '+(e.message||e.code)); }
+    });
+  }
   // v44: διαγραμμένα τουρνουά (αποθηκευμένα — ο διοργανωτής τα ανοίγει και πατά «↩ ΕΠΑΝΑΦΟΡΑ»)
   function renderDels(){
     const btn = $('#delBtn'), box = $('#delList'); if(!btn || !box) return;
@@ -173,6 +230,7 @@
     dels.sort((a,b)=>b.at-a.at).forEach(t=>{ const a=document.createElement('a'); a.className='card'; a.href='app.html?t='+encodeURIComponent(t.id)+'&s='+(t.size||32);
       const h=document.createElement('h3'); h.textContent='🗑 '+t.title; a.appendChild(h);
       const m=document.createElement('div'); m.className='meta'; m.textContent=(t.organizer?'🎱 '+t.organizer+' · ':'')+(t.at?'διαγράφηκε '+new Date(t.at).toLocaleDateString('el-GR'):'')+' · πατήστε για επαναφορά'; a.appendChild(m);
+      if(canAdmin(t)) a.prepend(actBtn('↩','Επαναφορά', ()=>restoreTour(t), true));
       box.appendChild(a); });
   }
   function drawQR(el, text){
@@ -196,8 +254,9 @@
     if(typeof firebase==='undefined'){ $('#status').textContent='⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.'; return; }
     try{
       if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+      authStart();
       firebase.firestore().collection('tournaments').onSnapshot(qs=>{
-        all = []; dels = []; qs.forEach(d=>{ const x=d.data(); if(x.deleted){ dels.push({id:d.id, title:x.title||d.id, size:x.size, organizer:x.organizer||'', at:+x.deletedAt||0}); return; } all.push({id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size, startDate:x.startDate, days:x.days, updatedAt:x.updatedAt, organizer:x.organizer||''}); });
+        all = []; dels = []; qs.forEach(d=>{ const x=d.data(); if(x.deleted){ dels.push({id:d.id, title:x.title||d.id, size:x.size, organizer:x.organizer||'', at:+x.deletedAt||0, owner:String(x.owner||'').toLowerCase(), club:x.club||''}); return; } all.push({owner:String(x.owner||'').toLowerCase(), club:x.club||'', id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size, startDate:x.startDate, days:x.days, updatedAt:x.updatedAt, organizer:x.organizer||''}); });
         render(); renderDels();
       }, err=>{ $('#status').textContent='⚠ Δεν ήταν δυνατή η ανάγνωση ('+(err.code||'σφάλμα')+').'; });
     }catch(e){ $('#status').textContent='⚠ Σφάλμα σύνδεσης.'; }
