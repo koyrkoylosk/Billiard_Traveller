@@ -1,6 +1,9 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v47 (11/10/2026)
+    - Πάνω μπάρα (για τον admin): «🎱 2/3 τραπέζια» (πράσινο = όλα συνδεδεμένα με το Scoreboard) και «▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ» —
+      πάντα ορατά· κλικ στα τραπέζια → πηγαίνει στην ενότητα «🎱 Τραπέζια»
   v46 (11/10/2026)
     - Τελική 16άδα: ο παίκτης από την πλευρά ηττημένων μπαίνει ΠΑΝΤΑ στις θέσεις 9–16 (πριν, όταν οι θέσεις 1–8
       δεν είχαν γεμίσει, «ανέβαινε» στις 1–8)· κάθε πλευρά ταξινομείται μόνη της με Μ.Ο.
@@ -161,7 +164,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v46 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v47 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1343,6 +1346,12 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   #delBanner .dbBtns{display:flex;gap:8px;flex-wrap:wrap}
   #delBanner button{font:800 14px system-ui,sans-serif;padding:7px 14px;border-radius:8px;border:2px solid #fff;background:#fff;color:#7f1d1d;cursor:pointer}
   #delBanner #dbPurge{background:transparent;color:#fecaca;border-color:#fecaca}
+  /* v47: τραπέζια & έναρξη πάντα ορατά στην πάνω μπάρα */
+  #tbChip{font-weight:800;white-space:nowrap}
+  #tbChip .d{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:#9ca3af;vertical-align:0}
+  #tbChip.ok .d{background:#22c55e;box-shadow:0 0 8px #22c55e}#tbChip.part .d{background:#f59e0b}#tbChip.off .d{background:#ef4444}
+  #tbStart{font-weight:900;background:#16a34a !important;color:#fff !important;border-color:#16a34a !important;white-space:nowrap}
+  #tbStart.on{background:#b45309 !important;border-color:#b45309 !important}
 </style>
 </head>
 <body>
@@ -1350,9 +1359,11 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v46</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v47</span>
     </div>
     <div class="topbar-right">
+      <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
+      <button id="tbStart" class="toggle" type="button" style="display:none"></button>
       <button id="installAppBtn" class="toggle" type="button" style="display:none" title="Εγκατάσταση σαν εφαρμογή">⬇ Εφαρμογή</button>
       <button id="adminBtn" class="toggle">Admin</button>
       <button id="themeBtn" class="toggle" disabled>Μενού</button>
@@ -4739,7 +4750,7 @@ function syncFinal16ToKO(seeds){
       TBL.unsub.forEach(u=>{ try{u();}catch(e){} }); TBL.unsub = []; TBL.on = false; clearInterval(TBL.tick);
     }
     if(sec) sec.style.display = (CLOUD_TID && (want || (TBL.view && TBL.view.length))) ? '' : 'none';
-    tblRender();
+    tblRender(); tblTopUi();
   }
   const TBL_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const tblNewCode = ()=>{ let s=''; const a=new Uint32Array(6); (window.crypto||{}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_,i)=>a[i]=Math.random()*1e9); a.forEach(v=>s+=TBL_ABC[v%TBL_ABC.length]); return s; };
@@ -4784,6 +4795,7 @@ function syncFinal16ToKO(seeds){
   }
   const tblStTxt = {off:'Χωρίς σύνδεση', free:'Ελεύθερο', wait:'Αναμονή παικτών', play:'Παίζει', other:'Ελεύθερο παιχνίδι', pause:'Εκτός τουρνουά', warm:'Ζέσταμα'};
   function tblRender(){
+    try{ tblTopUi(); }catch(e){}
     if(!TBL) return;
     if(TBL.on) TBL.view = tblBuildView();
     const list = $('#tblList'); if(!list) return;
@@ -4835,7 +4847,21 @@ function syncFinal16ToKO(seeds){
     const sec = $('#tblSection'); if(sec) sec.style.display = (CLOUD_TID && (TBL.on || TBL.view.length)) ? '' : 'none';
     tblRender();
   }
+  // v47: ένδειξη τραπεζιών + κουμπί έναρξης στην πάνω μπάρα
+  function tblTopUi(){
+    const c = $('#tbChip'), st = $('#tbStart'); if(!c || !st) return;
+    const show = tblActive();
+    c.style.display = st.style.display = show ? '' : 'none';
+    if(!show) return;
+    const all = Object.keys(TBL.tables||{}), on = all.filter(n=>tblOnline(TBL.tables[n])).length;
+    c.className = 'toggle '+(!all.length ? '' : on===all.length ? 'ok' : on ? 'part' : 'off');
+    c.innerHTML = '<span class="d"></span>🎱 '+(all.length ? on+'/'+all.length+' τραπέζια' : 'κανένα τραπέζι');
+    c.title = all.length ? (on+' από '+all.length+' τραπέζια συνδεδεμένα με το Scoreboard') : 'Κανένα τραπέζι δεν έχει συνδεθεί ακόμα (ελέγξτε «Κλαμπ τραπεζιών»)';
+    const go = !!(TBL && TBL.cfg.started);
+    st.textContent = go ? '⏸ ΠΑΥΣΗ' : '▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ'; st.classList.toggle('on', go);
+  }
   function tblStartUi(){
+    tblTopUi();
     const b = $('#tblStart'), m = $('#tblStartMsg'); if(!b) return;
     const on = !!(TBL && TBL.cfg.started);
     b.textContent = on ? '⏸ ΠΑΥΣΗ ΑΠΟΣΤΟΛΗΣ ΑΓΩΝΩΝ' : '▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ'; b.classList.toggle('on', on);
@@ -4913,7 +4939,7 @@ function syncFinal16ToKO(seeds){
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
-  const APP_VERSION = '46';
+  const APP_VERSION = '47';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -5559,6 +5585,10 @@ function syncFinal16ToKO(seeds){
     const pSec = $('#hParticipants'); if(pSec && pSec.closest('.section')) pSec.closest('.section').classList.add('sec-participants');
     const vs = $('#viewerSearch'); if(vs) vs.addEventListener('input', refreshViewerSearch);
     const cpb = $('#cloudPublishBtn'); if(cpb) cpb.addEventListener('click', cloudPublish);
+    { const tc=$('#tbChip'), ts=$('#tbStart');
+      if(tc) tc.addEventListener('click',()=>{ const sec=$('#tblSection'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'}); });
+      if(ts) ts.addEventListener('click',()=>{ const b=$('#tblStart'); if(b) b.click(); setTimeout(tblTopUi,300); }); }
+    setInterval(()=>{ try{ tblTopUi(); }catch(e){} }, 15000);
     const cdb = $('#cloudDeleteBtn'); if(cdb) cdb.addEventListener('click', cloudDeleteTournament);
     const cqb = $('#cloudQrBtn'); if(cqb) cqb.addEventListener('click', openQR);
     const vqb = $('#viewerQrBtn'); if(vqb) vqb.addEventListener('click', openQR);
