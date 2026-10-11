@@ -1,6 +1,12 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v48 (11/10/2026)
+    - 🔑 Admin κλαμπ με PIN (χωρίς Google): Admin → κλαμπ + PIN. Ένας υπολογιστής κάθε φορά — όταν μπει από άλλον,
+      ο προηγούμενος βγαίνει αυτόματα. Δουλεύει και από υπολογιστή τραπεζιού. Το PIN το ορίζει ο ιδιοκτήτης στο BT Setup
+    - Ο ιδιοκτήτης (Google) διαλέγει από λίστα σε ποιο κλαμπ γίνεται το τουρνουά· ο διοργανωτής γράφεται το κλαμπ
+    - «Κλαμπ τραπεζιών»: λίστα ενεργών κλαμπ, το όνομα διορθώνεται αυτόματα στα σωστά κεφαλαία της άδειας
+    - Κάθε τραπέζι: ✅ Παίρνει αγώνες / 🚫 Όχι αγώνες (ένα κλικ, από τον υπολογιστή του admin)
   v47 (11/10/2026)
     - Πάνω μπάρα (για τον admin): «🎱 2/3 τραπέζια» (πράσινο = όλα συνδεδεμένα με το Scoreboard) και «▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ» —
       πάντα ορατά· κλικ στα τραπέζια → πηγαίνει στην ενότητα «🎱 Τραπέζια»
@@ -164,7 +170,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v47 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v48 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -618,7 +624,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .tbl-start.on{background:#b5651d !important;border-color:#b5651d !important}
   .tbl-clubrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px}
   .tbl-clubrow label{display:flex;gap:8px;align-items:center;font-weight:700}
-  .tbl-clubrow input{min-width:220px;text-transform:uppercase}
+  .tbl-clubrow input{min-width:240px}
   .tbl-manual{margin:6px 0 10px}.tbl-manual summary{cursor:pointer;font-size:13px;opacity:.8}
   .tbl-ph{display:flex;gap:8px;align-items:center;border:1px solid var(--t-input-border,#cfd9ea);border-radius:8px;padding:4px 8px}
   .tbl-ph b{font-size:13px}
@@ -1352,6 +1358,23 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   #tbChip.ok .d{background:#22c55e;box-shadow:0 0 8px #22c55e}#tbChip.part .d{background:#f59e0b}#tbChip.off .d{background:#ef4444}
   #tbStart{font-weight:900;background:#16a34a !important;color:#fff !important;border-color:#16a34a !important;white-space:nowrap}
   #tbStart.on{background:#b45309 !important;border-color:#b45309 !important}
+  /* v48: διακόπτης ανά τραπέζι + σύνδεση PIN */
+  .tbl-card.is-off{opacity:.62;outline:2px dashed #ef4444}
+  .tc-off{font-weight:800;border-color:#16a34a !important;color:#15803d !important}
+  .tc-off.is-off{border-color:#ef4444 !important;color:#b91c1c !important}
+  #pinBox{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+  #pinBox.show{display:flex}
+  #pinCard{background:#fff;color:#0f2a44;border-radius:18px;padding:22px 24px;width:400px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:system-ui,sans-serif}
+  #pinCard h3{margin:0 0 12px;font-size:22px}
+  #pinCard label{display:block;font-weight:700;font-size:14px;margin:10px 0 4px}
+  #pinCard select,#pinCard input{width:100%;box-sizing:border-box;font-size:18px;padding:10px;border-radius:10px;border:1px solid #cbd5e1}
+  #pinCard #pinCode{font-size:34px;letter-spacing:.35em;text-align:center;font-weight:800}
+  #pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  #pinPad button{font-size:24px;font-weight:700;padding:12px 0;border-radius:10px;border:1px solid #cbd5e1;background:#f1f5f9;cursor:pointer}
+  #pinErr{min-height:20px;color:#b91c1c;font-weight:700;margin-top:8px}
+  #pinGo{width:100%;margin-top:10px;font-size:20px;font-weight:900;padding:12px;border-radius:12px;border:0;background:#16a34a;color:#fff;cursor:pointer}
+  #pinG{display:block;text-align:center;margin-top:12px;color:#475569;font-size:13px;cursor:pointer;text-decoration:underline}
+  #pinX{float:right;border:0;background:transparent;font-size:22px;cursor:pointer;color:#64748b}
 </style>
 </head>
 <body>
@@ -1359,7 +1382,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v47</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v48</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -1507,7 +1530,7 @@ Handicap	 -  No handicap
             <small id="tblStartMsg">Οι αγώνες στέλνονται στα τραπέζια μόνο μετά την έναρξη. Μέχρι τότε τα τραπέζια παίζουν ελεύθερα.</small>
           </div>
           <div class="tbl-clubrow">
-            <label>Κλαμπ τραπεζιών<input type="text" id="tblClub" placeholder="π.χ. CUE CLUB CORFU" autocomplete="off"></label>
+            <label>Κλαμπ τραπεζιών<input type="text" id="tblClub" placeholder="διαλέξτε κλαμπ…" autocomplete="off"></label><datalist id="clubList"></datalist>
             <small id="tblClubMsg"></small>
           </div>
           <details class="tbl-manual"><summary>Χειροκίνητη σύνδεση τραπεζιού (εφεδρικά)</summary>
@@ -1736,6 +1759,8 @@ Handicap	 -  No handicap
         <input type="text" id="cloudTitleIn" placeholder="π.χ. 3ο Τουρνουά Billiard Traveller — Αθήνα">
         <label for="cloudSlugIn">Κωδικός σελίδας (λατινικά, αριθμοί, παύλες):</label>
         <input type="text" id="cloudSlugIn" placeholder="π.χ. 2026-10-02-athina">
+        <label for="cloudClubSel" id="cloudClubLbl" style="display:none">Κλαμπ (τα τραπέζια του συνδέονται αυτόματα):</label>
+        <select id="cloudClubSel" style="display:none"><option value="">— χωρίς κλαμπ —</option></select>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <button type="button" id="cloudPublishBtn" class="btn">☁ Δημοσίευση online</button>
           <button type="button" id="cloudQrBtn" class="btn">🔳 QR & σύνδεσμοι</button>
@@ -2121,20 +2146,22 @@ Handicap	 -  No handicap
   const cloudReady = ()=> !!fbDb;
   const emailOf = u => String((u && u.email) || '').toLowerCase();
   const isSuperUser = u => !!u && SUPER_EMAILS.includes(emailOf(u));
-  let cloudRole = {super:false, publisher:false, name:'', facebook:'', club:''};
+  let cloudRole = {super:false, publisher:false, name:'', facebook:'', club:'', pin:''};
   let cloudRoleReady = Promise.resolve();
   let cloudDoc = {loaded:false, owner:'', organizer:'', facebook:''};   // στοιχεία του online τουρνουά
   let cloudOwnerWarned = false;
-  const canPublishRole = ()=> !!cloudUser && (cloudRole.super || cloudRole.publisher);
+  const canPublishRole = ()=> !!cloudUser && (cloudRole.super || cloudRole.publisher || !!cloudRole.pin);
   // Ποιος γράφει: ο ιδιοκτήτης πλατφόρμας παντού, ο διοργανωτής μόνο στα δικά του τουρνουά
   function cloudCanEdit(){
     if(!canPublishRole()) return false;
     if(cloudRole.super || !CLOUD_TID) return true;
+    if(cloudRole.pin) return cloudDoc.loaded && !!cloudDoc.club && cloudDoc.club === cloudRole.pin;   // v48: admin κλαμπ με PIN
     return cloudDoc.loaded && !!cloudDoc.owner && cloudDoc.owner === emailOf(cloudUser);
   }
   async function resolveRole(u){
-    const r = {super:false, publisher:false, name:'', facebook:'', club:''};
+    const r = {super:false, publisher:false, name:'', facebook:'', club:'', pin:''};
     if(!u) return r;
+    if(u.isAnonymous){ const c = pinStoredClub(); if(c){ r.pin = c; r.club = c; r.name = c; } return r; }   // v48: PIN
     if(isSuperUser(u)){ r.super = true; r.name = 'Billiard Traveller'; r.facebook = FB_PAGE_URL; }
     try{
       const ds = await fbDb.collection('publishers').doc(emailOf(u)).get();
@@ -2193,9 +2220,9 @@ Handicap	 -  No handicap
       entries: participants.filter(p=>isRealName((p||'').trim())).length,
       startDate: scheduleCfg.date || '', days: scheduleCfg.days || 3,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedBy: cloudUser ? cloudUser.email : '',
-      owner: cloudDoc.owner || emailOf(cloudUser),
-      organizer: cloudDoc.organizer || cloudRole.name || (cloudUser && cloudUser.displayName) || emailOf(cloudUser).split('@')[0],
+      updatedBy: cloudUser ? (cloudUser.email || ('PIN · '+devLabel())) : '',
+      owner: cloudDoc.owner || (cloudRole.pin ? 'club:'+cloudRole.pin : emailOf(cloudUser)),
+      organizer: cloudDoc.organizer || (cloudRole.super && tblClub() ? tblClub() : '') || cloudRole.name || (cloudUser && cloudUser.displayName) || emailOf(cloudUser).split('@')[0],
       facebook: cloudDoc.owner ? cloudDoc.facebook : (cloudRole.facebook || ''),
       club: (typeof tblClub==='function' ? tblClub() : '') || cloudDoc.club || '',
       state: JSON.stringify(snap)
@@ -2259,10 +2286,12 @@ Handicap	 -  No handicap
       cloudRoleReady = resolveRole(u).then(r=>{
         if(cloudUser !== (u||null)) return;
         cloudRole = r;
+        if(u && u.isAnonymous && !r.pin){ if(!pinBusy) fbAuth.signOut(); return; }
         if(u && !canPublishRole()){
           alert('Ο λογαριασμός '+u.email+' δεν έχει άδεια δημοσίευσης τουρνουά.\n\nΓια άδεια επικοινώνησε με το Billiard Traveller.');
           fbAuth.signOut(); return;
         }
+        pinWatch();
         cloudRecomputeAdmin();
       });
     });
@@ -2315,12 +2344,14 @@ Handicap	 -  No handicap
       pubBtn.disabled = true; return;
     }
     who.textContent = cloudUser
-      ? ('✔ Συνδεδεμένος ως '+cloudUser.email+(canPublishRole() && cloudRole.name ? ' · Διοργανωτής: '+cloudRole.name : ''))
+      ? (cloudRole.pin ? ('✔ Admin κλαμπ «'+cloudRole.pin+'» (PIN) · '+devLabel()) : ('✔ Συνδεδεμένος ως '+cloudUser.email+(canPublishRole() && cloudRole.name ? ' · Διοργανωτής: '+cloudRole.name : '')))
       : 'Δεν είσαι συνδεδεμένος — πάτα «Admin» για σύνδεση με Google.';
     pubBtn.disabled = CLOUD_TID ? !cloudCanEdit() : !canPublishRole();
     { const db = $('#cloudDeleteBtn'); if(db) db.style.display = (CLOUD_TID && ADMIN && cloudCanEdit() && !cloudDocDeleted) ? '' : 'none'; }
     if(typeof tourDeletedUi==='function') tourDeletedUi();
     if(tIn && !tIn.value) tIn.value = cloudTitle;
+    { const cs = $('#cloudClubSel'), cl = $('#cloudClubLbl'), show = !!(cloudRole.super && !CLOUD_TID);
+      if(cs){ cs.style.display = cl.style.display = show ? '' : 'none'; if(show) clubsFill(cs, (TBL && TBL.cfg.club) || ''); } }
     if(CLOUD_TID){
       sIn.value = CLOUD_TID; sIn.disabled = true;
       pubBtn.textContent = '☁ Αποθήκευση τώρα';
@@ -2343,6 +2374,8 @@ Handicap	 -  No handicap
       if(!cloudCanEdit()){ alert('❗ Αυτό το τουρνουά ανήκει σε άλλον διοργανωτή.'); return; }
       await cloudPushNow(); refreshCloudPanel(); return;
     }
+    { const cs = $('#cloudClubSel'); if(cs && cloudRole.super){ if(TBL) TBL.cfg.club = cs.value || ''; } }
+    if(cloudRole.pin && TBL) TBL.cfg.club = cloudRole.pin;
     const tid = slugify($('#cloudSlugIn').value);
     if(tid.length<3){ alert('❗ Ο κωδικός πρέπει να έχει τουλάχιστον 3 λατινικούς χαρακτήρες ή αριθμούς.'); return; }
     try{
@@ -2350,7 +2383,8 @@ Handicap	 -  No handicap
       const ex = await ref.get();
       if(ex.exists){
         const xd = ex.data() || {}, exOwner = String(xd.owner||'').toLowerCase();
-        if(!cloudRole.super && exOwner !== emailOf(cloudUser)){
+        const meOwner = cloudRole.pin ? 'club:'+cloudRole.pin : emailOf(cloudUser);
+        if(!cloudRole.super && exOwner !== meOwner && !(cloudRole.pin && String(xd.club||'')===cloudRole.pin)){
           alert('❗ Ο κωδικός «'+tid+'» χρησιμοποιείται ήδη από άλλο τουρνουά. Γράψε άλλον κωδικό.'); return;
         }
         if(!confirm('Υπάρχει ήδη online τουρνουά με κωδικό «'+tid+'». Να αντικατασταθεί;')) return;
@@ -2363,6 +2397,108 @@ Handicap	 -  No handicap
     }catch(e){
       alert('❗ Η δημοσίευση απέτυχε: '+(e.message||e.code||e));
     }
+  }
+
+  // ---- 🔑 v48: ADMIN ΚΛΑΜΠ ΜΕ PIN (χωρίς Google) · ένας υπολογιστής κάθε φορά ----
+  // Firestore (billiard-traveller): clubadmin/{κλαμπ} {pin, uid} (το PIN το ορίζει ο ιδιοκτήτης στο BT Setup, δεν διαβάζεται),
+  // clubsess/{κλαμπ} {uid, label, at} (ποια συσκευή είναι ο admin τώρα). Η συσκευή μπαίνει ανώνυμα (Firebase Anonymous).
+  const PIN_KEY = 'bt_pin_club';
+  var pinBusy = false;
+  function pinStoredClub(){ try{ return localStorage.getItem(PIN_KEY) || ''; }catch(e){ return ''; } }
+  function devId(){ try{ let d = localStorage.getItem('bt_dev_id'); if(!d){ d = Math.random().toString(36).slice(2,10); localStorage.setItem('bt_dev_id', d); } return d; }catch(e){ return 'dev'; } }
+  function devLabel(){
+    const ua = navigator.userAgent||''; const os = /Android/i.test(ua)?'Android':/iPhone|iPad/i.test(ua)?'iOS':/Windows/i.test(ua)?'Windows':/Mac/i.test(ua)?'Mac':'Συσκευή';
+    return os+' · '+devId();
+  }
+  // λίστα ενεργών κλαμπ (clubKeys στη βάση του Scoreboard) — για επιλογή χωρίς πληκτρολόγηση (σωστά κεφαλαία)
+  let clubsCache = null, clubsLoading = null;
+  function clubsLoad(){
+    if(clubsCache) return Promise.resolve(clubsCache);
+    if(clubsLoading) return clubsLoading;
+    const d = sbDb(); if(!d) return Promise.resolve([]);
+    clubsLoading = d.collection('clubKeys').get().then(sn=>{
+      const out = []; sn.forEach(x=>{ const v = x.data()||{}; if(v.active===true) out.push(x.id); });
+      clubsCache = out.sort((a,b)=>a.localeCompare(b,'el'));
+      const dl = $('#clubList'); if(dl) dl.innerHTML = clubsCache.map(c=>'<option value="'+c.replace(/"/g,'&quot;')+'">').join('');
+      return clubsCache;
+    }).catch(()=>{ clubsLoading = null; return []; });
+    return clubsLoading;
+  }
+  async function clubExact(name){
+    const n = String(name||'').trim(); if(!n) return '';
+    const list = await clubsLoad(); const low = n.toLocaleLowerCase('el');
+    return list.find(c=>c.toLocaleLowerCase('el')===low) || '';
+  }
+  async function clubsFill(sel, cur){
+    const list = await clubsLoad(); const keep = sel.value || cur || '';
+    sel.innerHTML = '<option value="">— χωρίς κλαμπ —</option>' + list.map(c=>'<option>'+c.replace(/</g,'&lt;')+'</option>').join('');
+    if(keep) sel.value = keep;
+  }
+  let pinUnsub = null;
+  function pinWatch(){
+    if(pinUnsub){ try{ pinUnsub(); }catch(e){} pinUnsub = null; }
+    if(!cloudRole.pin || !cloudUser) return;
+    const club = cloudRole.pin, uid = cloudUser.uid;
+    pinUnsub = fbDb.collection('clubsess').doc(club).onSnapshot(ds=>{
+      const d = ds.exists ? ds.data() : null;
+      if(d && d.uid && d.uid !== uid){
+        try{ localStorage.removeItem(PIN_KEY); }catch(e){}
+        cloudRole = {super:false, publisher:false, name:'', facebook:'', club:'', pin:''};
+        cloudRecomputeAdmin();
+        alert('🔑 Ο admin του «'+club+'» συνδέθηκε από άλλο μηχάνημα'+(d.label?' ('+d.label+')':'')+'.\n\nΕδώ η εφαρμογή συνεχίζει μόνο σε προβολή.');
+        fbAuth.signOut();
+      }
+    }, ()=>{});
+  }
+  async function pinOpen(){
+    pinWire();
+    const box = $('#pinBox'), sel = $('#pinClub'), err = $('#pinErr'), code = $('#pinCode');
+    err.textContent = ''; code.value = '';
+    const fixed = CLOUD_TID && cloudDoc.loaded && cloudDoc.club ? cloudDoc.club : '';
+    if(fixed){ sel.innerHTML = '<option>'+fixed.replace(/</g,'&lt;')+'</option>'; sel.disabled = true; }
+    else { sel.disabled = false; sel.innerHTML = '<option>Φόρτωση…</option>'; const list = await clubsLoad();
+      let last=''; try{ last = localStorage.getItem('bt_pin_last')||''; }catch(e){}
+      sel.innerHTML = list.map(c=>'<option>'+c.replace(/</g,'&lt;')+'</option>').join('') || '<option value="">(δεν βρέθηκαν κλαμπ)</option>';
+      if(last && list.includes(last)) sel.value = last; }
+    box.classList.add('show'); setTimeout(()=>{ try{ code.focus(); }catch(e){} }, 80);
+  }
+  async function pinLogin(){
+    const club = $('#pinClub').value, pin = $('#pinCode').value.replace(/\D/g,''), err = $('#pinErr');
+    if(!club){ err.textContent = 'Διαλέξτε κλαμπ'; return; }
+    if(pin.length < 4){ err.textContent = 'Γράψτε το PIN (4–8 ψηφία)'; return; }
+    err.textContent = '…';
+    pinBusy = true;
+    try{
+      if(cloudUser && !cloudUser.isAnonymous) await fbAuth.signOut();
+      if(!fbAuth.currentUser) await fbAuth.signInAnonymously();
+      const uid = fbAuth.currentUser.uid, label = devLabel(), at = Date.now();
+      try{ await fbDb.collection('clubadmin').doc(club).set({pin, uid, at, label}, {merge:true}); }
+      catch(e){ pinBusy = false; err.textContent = '✖ Λάθος PIN (ή δεν έχει οριστεί PIN για αυτό το κλαμπ)'; return; }
+      await fbDb.collection('clubsess').doc(club).set({uid, label, at});
+      try{ localStorage.setItem(PIN_KEY, club); localStorage.setItem('bt_pin_last', club); }catch(e){}
+      cloudUser = fbAuth.currentUser;
+      cloudRole = {super:false, publisher:false, name:club, facebook:'', club, pin:club};
+      if(TBL && !CLOUD_TID) TBL.cfg.club = club;
+      $('#pinBox').classList.remove('show');
+      pinBusy = false;
+      pinWatch(); cloudRecomputeAdmin();
+      if(CLOUD_TID && !ADMIN) alert('ℹ Συνδεθήκατε ως admin του «'+club+'», αλλά αυτό το τουρνουά ανήκει σε άλλο κλαμπ — μόνο προβολή.');
+    }catch(e){
+      pinBusy = false;
+      err.textContent = '⚠ '+(e.code==='auth/operation-not-allowed' ? 'Η ανώνυμη σύνδεση δεν είναι ενεργή στο Firebase (Authentication → Anonymous)' : (e.code||e.message));
+    }
+  }
+  let pinWired = false;
+  function pinWire(){
+    if(pinWired) return; pinWired = true;
+    const pad = $('#pinPad'), code = $('#pinCode'); if(!pad) return;
+    pad.innerHTML = ['1','2','3','4','5','6','7','8','9','⌫','0','✔'].map(k=>'<button type="button" data-k="'+k+'">'+k+'</button>').join('');
+    pad.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ const k=b.dataset.k;
+      if(k==='⌫') code.value = code.value.slice(0,-1); else if(k==='✔') pinLogin(); else if(code.value.length<8) code.value += k; }));
+    code.addEventListener('keydown', e=>{ if(e.key==='Enter') pinLogin(); });
+    $('#pinGo').addEventListener('click', pinLogin);
+    $('#pinX').addEventListener('click', ()=>$('#pinBox').classList.remove('show'));
+    $('#pinG').addEventListener('click', async ()=>{ $('#pinBox').classList.remove('show'); try{ localStorage.removeItem(PIN_KEY); }catch(e){} if(cloudUser) await fbAuth.signOut(); await cloudSignIn(); });
   }
 
   // ---- 🗑 v44: ΔΙΑΓΡΑΦΗ ΤΟΥΡΝΟΥΑ με ΑΠΟΘΗΚΕΥΣΗ (επαναφορά οποτεδήποτε) ----
@@ -2408,7 +2544,7 @@ Handicap	 -  No handicap
     const fname = downloadSnapshot(keepLocalCopy(), CLOUD_TID+'_diagrafi');
     cloudDeleted = true;
     await tblDisconnectAll();
-    try{ await fbDb.collection('tournaments').doc(CLOUD_TID).set({deleted:true, deletedAt:Date.now(), deletedBy:emailOf(cloudUser)}, {merge:true}); }
+    try{ await fbDb.collection('tournaments').doc(CLOUD_TID).set({deleted:true, deletedAt:Date.now(), deletedBy:(emailOf(cloudUser)||('PIN · '+devLabel()))}, {merge:true}); }
     catch(e){ cloudDeleted = false; setCloudBadge('⚠ Δεν διαγράφηκε','err'); alert('❗ Η διαγραφή απέτυχε: '+(e.code||e.message)+'\nΤο τουρνουά δεν άλλαξε.'); return; }
     try{ const l = JSON.parse(localStorage.getItem('bt_last_tour')||'null'); if(l && l.t===CLOUD_TID) localStorage.removeItem('bt_last_tour'); }catch(e){}
     alert('✔ Το τουρνουά «'+title+'» διαγράφηκε και ΑΠΟΘΗΚΕΥΤΗΚΕ.\n\n'+(fname?'Αρχείο backup: '+fname+' (φάκελος Λήψεις)\n':'')+'Για να το συνεχίσετε: λίστα τουρνουά → «♻ Διαγραμμένα» → το τουρνουά → «↩ ΕΠΑΝΑΦΟΡΑ».');
@@ -4571,7 +4707,9 @@ function syncFinal16ToKO(seeds){
   }
   const tblOnline = t => !!t && (Date.now() - (+t._rx||0)) < TBL_ONLINE_MS;   // ώρα λήψης σε αυτόν τον υπολογιστή
   function tblAssignedMatch(tno){ const a = TBL.assign[tno]; return a && a.match ? +a.match : 0; }
+  const tblOff = tno => !!(TBL && TBL.cfg.off && TBL.cfg.off[tno]);   // v48: 🚫 το τραπέζι δεν παίρνει αγώνες
   function tblFree(tno){
+    if(tblOff(tno)) return false;
     const t = TBL.tables[tno];
     if(!tblOnline(t) || t.status==='playing' || t.paused) return false;
     const mno = tblAssignedMatch(tno);
@@ -4805,11 +4943,12 @@ function syncFinal16ToKO(seeds){
     }else{
       list.innerHTML = TBL.view.map(v=>{
         const cls = v.st==='off' ? 'off' : (v.st==='play'||v.st==='wait'||v.st==='other'||v.st==='pause'||v.st==='warm') ? 'busy' : '';
-        let h = '<div class="tbl-card '+cls+'"><div class="tc-h"><span>🎱 '+esc(v.label)+'</span><span class="tc-st">'+tblStTxt[v.st]+(v.st==='play'?' #'+v.match:'')+'</span></div>';
+        let h = '<div class="tbl-card '+cls+(tblOff(v.no)?' is-off':'')+'"><div class="tc-h"><span>🎱 '+esc(v.label)+'</span><span class="tc-st">'+tblStTxt[v.st]+(v.st==='play'?' #'+v.match:'')+'</span></div>';
         if(v.match) h += '<div class="tc-m">#'+v.match+' · '+esc(v.phase)+(v.lim ? ' · '+esc(v.lim) : '')+'<br><b>'+esc(v.a)+'</b> – <b>'+esc(v.b)+'</b></div>';
         if(v.st==='play') h += '<div class="tc-sc">'+v.sa+' – '+v.sb+' <small style="font-size:12px;font-weight:600">στεκ. '+(v.inn||0)+'</small></div>';
         if(ADMIN && TBL.on){
           h += '<div class="tc-btns">';
+          h += '<button type="button" class="btn tc-off'+(tblOff(v.no)?' is-off':'')+'" data-toff="'+v.no+'">'+(tblOff(v.no)?'🚫 Όχι αγώνες':'✅ Παίρνει αγώνες')+'</button>';
           if(v.match) h += '<button type="button" class="btn" data-tclr="'+v.no+'">✖ Ακύρωση</button>';
           h += '<button type="button" class="btn" data-tset="'+v.no+'">➡ Αγώνας…</button></div>';
         }
@@ -4888,7 +5027,8 @@ function syncFinal16ToKO(seeds){
     });
     const sch = $('#tblSched'); if(sch) sch.addEventListener('change',()=>{ TBL.cfg.sched = sch.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
     const ld = $('#tblLead'); if(ld) ld.addEventListener('change',()=>{ TBL.cfg.lead = clampInt(ld.value,0,600); ld.value = TBL.cfg.lead; saveAutosaveSnapshot(); tblScheduleDispatch(); });
-    const cl = $('#tblClub'); if(cl) cl.addEventListener('change',()=>{ TBL.cfg.club = cl.value.trim().replace(/\s+/g,' '); cl.value = TBL.cfg.club; saveAutosaveSnapshot(); tblLinkSoon(); });
+    const cl = $('#tblClub'); if(cl){ cl.setAttribute('list','clubList'); cl.addEventListener('focus',()=>clubsLoad());
+      cl.addEventListener('change',async ()=>{ const v = cl.value.trim().replace(/\s+/g,' '); TBL.cfg.club = (await clubExact(v)) || v; cl.value = TBL.cfg.club; saveAutosaveSnapshot(); tblLinkSoon(); }); }
     const au = $('#tblAuto'); if(au) au.addEventListener('change',()=>{ TBL.cfg.auto = au.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
     const nk = $('#tblNewKey'); if(nk) nk.addEventListener('click',()=>{
       if(!tblActive()) return;
@@ -4897,6 +5037,9 @@ function syncFinal16ToKO(seeds){
     });
     const list = $('#tblList'); if(list) list.addEventListener('click', e=>{
       const b = e.target.closest('button'); if(!b || !tblActive()) return;
+      if(b.dataset.toff){ const n=+b.dataset.toff; TBL.cfg.off = Object.assign({}, TBL.cfg.off||{}); if(TBL.cfg.off[n]) delete TBL.cfg.off[n]; else TBL.cfg.off[n] = true;
+        tblMsg(TBL.cfg.off[n] ? '🚫 Τραπέζι '+n+': δεν παίρνει νέους αγώνες (όποιος παίζεται ολοκληρώνεται κανονικά)' : '✅ Τραπέζι '+n+': παίρνει ξανά αγώνες');
+        saveAutosaveSnapshot(); tblRender(); tblScheduleDispatch(); return; }
       if(b.dataset.tclr){ const n=+b.dataset.tclr; if(confirm('Ακύρωση ανάθεσης στο τραπέζι '+n+';')) tblClear(n); }
       if(b.dataset.tset){
         const n = +b.dataset.tset;
@@ -4917,7 +5060,7 @@ function syncFinal16ToKO(seeds){
     try{ const app = (firebase.apps||[]).find(a=>a.name==='btsb') || firebase.initializeApp(SB_FB,'btsb'); sbDbInst = app.firestore(); }catch(e){ sbDbInst = null; }
     return sbDbInst;
   }
-  function tblClub(){ return String((TBL && TBL.cfg.club) || cloudDoc.club || cloudRole.club || '').trim(); }
+  function tblClub(){ if(cloudRole && cloudRole.pin) return cloudRole.pin; return String((TBL && TBL.cfg.club) || cloudDoc.club || cloudRole.club || '').trim(); }
   // v41: το κλαμπ γράφεται όπως ακριβώς στην άδεια· για σιγουριά ενημερώνεται και η μορφή με ΚΕΦΑΛΑΙΑ
   function tblClubVariants(c){ c=String(c||'').trim(); if(!c) return []; const up=c.toLocaleUpperCase('el'); return up!==c?[c,up]:[c]; }
   async function tblLinkClub(force){
@@ -4939,7 +5082,7 @@ function syncFinal16ToKO(seeds){
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
-  const APP_VERSION = '47';
+  const APP_VERSION = '48';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -5346,9 +5489,9 @@ function syncFinal16ToKO(seeds){
       adminBtn.addEventListener('click', async ()=>{
         // Online (σελίδα στο internet): σύνδεση μόνο με Google — ο κωδικός δεν ισχύει
         if(cloudReady() && HOSTED){
-          if(!cloudUser){ await cloudSignIn(); }
-          else if(ADMIN){ if(confirm('Αποσύνδεση από admin;')) await fbAuth.signOut(); }
-          else if(confirm('Είσαι συνδεδεμένος ως '+cloudUser.email+' χωρίς δικαίωμα αλλαγών σε αυτό το τουρνουά.\n\nΑποσύνδεση;')){ await fbAuth.signOut(); }
+          if(!cloudUser || (cloudUser.isAnonymous && !cloudRole.pin)){ pinOpen(); }
+          else if(ADMIN){ if(confirm('Αποσύνδεση από admin;')){ try{ localStorage.removeItem(PIN_KEY); }catch(e){} cloudRole.pin=''; await fbAuth.signOut(); } }
+          else if(confirm('Είσαι συνδεδεμένος ως '+(cloudUser.email||('admin «'+cloudRole.pin+'»'))+' χωρίς δικαίωμα αλλαγών σε αυτό το τουρνουά.\n\nΑποσύνδεση;')){ try{ localStorage.removeItem(PIN_KEY); }catch(e){} await fbAuth.signOut(); }
           return;
         }
         if(!ADMIN){
@@ -5632,5 +5775,17 @@ function syncFinal16ToKO(seeds){
   if(btn && !standalone && /iPad|iPhone|iPod/.test(navigator.userAgent)){ btn.style.display=''; btn.addEventListener('click',function(){ if(!ev) alert('Πατήστε το κουμπί Κοινοποίηση (□↑) του Safari → «Προσθήκη στην οθόνη Αφετηρίας».'); }); }
 })();
 </script>
+<div id="pinBox"><div id="pinCard">
+  <button type="button" id="pinX">✕</button>
+  <h3>🔑 Σύνδεση Admin</h3>
+  <label for="pinClub">Κλαμπ</label>
+  <select id="pinClub"></select>
+  <label for="pinCode">PIN admin</label>
+  <input id="pinCode" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••">
+  <div id="pinPad"></div>
+  <div id="pinErr"></div>
+  <button type="button" id="pinGo">ΣΥΝΔΕΣΗ</button>
+  <a id="pinG">Σύνδεση με Google (Billiard Traveller / διοργανωτής)</a>
+</div></div>
 </body>
 </html>
