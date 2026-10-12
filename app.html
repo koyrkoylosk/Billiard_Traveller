@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v58 (12/10/2026) — 🎱 Τουρνουά αμερικάνικου: 8/9/10-BALL, race to, μπρέικ εναλλάξ/winner, Τελική 16άδα με τυχαία κλήρωση μία φορά, frames αντί Μ.Ο., μπάλα στην κεφαλίδα
   v57 (12/10/2026) — 📢 Χορηγοί & διαφημίσεις του κλαμπ στη βάση (αδμιν PIN / ιδιοκτήτης για κάθε κλαμπ) · πλαϊνά κουτιά για όλους · τέλος: 💾 Αποθήκευση + ➕ Νέο τουρνουά
   v56 (12/10/2026) — 🎉 Εικόνες νικητών (Top 4 + Τελική 16άδα) με λογότυπο, κλαμπ, χορηγούς · κοινοποίηση Facebook/Instagram
   v55 (12/10/2026) — YT: ο σύνδεσμος YouTube του τραπεζιού μπαίνει αυτόματα στον αγώνα που παίζεται εκεί (το κουμπί ανάβει)
@@ -186,7 +187,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v57 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v58 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -657,6 +658,11 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .tbl-card .tc-btns button{font-size:12px;padding:3px 8px}
   .tbl-badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#1e6b43;color:#fff;font-size:11px;font-weight:800;white-space:nowrap;vertical-align:middle}
   .tbl-empty{opacity:.7;font-size:14px}
+  /* v58: αμερικάνικο */
+  :root:not(.tour-pool) .poolOnly{display:none !important}
+  :root.tour-pool .lblInn{display:none !important}
+  .tourBall{display:inline-flex;vertical-align:middle;margin-left:8px}
+  .tourBall svg{filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
   /* v57: χορηγοί */
   :root.cloud-mode.has-club-ads:not(.is-admin) .sponsor-col{display:flex !important}
   [data-adtxt]:not([data-adtxt=""]){position:relative}
@@ -1458,7 +1464,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v57</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v58</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -1611,6 +1617,8 @@ Handicap	 -  No handicap
           <div class="tbl-clubrow">
             <label>Κλαμπ τραπεζιών<input type="text" id="tblClub" placeholder="διαλέξτε κλαμπ…" autocomplete="off"></label><datalist id="clubList"></datalist>
             <label>Είδος παιχνιδιού<select id="tblGame"><option value="carom">Καραμπόλα</option><option value="pool">Αμερικάνικο</option></select></label>
+            <label class="poolOnly">Παιχνίδι<select id="tblBall"><option value="8">8-BALL</option><option value="9">9-BALL</option><option value="10">10-BALL</option></select></label>
+            <label class="poolOnly">Μπρέικ<select id="tblBrk"><option value="alt">Εναλλάξ</option><option value="win">Winner break</option></select></label>
             <small id="tblClubMsg"></small>
           </div>
           <details class="tbl-manual"><summary>Χειροκίνητη σύνδεση τραπεζιού (εφεδρικά)</summary>
@@ -1624,13 +1632,13 @@ Handicap	 -  No handicap
           </details>
           <div class="tbl-cfg">
             <label><input type="checkbox" id="tblAuto" checked> Αυτόματη ανάθεση αγώνων</label>
-            <span class="tbl-ph"><b>Πρόκριση</b><label>πόντοι<input type="number" id="tblDistQ" min="1" max="999" value="25"></label><label>στεκιές<input type="number" id="tblInnQ" min="0" max="999" value="0"></label></span>
-            <span class="tbl-ph"><b>Knock Out</b><label>πόντοι<input type="number" id="tblDistKO" min="1" max="999" value="30"></label><label>στεκιές<input type="number" id="tblInnKO" min="0" max="999" value="0"></label></span>
-            <span class="tbl-ph"><b>Τελικός</b><label>πόντοι<input type="number" id="tblDistF" min="1" max="999" value="30"></label><label>στεκιές<input type="number" id="tblInnF" min="0" max="999" value="0"></label></span>
-            <label><input type="checkbox" id="tblEq" checked> Τελευταία στεκιά ισοφάρισης</label>
+            <span class="tbl-ph"><b>Πρόκριση</b><label><span class="lblPts">πόντοι</span><input type="number" id="tblDistQ" min="1" max="999" value="25"></label><label class="lblInn">στεκιές<input type="number" id="tblInnQ" min="0" max="999" value="0"></label></span>
+            <span class="tbl-ph"><b>Knock Out</b><label><span class="lblPts">πόντοι</span><input type="number" id="tblDistKO" min="1" max="999" value="30"></label><label class="lblInn">στεκιές<input type="number" id="tblInnKO" min="0" max="999" value="0"></label></span>
+            <span class="tbl-ph"><b>Τελικός</b><label><span class="lblPts">πόντοι</span><input type="number" id="tblDistF" min="1" max="999" value="30"></label><label class="lblInn">στεκιές<input type="number" id="tblInnF" min="0" max="999" value="0"></label></span>
+            <label class="lblInn"><input type="checkbox" id="tblEq" checked> Τελευταία στεκιά ισοφάρισης</label>
             <label>Ζέσταμα<input type="number" id="tblWarm" min="0" max="15" value="5"> λεπτά ανά παίκτη (0 = χωρίς)</label>
             <label><input type="checkbox" id="tblSched"> Τήρηση ωραρίου: αγώνας στο τραπέζι από<input type="number" id="tblLead" min="0" max="600" value="30"> λεπτά πριν την ώρα του</label>
-            <small style="width:100%;opacity:.75">Στεκιές 0 = χωρίς όριο στεκιών.</small>
+            <small class="lblInn" style="width:100%;opacity:.75">Στεκιές 0 = χωρίς όριο στεκιών.</small>
             <button type="button" class="btn" id="tblNewKey">🔑 Νέο κλειδί</button>
           </div>
           <small id="tblMsg" class="tbl-msg"></small>
@@ -2316,6 +2324,7 @@ Handicap	 -  No handicap
       facebook: cloudDoc.owner ? cloudDoc.facebook : (cloudRole.facebook || ''),
       club: (typeof tblClub==='function' ? tblClub() : '') || cloudDoc.club || '',
       game: (TBL && TBL.cfg.game==='pool') ? 'pool' : 'carom',
+      ball: (TBL && TBL.cfg.game==='pool') ? String(TBL.cfg.ball||'9') : '',
       state: JSON.stringify(snap)
     };
   }
@@ -3683,7 +3692,7 @@ Handicap	 -  No handicap
     const tbl=document.createElement('table');
     const thead=document.createElement('thead');
     const trh=document.createElement('tr');
-    ['Θέση','Παίκτης','Πόντοι (Knockout)','Στεκιές (Knockout)','Μ.Ο. Knockout'].forEach(t=>{
+    (isPoolTour() ? ['Θέση','Παίκτης','Frames κέρδισε','Frames έχασε','Διαφορά'] : ['Θέση','Παίκτης','Πόντοι (Knockout)','Στεκιές (Knockout)','Μ.Ο. Knockout']).forEach(t=>{
       const th=document.createElement('th'); th.textContent=t; trh.appendChild(th);
     });
     thead.appendChild(trh);
@@ -3693,7 +3702,8 @@ Handicap	 -  No handicap
     rows.forEach(r=>{
       const t = getTotals(r.name);
       const tr=document.createElement('tr');
-      [r.pos, r.name, t.points, t.innings, fmt4(t.avg)].forEach(v=>{
+      const fw = isPoolTour() ? koFramesWL(r.name) : null;
+      (fw ? [r.pos, r.name, fw.w, fw.l, (fw.w-fw.l>0?'+':'')+(fw.w-fw.l)] : [r.pos, r.name, t.points, t.innings, fmt4(t.avg)]).forEach(v=>{
         const td=document.createElement('td'); td.textContent=v; tr.appendChild(td);
       });
       tb.appendChild(tr);
@@ -4592,6 +4602,18 @@ function syncFinal16ToKO(seeds){
     });
     return ok;
   }
+  if(typeof isPoolTour==='function' && isPoolTour()){
+    // v58 αμερικάνικο: όταν κλείσουν ΟΛΟΙ οι αγώνες, κλήρωση μία φορά και κλείδωμα
+    const ready = allDone(TOP_FROM,TOP_TO) && allDone(BOT_FROM,BOT_TO);
+    const draw = ready ? poolF16Draw(seeds) : null;
+    map.forEach((row,i)=>{ const k = koMatches[row[0]]; if(!k) return;
+      const wa = draw ? draw[i*2] : '', wb = draw ? draw[i*2+1] : '';
+      if(k.nameA.value!==wa){ k.nameA.value = wa; changed = true; } if(k.nameB.value!==wb){ k.nameB.value = wb; changed = true; }
+      const tt = k.root.querySelectorAll('.koPTitle'); if(tt.length>=2){ const lab = draw ? '🎲 Κλήρωση' : '🎲 Κλήρωση (μετά την πρόκριση)'; if(tt[0].textContent!==lab){ tt[0].textContent = lab; tt[1].textContent = lab; } } });
+    koTopLocked = koLocked = !!draw; if(draw) koLockedSeeds = seeds.map(s => s ? ({...s}) : s);
+    if(changed) saveAutosaveSnapshot();
+    return;
+  }
   koTopLocked = fillSide(allDone(TOP_FROM,TOP_TO), 0, 'nameA', 1);
   koLocked    = fillSide(allDone(BOT_FROM,BOT_TO), 8, 'nameB', 2);
   if(koLocked) koLockedSeeds = seeds.map(s => s ? ({...s}) : s);
@@ -4874,7 +4896,7 @@ function syncFinal16ToKO(seeds){
   const TBL_ONLINE_MS = 3*60*1000;
   function tblInit(){
     if(TBL) return;
-    TBL = {cfg:{auto:true, distQ:25, distKO:30, distF:30, innQ:0, innKO:0, innF:0, eq:true, club:'', sched:false, lead:30, started:false, begun:false, game:'carom', warm:5}, key:'', tables:{}, assign:{}, live:{}, unsub:[], on:false, view:[], seen:{}, timer:null};
+    TBL = {cfg:{auto:true, distQ:25, distKO:30, distF:30, innQ:0, innKO:0, innF:0, eq:true, club:'', sched:false, lead:30, started:false, begun:false, game:'carom', ball:'9', brk:'alt', f16draw:null, f16key:'', warm:5}, key:'', tables:{}, assign:{}, live:{}, unsub:[], on:false, view:[], seen:{}, timer:null};
   }
   tblInit();
   const tblRef = ()=> fbDb.collection('tournaments').doc(CLOUD_TID);
@@ -4964,7 +4986,9 @@ function syncFinal16ToKO(seeds){
     if(!tblRealPlayer(x.a) || !tblRealPlayer(x.b)){ tblMsg('⚠ Ο αγώνας #'+mno+' δεν έχει ακόμα και τους δύο παίκτες'); return; }
     // ο ίδιος αγώνας δεν μένει σε δύο τραπέζια
     for(const t of Object.keys(TBL.assign)){ if(+t!==+tno && tblAssignedMatch(t)===+mno) await tblClear(+t, true); }
-    const a = {match:+mno, a:x.a, b:x.b, dist:tblDist(+mno), inn:tblInn(+mno), eq:TBL.cfg.eq!==false, warm:Math.max(0,+TBL.cfg.warm||0), phase:tblPhase(+mno), title:cloudTitle||'', seq:Date.now()};
+    const pool = TBL.cfg.game==='pool';
+    const a = {match:+mno, a:x.a, b:x.b, dist:tblDist(+mno), inn:pool?0:tblInn(+mno), eq:pool?false:TBL.cfg.eq!==false, warm:Math.max(0,+TBL.cfg.warm||0), phase:tblPhase(+mno), title:cloudTitle||'', seq:Date.now(),
+               game:pool?'pool':'carom', ball:pool?String(TBL.cfg.ball||'9'):'', brk:pool?(TBL.cfg.brk==='win'?'win':'alt'):''};
     TBL.assign[tno] = a;
     try{ await tblRef().collection('assign').doc(String(tno)).set(a); tblMsg('✔ #'+mno+' → Τραπέζι '+tno); }
     catch(e){ tblMsg('⚠ Η ανάθεση δεν έγινε ('+(e.code||e.message)+')'); }
@@ -5216,7 +5240,7 @@ function syncFinal16ToKO(seeds){
   }
   function tblStartUi(){
     tblTopUi();
-    { const gm=$('#tblGame'); if(gm && TBL) gm.value=tblGame(); }
+    { const gm=$('#tblGame'); if(gm && TBL) gm.value=tblGame(); const bl=$('#tblBall'); if(bl && TBL) bl.value=String(TBL.cfg.ball||'9'); const bk=$('#tblBrk'); if(bk && TBL) bk.value=TBL.cfg.brk==='win'?'win':'alt'; tourGameUi(); }
     const b = $('#tblStart'), m = $('#tblStartMsg'); if(!b) return;
     const on = !!(TBL && TBL.cfg.started);
     b.textContent = on ? '⏸ ΠΑΥΣΗ ΑΠΟΣΤΟΛΗΣ ΑΓΩΝΩΝ' : '▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ'; b.classList.toggle('on', on);
@@ -5245,7 +5269,11 @@ function syncFinal16ToKO(seeds){
     });
     const sch = $('#tblSched'); if(sch) sch.addEventListener('change',()=>{ TBL.cfg.sched = sch.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
     const ld = $('#tblLead'); if(ld) ld.addEventListener('change',()=>{ TBL.cfg.lead = clampInt(ld.value,0,600); ld.value = TBL.cfg.lead; saveAutosaveSnapshot(); tblScheduleDispatch(); });
-    const gm = $('#tblGame'); if(gm){ gm.value = tblGame(); gm.addEventListener('change',()=>{ if(TBL.cfg.begun && !confirm('Το τουρνουά έχει ήδη ξεκινήσει. Αλλαγή είδους παιχνιδιού;')){ gm.value = tblGame(); return; } TBL.cfg.game = gm.value==='pool'?'pool':'carom'; saveAutosaveSnapshot(); cloudSchedulePush(); tblLinkSoon(); }); }
+    const gm = $('#tblGame'); if(gm){ gm.value = tblGame(); gm.addEventListener('change',()=>{ if(TBL.cfg.begun && !confirm('Το τουρνουά έχει ήδη ξεκινήσει. Αλλαγή είδους παιχνιδιού;')){ gm.value = tblGame(); return; } TBL.cfg.game = gm.value==='pool'?'pool':'carom';
+      if(TBL.cfg.game==='pool'){ if((+TBL.cfg.distQ||0)>15) TBL.cfg.distQ=5; if((+TBL.cfg.distKO||0)>15) TBL.cfg.distKO=7; if((+TBL.cfg.distF||0)>15) TBL.cfg.distF=9; ['Q','KO','F'].forEach(k=>{ const e=$('#tblDist'+k); if(e) e.value=TBL.cfg['dist'+k]; }); }
+      tourGameUi(); saveAutosaveSnapshot(); cloudSchedulePush(); tblLinkSoon(); }); }
+    { const bl = $('#tblBall'); if(bl){ bl.value = String(TBL.cfg.ball||'9'); bl.addEventListener('change',()=>{ TBL.cfg.ball = bl.value; tourGameUi(); saveAutosaveSnapshot(); cloudSchedulePush(); }); }
+      const bk = $('#tblBrk'); if(bk){ bk.value = TBL.cfg.brk==='win'?'win':'alt'; bk.addEventListener('change',()=>{ TBL.cfg.brk = bk.value==='win'?'win':'alt'; saveAutosaveSnapshot(); cloudSchedulePush(); }); } }
     const cl = $('#tblClub'); if(cl){ cl.setAttribute('list','clubList'); cl.addEventListener('focus',()=>clubsLoad());
       cl.addEventListener('change',async ()=>{ const v = cl.value.trim().replace(/\s+/g,' '); TBL.cfg.club = (await clubExact(v)) || v; cl.value = TBL.cfg.club; saveAutosaveSnapshot(); tblLinkSoon(); }); }
     const au = $('#tblAuto'); if(au) au.addEventListener('change',()=>{ TBL.cfg.auto = au.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
@@ -5336,6 +5364,41 @@ function syncFinal16ToKO(seeds){
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
+  // ================= 🎱 v58: ΑΜΕΡΙΚΑΝΙΚΟ (8 / 9 / 10-BALL) =================
+  function isPoolTour(){ try{ return !!(TBL && TBL.cfg && TBL.cfg.game==='pool'); }catch(e){ return false; } }
+  function ballSvgT(b,sz){ b=String(b||'9'); sz=sz||34; const col={'8':'#111','9':'#f5c400','10':'#1f4fd1'}[b]||'#f5c400', str=b!=='8', id='tb'+b+Math.random().toString(36).slice(2,6);
+    return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="'+id+'" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient><clipPath id="c'+id+'"><circle cx="50" cy="50" r="48"/></clipPath></defs>'+
+      '<circle cx="50" cy="50" r="48" fill="'+(str?'#f7f5ef':col)+'"/>'+(str?'<rect x="0" y="24" width="100" height="52" fill="'+col+'" clip-path="url(#c'+id+')"/>':'')+
+      '<circle cx="50" cy="50" r="21" fill="#fff"/><text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-family="Arial Black,Arial" font-weight="900" font-size="'+(b.length>1?22:28)+'" fill="#111">'+b+'</text><circle cx="50" cy="50" r="48" fill="url(#'+id+')"/></svg>'; }
+  function tourGameUi(){
+    const pool = isPoolTour(); document.documentElement.classList.toggle('tour-pool', pool);
+    document.querySelectorAll('.lblPts').forEach(e=>e.textContent = pool ? 'race to' : 'πόντοι');
+    const b = pool ? String(TBL.cfg.ball||'9') : '';
+    ['#viewerTitle'].forEach(sel=>{ const h = $(sel); if(!h) return; let sp = h.querySelector('.tourBall'); if(!sp){ sp = document.createElement('span'); sp.className='tourBall'; h.appendChild(sp); }
+      if(sp.dataset.b!==b){ sp.dataset.b=b; sp.innerHTML = b ? ballSvgT(b, sel==='#viewerTitle'?28:30) : ''; } });
+  }
+  setInterval(()=>{ try{ tourGameUi(); }catch(e){} }, 3000);
+  // frames κέρδισε / έχασε στο Knock Out (αντί για Μ.Ο. στο αμερικάνικο)
+  function koFramesWL(name){
+    let w=0, l=0; const n = String(name||'').trim();
+    for(let id=41; id<=55; id++){ const k = koMatches[id]; if(!k) continue;
+      const a = k.nameA.value.trim(), b = k.nameB.value.trim(), pa = +k.ptsA.value||0, pb = +k.ptsB.value||0;
+      if(a===n){ w+=pa; l+=pb; } else if(b===n){ w+=pb; l+=pa; } }
+    return {w,l};
+  }
+  function rankStat(r){ if(isPoolTour()){ const f = koFramesWL(r.name); return 'Frames '+f.w+'–'+f.l; } return 'Μ.Ο. '+fmt4(r.avg||0); }
+  // Τελική 16άδα στο αμερικάνικο: τα ζευγάρια με ΤΥΧΑΙΑ κλήρωση, μία φορά, μόλις κλείσει και ο τελευταίος αγώνας
+  function poolF16Draw(seeds){
+    const names = seeds.slice(0,16).map(s=>s && s.name).filter(Boolean);
+    if(names.length!==16 || !names.every(n=>isRealName(n))) return null;
+    const key = names.slice().sort().join('|');
+    if(TBL.cfg.f16draw && TBL.cfg.f16key===key) return TBL.cfg.f16draw;
+    const arr = names.slice(); for(let i=arr.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); const t=arr[i]; arr[i]=arr[j]; arr[j]=t; }
+    TBL.cfg.f16draw = arr; TBL.cfg.f16key = key;
+    try{ tblMsg('🎲 Κλήρωση Τελικής 16άδας: έγινε — τα ζευγάρια κλείδωσαν'); }catch(e){}
+    setTimeout(()=>{ try{ saveAutosaveSnapshot(); cloudSchedulePush(); }catch(e){} }, 50);
+    return arr;
+  }
   // ================= 🖨 v54: ΛΙΣΤΑ ΣΥΜΜΕΤΟΧΩΝ ΓΙΑ ΕΚΤΥΠΩΣΗ =================
   // όλοι οι παίκτες (αλφαβητικά) + 10 μικρά κουτάκια: το 1ο «ΣΥΜΜΕΤΟΧΗ», τα άλλα ελεύθερα (π.χ. χρεώσεις μπαρ)
   function printEntries(){
@@ -5470,13 +5533,13 @@ function syncFinal16ToKO(seeds){
     const rows = koRankRows(); if(rows.length < 2) return null;
     const info = celInfo(), logo = await celLoadLogo();
     const c = document.createElement('canvas'); c.width=CEL_W; c.height=CEL_H; const ctx = c.getContext('2d');
-    celBg(ctx, [560, 1150]); celHeader(ctx, info, logo, '★  ΟΙ ΝΙΚΗΤΕΣ  ★');
+    celBg(ctx, [560, 1150]); celHeader(ctx, info, logo, isPoolTour() ? '★  ΟΙ ΝΙΚΗΤΕΣ · '+String(TBL.cfg.ball||'9')+'-BALL  ★' : '★  ΟΙ ΝΙΚΗΤΕΣ  ★');
     const r1 = rows[0], r2 = rows[1], r3 = rows.filter(r=>r.pos==='3');
     celTrophy(ctx, CEL_W/2, 400, 1.05);
     // πρωταθλητής
     ctx.textAlign='center'; ctx.fillStyle='#ffd166'; ctx.font='900 30px '+CEL_FONT; ctx.fillText('ΠΡΩΤΑΘΛΗΤΗΣ', CEL_W/2, 610);
     celGoldText(ctx, celUp(r1.name), CEL_W/2, 680, celFit(ctx, celUp(r1.name), CEL_W-160, 72, 900));
-    ctx.fillStyle='#fff'; ctx.font='700 30px '+CEL_FONT; ctx.fillText('Μ.Ο. '+fmt4(r1.avg), CEL_W/2, 724);
+    ctx.fillStyle='#fff'; ctx.font='700 30px '+CEL_FONT; ctx.fillText(rankStat(r1), CEL_W/2, 724);
     // βάθρο
     const base = 1140, P = [{x:CEL_W/2, w:300, h:250, col:['#fff1b8','#e2a51c'], lab:'1', r:r1},
                             {x:CEL_W/2-320, w:290, h:185, col:['#f4f7fb','#9aa7b6'], lab:'2', r:r2},
@@ -5488,7 +5551,7 @@ function syncFinal16ToKO(seeds){
     });
     // 2ος
     const nameAt = (r, x, y, maxW, size)=>{ ctx.fillStyle='#fff'; ctx.textAlign='center'; celFit(ctx, celUp(r.name), maxW, size, 800); ctx.fillText(celUp(r.name), x, y);
-      ctx.fillStyle='#bfe9ee'; ctx.font='600 22px '+CEL_FONT; ctx.fillText('Μ.Ο. '+fmt4(r.avg), x, y+30); };
+      ctx.fillStyle='#bfe9ee'; ctx.font='600 22px '+CEL_FONT; ctx.fillText(rankStat(r), x, y+30); };
     ctx.fillStyle='#d9e2ec'; ctx.font='900 24px '+CEL_FONT; ctx.textAlign='center'; ctx.fillText('2ος', P[1].x, base-P[1].h-96);
     nameAt(r2, P[1].x, base-P[1].h-60, 290, 34);
     ctx.fillStyle='#f0b27a'; ctx.font='900 24px '+CEL_FONT; ctx.fillText(r3.length>1?'3οι':'3ος', P[2].x, base-P[2].h-(r3.length>1?150:96));
@@ -5500,11 +5563,11 @@ function syncFinal16ToKO(seeds){
     const rows = koRankRows(); if(rows.length < 2) return null;
     const info = celInfo(), logo = await celLoadLogo();
     const c = document.createElement('canvas'); c.width=CEL_W; c.height=CEL_H; const ctx = c.getContext('2d');
-    celBg(ctx, [390, CEL_H-60]); celHeader(ctx, info, logo, '★  ΤΕΛΙΚΗ ΚΑΤΑΤΑΞΗ  ★');
+    celBg(ctx, [390, CEL_H-60]); celHeader(ctx, info, logo, isPoolTour() ? '★  ΤΕΛΙΚΗ ΚΑΤΑΤΑΞΗ · '+String(TBL.cfg.ball||'9')+'-BALL  ★' : '★  ΤΕΛΙΚΗ ΚΑΤΑΤΑΞΗ  ★');
     const top = 436, bottom = info.sponsors.length ? CEL_H-210 : CEL_H-80, n = Math.min(16, rows.length);
     const rh = Math.min(52, (bottom-top)/n), x0 = 90, x1 = CEL_W-90;
     const medal = {'1':['#fff1b8','#e2a51c'], '2':['#f4f7fb','#9aa7b6'], '3':['#ffd9b0','#b8722c']};
-    ctx.fillStyle='#ffd166'; ctx.font='800 18px '+CEL_FONT; ctx.textAlign='left'; ctx.fillText('ΘΕΣΗ', x0+8, top-10); ctx.fillText('ΠΑΙΚΤΗΣ', x0+150, top-10); ctx.textAlign='right'; ctx.fillText('Μ.Ο.', x1-14, top-10);
+    ctx.fillStyle='#ffd166'; ctx.font='800 18px '+CEL_FONT; ctx.textAlign='left'; ctx.fillText('ΘΕΣΗ', x0+8, top-10); ctx.fillText('ΠΑΙΚΤΗΣ', x0+150, top-10); ctx.textAlign='right'; ctx.fillText(isPoolTour()?'FRAMES':'Μ.Ο.', x1-14, top-10);
     for(let i=0;i<n;i++){
       const r = rows[i], y = top + i*rh;
       ctx.fillStyle = i%2 ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.11)'; ctx.fillRect(x0, y+3, x1-x0, rh-6);
@@ -5513,7 +5576,7 @@ function syncFinal16ToKO(seeds){
       else { ctx.fillStyle='rgba(18,163,173,.55)'; ctx.fillRect(x0, y+3, 120, rh-6); ctx.fillStyle='#fff'; }
       ctx.font='900 '+Math.round(rh*.48)+'px '+CEL_FONT; ctx.textAlign='center'; ctx.fillText(r.pos, x0+60, y+rh*.66);
       ctx.fillStyle = m ? '#fff3c4' : '#ffffff'; ctx.textAlign='left'; celFit(ctx, celUp(r.name), x1-x0-330, Math.round(rh*.5), i<4?900:700); ctx.fillText(celUp(r.name), x0+150, y+rh*.66);
-      ctx.fillStyle='#bfe9ee'; ctx.textAlign='right'; ctx.font='700 '+Math.round(rh*.42)+'px '+CEL_FONT; ctx.fillText(fmt4(r.avg), x1-14, y+rh*.66);
+      ctx.fillStyle='#bfe9ee'; ctx.textAlign='right'; ctx.font='700 '+Math.round(rh*.42)+'px '+CEL_FONT; ctx.fillText(isPoolTour()?rankStat(r).replace('Frames ',''):fmt4(r.avg), x1-14, y+rh*.66);
     }
     await celFooter(ctx, info);
     return c;
@@ -5668,7 +5731,7 @@ function syncFinal16ToKO(seeds){
       $('#amName').value = ''; $('#amFile').value = ''; msg.textContent = '✔ Προστέθηκε — φαίνεται σε λίγα δευτερόλεπτα σε όλα τα τραπέζια';
     }catch(e){ msg.textContent = '⚠ '+(e.code||e.message); }
   }
-  const APP_VERSION = '57';
+  const APP_VERSION = '58';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
