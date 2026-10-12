@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v52 (12/10/2026) — ένα τουρνουά σε εξέλιξη ανά κλαμπ και είδος παιχνιδιού · είδος παιχνιδιού · οδηγία ΕΝΑΡΞΗΣ · λειτουργία μέσα στην εφαρμογή Scoreboard
   v51 (11/10/2026)
     - 📲 «Ο αγώνας μου»: ο παίκτης σκανάρει το QR του τουρνουά, διαλέγει το όνομά του και τον ειδοποιούμε με δόνηση/ήχο/μήνυμα:
       ⏳ «Ετοιμάσου» όταν είναι επόμενος και ένα τραπέζι πλησιάζει στο τέλος (πόντοι ≥ απόσταση−3 ή στεκιές ≥ όριο−4)
@@ -179,7 +180,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v51 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v52 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1408,7 +1409,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v51</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v52</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -1558,6 +1559,7 @@ Handicap	 -  No handicap
           </div>
           <div class="tbl-clubrow">
             <label>Κλαμπ τραπεζιών<input type="text" id="tblClub" placeholder="διαλέξτε κλαμπ…" autocomplete="off"></label><datalist id="clubList"></datalist>
+            <label>Είδος παιχνιδιού<select id="tblGame"><option value="carom">Καραμπόλα</option><option value="pool">Αμερικάνικο</option></select></label>
             <small id="tblClubMsg"></small>
           </div>
           <details class="tbl-manual"><summary>Χειροκίνητη σύνδεση τραπεζιού (εφεδρικά)</summary>
@@ -2262,6 +2264,7 @@ Handicap	 -  No handicap
       organizer: cloudDoc.organizer || (cloudRole.super && tblClub() ? tblClub() : '') || cloudRole.name || (cloudUser && cloudUser.displayName) || emailOf(cloudUser).split('@')[0],
       facebook: cloudDoc.owner ? cloudDoc.facebook : (cloudRole.facebook || ''),
       club: (typeof tblClub==='function' ? tblClub() : '') || cloudDoc.club || '',
+      game: (TBL && TBL.cfg.game==='pool') ? 'pool' : 'carom',
       state: JSON.stringify(snap)
     };
   }
@@ -2570,7 +2573,7 @@ Handicap	 -  No handicap
     try{ if(TBL){ TBL.cfg.auto = false; clearTimeout(TBL.timer); (TBL.unsub||[]).forEach(u=>{ try{u();}catch(e){} }); TBL.unsub = []; TBL.on = false; } }catch(e){}
     try{
       const d = sbDb(), names = [...new Set([...tblClubVariants(tblClub()), ...tblClubVariants(tblLinked)])];
-      if(d) for(const n of names){ try{ await d.collection('clubs').doc(n).collection('tour').doc('current').set({tid:CLOUD_TID, active:false, at:Date.now()}); }catch(e){} }
+      if(d){ await tblRelease(d, names, 'current'); await tblRelease(d, names, 'pool'); }
     }catch(e){}
     const ref = fbDb.collection('tournaments').doc(CLOUD_TID), errs = [];
     for(const col of ['assign','live','tables']){
@@ -4819,7 +4822,7 @@ function syncFinal16ToKO(seeds){
   const TBL_ONLINE_MS = 3*60*1000;
   function tblInit(){
     if(TBL) return;
-    TBL = {cfg:{auto:true, distQ:25, distKO:30, distF:30, innQ:0, innKO:0, innF:0, eq:true, club:'', sched:false, lead:30, started:false, warm:5}, key:'', tables:{}, assign:{}, live:{}, unsub:[], on:false, view:[], seen:{}, timer:null};
+    TBL = {cfg:{auto:true, distQ:25, distKO:30, distF:30, innQ:0, innKO:0, innF:0, eq:true, club:'', sched:false, lead:30, started:false, begun:false, game:'carom', warm:5}, key:'', tables:{}, assign:{}, live:{}, unsub:[], on:false, view:[], seen:{}, timer:null};
   }
   tblInit();
   const tblRef = ()=> fbDb.collection('tournaments').doc(CLOUD_TID);
@@ -5130,7 +5133,13 @@ function syncFinal16ToKO(seeds){
     const c = $('#tbChip'), st = $('#tbStart'); if(!c || !st) return;
     const show = tblActive();
     c.style.display = st.style.display = show ? '' : 'none';
-    if(!show) return;
+    st.dataset.need = '';
+    if(!show){
+      // v52: τοπικό τουρνουά (χωρίς όνομα/κλαμπ online) — το κουμπί φαίνεται και εξηγεί τι λείπει
+      if(ADMIN && !CLOUD_TID && cloudReady()){ st.style.display=''; st.dataset.need='1'; st.textContent='▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ'; st.classList.remove('on'); }
+      return;
+    }
+    if(tblBlock){ c.className='toggle off'; c.innerHTML='<span class="d"></span>🔒 τραπέζια σε άλλο τουρνουά'; c.title='Τα τραπέζια είναι στο «'+(tblBlock.title||tblBlock.tid)+'»'; st.textContent='⏳ ΑΝΕΝΕΡΓΟ'; st.classList.add('on'); return; }
     const all = Object.keys(TBL.tables||{}), on = all.filter(n=>tblOnline(TBL.tables[n])).length;
     c.className = 'toggle '+(!all.length ? '' : on===all.length ? 'ok' : on ? 'part' : 'off');
     c.innerHTML = '<span class="d"></span>🎱 '+(all.length ? on+'/'+all.length+' τραπέζια' : 'κανένα τραπέζι');
@@ -5140,6 +5149,7 @@ function syncFinal16ToKO(seeds){
   }
   function tblStartUi(){
     tblTopUi();
+    { const gm=$('#tblGame'); if(gm && TBL) gm.value=tblGame(); }
     const b = $('#tblStart'), m = $('#tblStartMsg'); if(!b) return;
     const on = !!(TBL && TBL.cfg.started);
     b.textContent = on ? '⏸ ΠΑΥΣΗ ΑΠΟΣΤΟΛΗΣ ΑΓΩΝΩΝ' : '▶ ΕΝΑΡΞΗ ΤΟΥΡΝΟΥΑ'; b.classList.toggle('on', on);
@@ -5152,12 +5162,14 @@ function syncFinal16ToKO(seeds){
     inn('#tblInnQ','innQ'); inn('#tblInnKO','innKO'); inn('#tblInnF','innF');
     const eqc = $('#tblEq'); if(eqc) eqc.addEventListener('change',()=>{ TBL.cfg.eq = eqc.checked; saveAutosaveSnapshot(); });
     const wm = $('#tblWarm'); if(wm) wm.addEventListener('change',()=>{ TBL.cfg.warm = clampInt(wm.value,0,15); wm.value = TBL.cfg.warm; saveAutosaveSnapshot(); });
-    const stb = $('#tblStart'); if(stb) stb.addEventListener('click',()=>{
+    const stb = $('#tblStart'); if(stb) stb.addEventListener('click',async ()=>{
       if(!tblActive()) return;
       if(!TBL.cfg.started){
+        const o = await tblOtherRunning();
+        if(o){ alert('⛔ Υπάρχει ήδη τουρνουά '+GAME_LBL[tblGame()]+' σε εξέλιξη στο κλαμπ:\n\n«'+(o.title||o.tid)+'»\n\nΤελειώστε το ή διαγράψτε το πρώτα.\n(Ένα τουρνουά άλλου είδους, π.χ. Αμερικάνικο, μπορεί να τρέχει παράλληλα.)'); return; }
         const c = tblCandidates().length;
         if(!c && !confirm('Δεν υπάρχει ακόμα αγώνας με δύο παίκτες (έγινε κλήρωση;). Έναρξη έτσι κι αλλιώς;')) return;
-        TBL.cfg.started = true; tblMsg('▶ Το τουρνουά ξεκίνησε — οι αγώνες στέλνονται στα ελεύθερα τραπέζια');
+        TBL.cfg.started = true; const first = !TBL.cfg.begun; TBL.cfg.begun = true; if(first || tblBlock) tblLinkClub(tblBlock?'take':''); tblMsg('▶ Το τουρνουά ξεκίνησε — οι αγώνες στέλνονται στα ελεύθερα τραπέζια');
       }else{
         if(!confirm('Παύση αποστολής αγώνων;\n(Όσοι παίζονται συνεχίζουν κανονικά· νέοι αγώνες δεν στέλνονται μέχρι να ξαναπατήσετε ΕΝΑΡΞΗ.)')) return;
         TBL.cfg.started = false; tblMsg('⏸ Παύση αποστολής αγώνων');
@@ -5166,6 +5178,7 @@ function syncFinal16ToKO(seeds){
     });
     const sch = $('#tblSched'); if(sch) sch.addEventListener('change',()=>{ TBL.cfg.sched = sch.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
     const ld = $('#tblLead'); if(ld) ld.addEventListener('change',()=>{ TBL.cfg.lead = clampInt(ld.value,0,600); ld.value = TBL.cfg.lead; saveAutosaveSnapshot(); tblScheduleDispatch(); });
+    const gm = $('#tblGame'); if(gm){ gm.value = tblGame(); gm.addEventListener('change',()=>{ if(TBL.cfg.begun && !confirm('Το τουρνουά έχει ήδη ξεκινήσει. Αλλαγή είδους παιχνιδιού;')){ gm.value = tblGame(); return; } TBL.cfg.game = gm.value==='pool'?'pool':'carom'; saveAutosaveSnapshot(); cloudSchedulePush(); tblLinkSoon(); }); }
     const cl = $('#tblClub'); if(cl){ cl.setAttribute('list','clubList'); cl.addEventListener('focus',()=>clubsLoad());
       cl.addEventListener('change',async ()=>{ const v = cl.value.trim().replace(/\s+/g,' '); TBL.cfg.club = (await clubExact(v)) || v; cl.value = TBL.cfg.club; saveAutosaveSnapshot(); tblLinkSoon(); }); }
     const au = $('#tblAuto'); if(au) au.addEventListener('change',()=>{ TBL.cfg.auto = au.checked; saveAutosaveSnapshot(); tblScheduleDispatch(); });
@@ -5202,26 +5215,61 @@ function syncFinal16ToKO(seeds){
   function tblClub(){ if(cloudRole && cloudRole.pin) return cloudRole.pin; return String((TBL && TBL.cfg.club) || cloudDoc.club || cloudRole.club || '').trim(); }
   // v41: το κλαμπ γράφεται όπως ακριβώς στην άδεια· για σιγουριά ενημερώνεται και η μορφή με ΚΕΦΑΛΑΙΑ
   function tblClubVariants(c){ c=String(c||'').trim(); if(!c) return []; const up=c.toLocaleUpperCase('el'); return up!==c?[c,up]:[c]; }
+  // v52: ΕΝΑ τουρνουά σε εξέλιξη ανά κλαμπ ΚΑΙ ανά είδος παιχνιδιού (Καραμπόλα → tour/current · Αμερικάνικο → tour/pool)
+  //   · ένα ανενεργό («προσεχώς») τουρνουά φτιάχνεται πάντα, αλλά δεν παίρνει τα τραπέζια όσο τρέχει άλλο του ίδιου είδους
+  const escH = x=>String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const GAME_LBL = {carom:'Καραμπόλα', pool:'Αμερικάνικο'};
+  function tblGame(){ return (TBL && TBL.cfg.game==='pool') ? 'pool' : 'carom'; }
+  function tblPtrId(g){ return (g||tblGame())==='pool' ? 'pool' : 'current'; }
+  let tblBlock = null, tblLinkedPtr = 'current';
+  async function tblPtrOther(d, names, ptr){
+    for(const n of names){ try{ const ds = await d.collection('clubs').doc(n).collection('tour').doc(ptr||tblPtrId()).get();
+      if(ds.exists){ const x = ds.data()||{}; if(x.active && x.tid && x.tid!==CLOUD_TID && Date.now()-(+x.at||0) < 36*3600*1000) return x; } }catch(e){} }
+    return null;
+  }
+  // αποσύνδεση: μόνο αν ο δείκτης του κλαμπ δείχνει ΑΚΟΜΑ σε αυτό το τουρνουά (να μη «διώξουμε» άλλο τουρνουά)
+  async function tblRelease(d, names, ptr){
+    for(const n of names){ try{ const r = d.collection('clubs').doc(n).collection('tour').doc(ptr||tblPtrId()); const ds = await r.get();
+      if(ds.exists && (ds.data()||{}).tid===CLOUD_TID) await r.set({tid:CLOUD_TID, active:false, at:Date.now()}); }catch(e){} }
+  }
   async function tblLinkClub(force){
     if(!tblActive() || !TBL.key) return;
     const club = tblClub(), msg = $('#tblClubMsg');
     const d = sbDb(); if(!d){ if(msg) msg.textContent='⚠ Δεν φόρτωσε η βάση του Scoreboard'; return; }
+    const ptr = tblPtrId();
     const put = async (names, data) => { let ok=0, err=null;
-      for(const n of names){ try{ await d.collection('clubs').doc(n).collection('tour').doc('current').set(data); ok++; }catch(e){ err=e; } }
+      for(const n of names){ try{ await d.collection('clubs').doc(n).collection('tour').doc(ptr).set(data); ok++; }catch(e){ err=e; } }
       if(!ok && err) throw err; return ok; };
     try{
-      if(tblLinked && tblLinked!==club){ try{ await put(tblClubVariants(tblLinked), {tid:CLOUD_TID, active:false, at:Date.now()}); }catch(e){} }
-      if(!club){ tblLinked=''; if(msg) msg.textContent='Γράψτε το κλαμπ (ακριβώς όπως στην άδεια) για αυτόματη σύνδεση των τραπεζιών.'; return; }
+      if(tblLinked && (tblLinked!==club || tblLinkedPtr!==ptr)){ try{ await tblRelease(d, tblClubVariants(tblLinked), tblLinkedPtr); }catch(e){} tblLinked=''; }
+      if(!club){ tblLinked=''; tblBlock=null; if(msg) msg.textContent='Γράψτε το κλαμπ (ακριβώς όπως στην άδεια) για αυτόματη σύνδεση των τραπεζιών.'; tblTopUi(); return; }
       const active = !champion();
-      await put(tblClubVariants(club), {tid:CLOUD_TID, key:TBL.key, title:cloudTitle||'', organizer:cloudDoc.organizer||cloudRole.name||'', size:SIZE, active, at:Date.now()});
-      tblLinked = club;
-      if(msg) msg.textContent = active ? '✔ Τα τραπέζια του «'+club+'» συνδέονται αυτόματα' : '🏁 Το τουρνουά τελείωσε — τα τραπέζια αποσυνδέθηκαν';
+      if(!active){ await tblRelease(d, tblClubVariants(club), ptr); tblLinked=club; tblBlock=null; if(msg) msg.textContent='🏁 Το τουρνουά τελείωσε — τα τραπέζια αποσυνδέθηκαν'; tblTopUi(); return; }
+      const other = await tblPtrOther(d, tblClubVariants(club), ptr);
+      if(other && force!=='take' && (other.started || !TBL.cfg.begun)){
+        tblBlock = other; tblLinked = '';
+        if(msg) msg.innerHTML = '🔒 Τα τραπέζια '+escH(GAME_LBL[tblGame()])+' του «'+escH(club)+'» είναι σε άλλο τουρνουά: <b>'+escH(other.title||other.tid)+'</b>'+(other.started?' (σε εξέλιξη)':' (προσεχώς)')+
+          '. Αυτό το τουρνουά μένει <b>ανενεργό</b> μέχρι να τελειώσει ή να διαγραφεί εκείνο. <button type="button" class="btn" id="tblTake" style="margin-left:6px">Πάρε τα τραπέζια</button>';
+        const tk = $('#tblTake'); if(tk) tk.onclick = ()=>{ if(confirm('Το άλλο τουρνουά («'+(other.title||other.tid)+'») έχει ξεχαστεί ανοιχτό;\n\nΑν συνεχίσετε, τα τραπέζια θα φύγουν από εκείνο και θα έρθουν σε αυτό.')) tblLinkClub('take'); };
+        tblTopUi(); return;
+      }
+      tblBlock = null;
+      await put(tblClubVariants(club), {tid:CLOUD_TID, key:TBL.key, title:cloudTitle||'', organizer:cloudDoc.organizer||cloudRole.name||'', size:SIZE, active:true, started:!!TBL.cfg.begun, game:tblGame(), at:Date.now()});
+      tblLinked = club; tblLinkedPtr = ptr;
+      if(msg) msg.textContent = '✔ Τα τραπέζια ('+GAME_LBL[tblGame()]+') του «'+club+'» συνδέονται αυτόματα';
+      tblTopUi();
     }catch(e){ if(msg) msg.textContent = '⚠ Αυτόματη σύνδεση: '+(e.code||e.message)+' (ελέγξτε ότι το κλαμπ έχει ενεργή άδεια και γράφεται ακριβώς όπως στην άδεια)'; }
   }
+  // πριν την ΕΝΑΡΞΗ: τρέχει ήδη άλλο τουρνουά του ίδιου είδους στο κλαμπ;
+  async function tblOtherRunning(){
+    const club = tblClub(), d = sbDb(); if(!club || !d) return null;
+    const o = await tblPtrOther(d, tblClubVariants(club)); return (o && o.started) ? o : null;
+  }
+  setInterval(()=>{ if(tblBlock && tblActive()) tblLinkClub(); }, 60*1000);
   function tblLinkSoon(){ clearTimeout(tblLinkTimer); tblLinkTimer = setTimeout(()=>tblLinkClub(), 1200); }
   setInterval(()=>{ if(tblActive()) tblLinkClub(); }, 10*60*1000);
 
-  const APP_VERSION = '51';
+  const APP_VERSION = '52';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -5870,7 +5918,10 @@ function syncFinal16ToKO(seeds){
     const cpb = $('#cloudPublishBtn'); if(cpb) cpb.addEventListener('click', cloudPublish);
     { const tc=$('#tbChip'), ts=$('#tbStart');
       if(tc) tc.addEventListener('click',()=>{ const sec=$('#tblSection'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'}); });
-      if(ts) ts.addEventListener('click',()=>{ const b=$('#tblStart'); if(b) b.click(); setTimeout(tblTopUi,300); }); }
+      if(ts) ts.addEventListener('click',()=>{
+        if(ts.dataset.need){ alert('Για να στέλνονται οι αγώνες στα τραπέζια, το τουρνουά πρέπει πρώτα να γίνει online:\n\n1) Γράψτε ΟΝΟΜΑ τουρνουά\n2) Διαλέξτε ΚΛΑΜΠ\n3) Πατήστε «☁ Δημοσίευση online»\n\nΜετά θα εμφανιστεί εδώ το ▶ ΕΝΑΡΞΗ.'); const bx=$('#cloudPublishBox'); if(bx){ const sec=bx.closest('details'); if(sec) sec.open=true; bx.scrollIntoView({behavior:'smooth',block:'center'}); } const ti=$('#cloudTitleIn'); if(ti) setTimeout(()=>ti.focus(),400); return; }
+        if(tblBlock){ const sec=$('#tblSection'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'}); return; }
+        const b=$('#tblStart'); if(b) b.click(); setTimeout(tblTopUi,300); }); }
     setInterval(()=>{ try{ tblTopUi(); }catch(e){} }, 15000);
     const cdb = $('#cloudDeleteBtn'); if(cdb) cdb.addEventListener('click', cloudDeleteTournament);
     const cqb = $('#cloudQrBtn'); if(cqb) cqb.addEventListener('click', openQR);
@@ -5906,6 +5957,7 @@ function syncFinal16ToKO(seeds){
   if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
   var btn=document.getElementById('installAppBtn'), ev=null;
   var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+  try{ if(window.top!==window.self) standalone=true; }catch(e){ standalone=true; }   // v52: μέσα στην εφαρμογή Scoreboard (ρόλος αδμιν) — όχι κουμπί εγκατάστασης
   window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); ev=e; if(btn&&!standalone) btn.style.display=''; });
   window.addEventListener('appinstalled',function(){ if(btn) btn.style.display='none'; });
   if(btn) btn.addEventListener('click',function(){
