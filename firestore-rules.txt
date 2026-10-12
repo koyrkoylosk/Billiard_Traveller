@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Ιδιοκτήτης πλατφόρμας: αλλάζει/σβήνει τα πάντα
+    function isSuper() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['kostas.koyrkoyloss@gmail.com'];
+    }
+    // Διοργανωτής με άδεια: υπάρχει έγγραφο publishers/{email} και δεν έχει active = false
+    function isPublisher() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/publishers/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/publishers/$(request.auth.token.email)).data.get('active', true) != false;
+    }
+    // v48: admin κλαμπ με PIN — η συσκευή που μπήκε τελευταία με το σωστό PIN (clubadmin/{κλαμπ}.uid)
+    function pinAdmin(club) {
+      return request.auth != null
+        && club is string && club != ''
+        && exists(/databases/$(database)/documents/clubadmin/$(club))
+        && get(/databases/$(database)/documents/clubadmin/$(club)).data.get('uid', '') == request.auth.uid;
+    }
+    // v35: ο διοργανωτής του συγκεκριμένου τουρνουά (ή ο ιδιοκτήτης πλατφόρμας) · v48: ή ο admin του κλαμπ του τουρνουά
+    function canManage(tid) {
+      return isSuper()
+        || (isPublisher()
+            && get(/databases/$(database)/documents/tournaments/$(tid)).data.get('owner', '') == request.auth.token.email)
+        || pinAdmin(get(/databases/$(database)/documents/tournaments/$(tid)).data.get('club', ''));
+    }
+    // v35: τραπέζι Scoreboard με το σωστό κλειδί τραπεζιών του τουρνουά
+    function tableKeyOk(tid) {
+      return exists(/databases/$(database)/documents/tournaments/$(tid)/private/tablekey)
+        && request.resource.data.key is string
+        && request.resource.data.key == get(/databases/$(database)/documents/tournaments/$(tid)/private/tablekey).data.code;
+    }
+    function validDoc(tid) {
+      return tid.matches('^[a-z0-9-]{3,60}$')
+        && request.resource.data.state is string
+        && request.resource.data.state.size() < 900000
+        && request.resource.data.owner is string;
+    }
+
+    match /tournaments/{tid} {
+      allow read: if true;
+      allow create: if validDoc(tid)
+        && (((isSuper() || isPublisher()) && request.resource.data.owner == request.auth.token.email)
+            || pinAdmin(request.resource.data.get('club', '')));
+      allow update: if validDoc(tid)
+        && (isSuper()
+            || (isPublisher()
+                && resource.data.get('owner', '') == request.auth.token.email
+                && request.resource.data.owner == resource.data.owner)
+            || (pinAdmin(resource.data.get('club', ''))
+                && request.resource.data.get('club', '') == resource.data.get('club', '')
+                && request.resource.data.owner == resource.data.owner));
+      allow delete: if isSuper()
+        || (isPublisher() && resource.data.get('owner', '') == request.auth.token.email)
+        || pinAdmin(resource.data.get('club', ''));
+
+      // v35: σύνδεση με τα τραπέζια (Billiard Traveller SCOREBOARD)
+      match /private/{doc} {                 // κλειδί τραπεζιών: μόνο ο διοργανωτής
+        allow read, write: if canManage(tid);
+      }
+      match /assign/{table} {                // ανάθεση αγώνα σε τραπέζι: τη γράφει ο διοργανωτής
+        allow read: if true;
+        allow write: if canManage(tid);
+      }
+      match /tables/{table} {                // κατάσταση τραπεζιού: τη γράφει το τραπέζι με το κλειδί
+        allow read, delete: if canManage(tid);
+        allow create, update: if tableKeyOk(tid) && request.resource.data.size() < 20;
+      }
+      match /live/{matchNo} {                // σκορ αγώνα από το τραπέζι
+        allow read, delete: if canManage(tid);
+        allow create, update: if tableKeyOk(tid) && request.resource.data.size() < 20;
+      }
+    }
+
+    // Λίστα διοργανωτών: τη γράφει μόνο ο ιδιοκτήτης· ο καθένας διαβάζει μόνο τη δική του γραμμή
+    match /publishers/{email} {
+      allow read: if isSuper()
+        || (request.auth != null && request.auth.token.email == email);
+      allow write: if isSuper();
+    }
+
+    // v48: PIN admin ανά κλαμπ. Το PIN το ορίζει μόνο ο ιδιοκτήτης (BT Setup) και ΔΕΝ διαβάζεται από κανέναν άλλον.
+    // Μια συσκευή «μπαίνει» γράφοντας το σωστό PIN + το δικό της uid → η προηγούμενη συσκευή χάνει αμέσως το δικαίωμα.
+    match /clubadmin/{club} {
+      allow read, create, delete: if isSuper();
+      allow update: if isSuper()
+        || (request.auth != null
+            && request.resource.data.get('pin', '') == resource.data.get('pin', '-')
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'at', 'label']));
+    }
+    // ποια συσκευή είναι τώρα ο admin του κλαμπ (για να το βλέπουν οι άλλες συσκευές και το BT Setup)
+    match /clubsess/{club} {
+      allow read: if true;
+      allow write: if isSuper() || (request.resource.data.uid == request.auth.uid && pinAdmin(club));
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
