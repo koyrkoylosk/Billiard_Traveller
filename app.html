@@ -1,6 +1,8 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v56 (12/10/2026) — 🎉 Εικόνες νικητών (Top 4 + Τελική 16άδα) με λογότυπο, κλαμπ, χορηγούς · κοινοποίηση Facebook/Instagram
+  v55 (12/10/2026) — YT: ο σύνδεσμος YouTube του τραπεζιού μπαίνει αυτόματα στον αγώνα που παίζεται εκεί (το κουμπί ανάβει)
   v54 (12/10/2026) — 🖨 Λίστα συμμετοχών για εκτύπωση (ΣΥΜΜΕΤΟΧΗ + 9 κουτάκια για χρεώσεις)
   v53 (12/10/2026) — αγώνας που περιμένει σε τραπέζι που έκλεισε/δεν απαντά/🚫 πάει αυτόματα σε άλλο ελεύθερο τραπέζι
   v52 (12/10/2026) — ένα τουρνουά σε εξέλιξη ανά κλαμπ και είδος παιχνιδιού · είδος παιχνιδιού · οδηγία ΕΝΑΡΞΗΣ · λειτουργία μέσα στην εφαρμογή Scoreboard
@@ -182,7 +184,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v54 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v56 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -653,6 +655,21 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .tbl-card .tc-btns button{font-size:12px;padding:3px 8px}
   .tbl-badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#1e6b43;color:#fff;font-size:11px;font-weight:800;white-space:nowrap;vertical-align:middle}
   .tbl-empty{opacity:.7;font-size:14px}
+  /* v56: εικόνες νικητών */
+  #celModal{display:none;position:fixed;inset:0;z-index:100050;background:rgba(2,10,16,.82);align-items:center;justify-content:center;padding:14px;overflow:auto}
+  #celModal.show{display:flex}
+  #celModal .celCard{position:relative;background:linear-gradient(180deg,#0b2f3a,#071c2b);color:#fff;border:2px solid #ffd166;border-radius:18px;padding:18px 18px 14px;width:min(960px,100%);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  #celModal h2{margin:4px 0 2px;font-size:26px;color:#ffd166}
+  #celModal p{margin:0 0 10px;color:#bfe9ee}
+  #celModal .celImgs{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  #celModal figure{margin:0;flex:1 1 300px;max-width:420px}
+  #celModal figure img{width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#04121a}
+  #celModal figcaption{font-size:13px;color:#bfe9ee;margin-top:4px}
+  #celModal .celBtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+  #celModal .celBtns button,#celModal .celBtns a{padding:12px 18px;border-radius:12px;border:1px solid #7fe3ea;background:#0b2428;color:#7fe3ea;font-weight:800;font-size:16px;cursor:pointer;text-decoration:none}
+  #celModal .celBtns .celPri{background:linear-gradient(180deg,#ffd166,#c98a14);color:#1a1200;border-color:#ffe59a}
+  #celModal .celX{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:18px;cursor:pointer}
+  #celModal small{display:block;margin-top:8px;color:#ffd166;min-height:1.2em}
   /* v32: Τελική κατάταξη & Top Μ.Ο. tables */
   .koFinalRankBlock,
   .bestMoyBlock{
@@ -931,6 +948,9 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   :root[data-theme] .icon.play, :root[data-theme] .koStart{background:var(--t-run)}
   :root[data-theme] .icon.stop, :root[data-theme] .koStop{background:var(--t-stop)}
   :root[data-theme] .icon.yt{background:#e62117}
+  .icon.yt:not(.has){opacity:.45}
+  .icon.yt.has{opacity:1;box-shadow:0 0 0 2px #fff,0 0 10px 2px rgba(255,0,0,.7);animation:ytPulse 1.6s infinite}
+  @keyframes ytPulse{50%{box-shadow:0 0 0 2px #fff,0 0 16px 5px rgba(255,0,0,.85)}}
   :root[data-theme] .icon:disabled, :root[data-theme] .koBtn:disabled{opacity:.55;cursor:not-allowed}
 
   /* ---------- Αγώνες 1–40 ---------- */
@@ -1411,7 +1431,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v54</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v56</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -1630,7 +1650,7 @@ Handicap	 -  No handicap
 
         <!-- 🏁 Τελική κατάταξη Knockout 16 -->
         <div class="koFinalRankBlock">
-          <h3>🏁 Τελική Κατάταξη Knockout 16</h3>
+          <h3>🏁 Τελική Κατάταξη Knockout 16 <button type="button" id="celOpenBtn" class="btn" style="display:none;margin-left:8px">🎉 Εικόνες νικητών</button></h3>
           <div id="koFinalRankingWrap"></div>
         </div>
 
@@ -3652,6 +3672,7 @@ Handicap	 -  No handicap
     });
     tbl.appendChild(tb);
     wrap.appendChild(tbl);
+    if(typeof celMaybe==='function') setTimeout(celMaybe, 0);
   }
 
   // Top 3 ειδικά Μ.Ο. 1–55
@@ -4956,6 +4977,11 @@ function syncFinal16ToKO(seeds){
       if(o) tgt.ot = o; if(wh) tgt.white = wh;
       if(x.kind==='q' && x.m.dom) updateWinStyles(x.m, x.m.dom.row);
       paintBalls(); }
+    // v55: σύνδεσμος YouTube του τραπεζιού → κουμπί YT του αγώνα (μόνο αν δεν έχει βάλει άλλον ο αδμιν)
+    if(d.yt && /^https?:\/\//i.test(String(d.yt)) && (d.status==='running' || d.status==='done')){
+      const tgt = x.kind==='q' ? x.m : x.k;
+      if((!tgt.youtube || tgt.ytAuto) && tgt.youtube!==d.yt){ tgt.youtube = String(d.yt); tgt.ytAuto = true; ytPaint(); }
+    }
     if(d.status==='done') tblClose(x, d.table);
     else saveAutosaveSnapshot();
   }
@@ -5313,7 +5339,200 @@ function syncFinal16ToKO(seeds){
     const w = fr.contentWindow; w.document.open(); w.document.write(html); w.document.close();
     setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){ alert('Η εκτύπωση δεν άνοιξε: '+e.message); } }, 300);
   }
-  const APP_VERSION = '54';
+  // v55: το κουμπί YT «ανάβει» όταν ο αγώνας έχει σύνδεσμο
+  function ytPaint(){
+    try{
+      matches.forEach(m=>{ const b = m && m.dom && m.dom.btnYT; if(b){ b.classList.toggle('has', !!m.youtube); b.title = m.youtube ? '▶ Δείτε τον αγώνα στο YouTube' : 'YouTube'; } });
+      for(let id=41; id<=55; id++){ const k = koMatches[id]; if(k && k.btnYT){ k.btnYT.classList.toggle('has', !!k.youtube); k.btnYT.title = k.youtube ? '▶ Δείτε τον αγώνα στο YouTube' : 'YouTube'; } }
+    }catch(e){}
+  }
+  setInterval(ytPaint, 5000);
+  // ================= 🎉 v56: ΕΙΚΟΝΕΣ ΝΙΚΗΤΩΝ (Top 4 + Τελική 16άδα) για Facebook / Instagram =================
+  function koRankRows(){
+    const totals = collectKnockoutTotals();
+    const avgOf = n=>{ const t = totals[n]; return t && t.innings>0 ? t.points/t.innings : 0; };
+    const rows = []; const f = koGetWinLose(55);
+    if(f){ rows.push({pos:'1', name:f.winner.name}); rows.push({pos:'2', name:f.loser.name}); }
+    [[53,54,'3'],[49,52,'5–8'],[41,48,'9–16']].forEach(([a,b,l])=>{ for(let id=a; id<=b; id++){ const r = koGetWinLose(id); if(r && isRealName(r.loser.name)) rows.push({pos:l, name:r.loser.name}); } });
+    rows.forEach(r=>r.avg = avgOf(r.name));
+    return rows;
+  }
+  let celLogo = null;
+  function celLoadLogo(){ return new Promise(res=>{ if(celLogo) return res(celLogo); const im = new Image(); im.onload=()=>{ celLogo=im; res(im); }; im.onerror=()=>res(null); im.src='bt-logo.webp'; }); }
+  function celLoadImg(src){ return new Promise(res=>{ if(!src) return res(null); const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; }); }
+  function celInfo(){
+    const title = (cloudTitle || (document.querySelector('.topbar h1')||{}).textContent || 'Τουρνουά').trim();
+    const club = ((typeof tblClub==='function' && tblClub()) || cloudDoc.club || cloudDoc.organizer || '').trim();
+    const d = scheduleCfg.date ? new Date(scheduleCfg.date+'T12:00:00') : new Date();
+    const date = isNaN(d) ? '' : d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+    const sponsors = [];
+    Object.keys(sponsorCarousels||{}).forEach(k=>{ const c = sponsorCarousels[k]; const cap = (($('#'+c.captionId)||{}).textContent||'').trim();
+      const img = (c.images||[])[0] || ''; const name = cap && cap!=='Χώρος διαφήμισης' ? cap : '';
+      if(img || name) sponsors.push({img, name}); });
+    return {title, club, date, sponsors};
+  }
+  const CEL_W = 1080, CEL_H = 1350;
+  const celUp = x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleUpperCase('el');   // κεφαλαία χωρίς τόνους
+  const CEL_FONT = '"Segoe UI","Noto Sans","Helvetica Neue",Arial,sans-serif';
+  function celFit(ctx, text, maxW, size, weight){ let s = size; do{ ctx.font = (weight||800)+' '+s+'px '+CEL_FONT; if(ctx.measureText(text).width <= maxW) break; s -= 2; }while(s > 14); return s; }
+  function celBg(ctx, clear){
+    const g = ctx.createLinearGradient(0,0,0,CEL_H); g.addColorStop(0,'#071c2b'); g.addColorStop(.55,'#0b2f3a'); g.addColorStop(1,'#04121a');
+    ctx.fillStyle = g; ctx.fillRect(0,0,CEL_W,CEL_H);
+    const r = ctx.createRadialGradient(CEL_W/2,420,40,CEL_W/2,420,620); r.addColorStop(0,'rgba(255,214,102,.35)'); r.addColorStop(1,'rgba(255,214,102,0)');
+    ctx.fillStyle = r; ctx.fillRect(0,0,CEL_W,CEL_H);
+    // ακτίνες
+    ctx.save(); ctx.translate(CEL_W/2,420); ctx.globalAlpha=.07; ctx.fillStyle='#ffe08a';
+    for(let i=0;i<24;i++){ ctx.rotate(Math.PI/12); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-40,-900); ctx.lineTo(40,-900); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    // κομφετί (σταθερό μοτίβο)
+    let seed = 7; const rnd = ()=>{ seed = (seed*16807)%2147483647; return seed/2147483647; };
+    const cols = ['#ffd166','#ef476f','#06d6a0','#4cc9f0','#ffffff','#f4a261','#c77dff'];
+    for(let i=0;i<170;i++){
+      const x = rnd()*CEL_W, y = rnd()*CEL_H, s = 6+rnd()*12, a = rnd()*Math.PI;
+      if(clear && y>clear[0] && y<clear[1] && x>60 && x<1020) continue;   // όχι κομφετί πάνω στα ονόματα
+      if(y>230 && y<380 && x>100 && x<980) continue;
+      if(y>CEL_H-80 && x>280 && x<800) continue;
+      ctx.save(); ctx.translate(x,y); ctx.rotate(a); ctx.globalAlpha = .55+rnd()*.4; ctx.fillStyle = cols[i%cols.length];
+      if(i%3===0){ ctx.beginPath(); ctx.arc(0,0,s/2.4,0,Math.PI*2); ctx.fill(); } else ctx.fillRect(-s/2,-s/5,s,s/2.5);
+      ctx.restore();
+    }
+    // χρυσό πλαίσιο
+    ctx.strokeStyle='rgba(255,209,102,.9)'; ctx.lineWidth=6; ctx.strokeRect(22,22,CEL_W-44,CEL_H-44);
+    ctx.strokeStyle='rgba(255,209,102,.35)'; ctx.lineWidth=2; ctx.strokeRect(36,36,CEL_W-72,CEL_H-72);
+  }
+  function celGoldText(ctx, text, x, y, size, align){
+    ctx.font = '900 '+size+'px '+CEL_FONT; ctx.textAlign = align||'center'; ctx.textBaseline='alphabetic';
+    const g = ctx.createLinearGradient(0,y-size,0,y+size*.2); g.addColorStop(0,'#fff3c4'); g.addColorStop(.5,'#ffd166'); g.addColorStop(1,'#c98a14');
+    ctx.shadowColor='rgba(0,0,0,.55)'; ctx.shadowBlur=14; ctx.shadowOffsetY=4; ctx.fillStyle=g; ctx.fillText(text,x,y); ctx.shadowColor='transparent'; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+  }
+  function celHeader(ctx, info, logo, sub){
+    if(logo){ ctx.save(); ctx.beginPath(); ctx.arc(CEL_W/2,128,82,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=20; ctx.fill(); ctx.restore(); ctx.drawImage(logo, CEL_W/2-80, 48, 160, 160); }
+    const ts = celFit(ctx, celUp(info.title), CEL_W-140, 58, 900);
+    celGoldText(ctx, celUp(info.title), CEL_W/2, 282, ts);
+    ctx.fillStyle='#bfe9ee'; ctx.textAlign='center'; const line = [info.club ? 'Διοργάνωση: '+info.club : '', info.date].filter(Boolean).join('  ·  ');
+    celFit(ctx, line, CEL_W-160, 28, 600); ctx.fillText(line, CEL_W/2, 326);
+    if(sub){ ctx.fillStyle='#ffffff'; ctx.font='800 26px '+CEL_FONT; ctx.fillText(sub, CEL_W/2, 368); }
+  }
+  async function celFooter(ctx, info){
+    const y0 = CEL_H-190;
+    if(info.sponsors.length){
+      ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(60,y0,CEL_W-120,120);
+      ctx.fillStyle='#ffd166'; ctx.font='800 20px '+CEL_FONT; ctx.textAlign='center'; ctx.fillText('ΧΟΡΗΓΟΙ', CEL_W/2, y0+28);
+      const n = Math.min(6, info.sponsors.length), slot = (CEL_W-160)/n;
+      for(let i=0;i<n;i++){
+        const sp = info.sponsors[i], cx = 80+slot*i+slot/2;
+        const im = await celLoadImg(sp.img);
+        if(im){ const h=70, w=Math.min(slot-20, im.width*h/im.height); ctx.fillStyle='#fff'; ctx.fillRect(cx-w/2-6,y0+38,w+12,h+8); ctx.drawImage(im, cx-w/2, y0+42, w, h); }
+        else { ctx.fillStyle='#fff'; celFit(ctx, sp.name, slot-16, 26, 700); ctx.fillText(sp.name, cx, y0+86); }
+      }
+    }
+    ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font='700 22px '+CEL_FONT; ctx.textAlign='center';
+    ctx.fillText('Billiard Traveller · Investing in happiness', CEL_W/2, CEL_H-44);
+  }
+  function celTrophy(ctx, cx, top, s){
+    const g = ctx.createLinearGradient(cx-60*s,0,cx+60*s,0); g.addColorStop(0,'#b07812'); g.addColorStop(.45,'#ffe59a'); g.addColorStop(1,'#b07812');
+    ctx.save(); ctx.fillStyle=g; ctx.strokeStyle=g; ctx.shadowColor='rgba(255,200,80,.6)'; ctx.shadowBlur=30;
+    ctx.beginPath(); ctx.moveTo(cx-55*s,top); ctx.lineTo(cx+55*s,top); ctx.quadraticCurveTo(cx+52*s,top+85*s,cx,top+100*s); ctx.quadraticCurveTo(cx-52*s,top+85*s,cx-55*s,top); ctx.fill();
+    ctx.lineWidth=9*s; ctx.beginPath(); ctx.arc(cx-55*s,top+30*s,22*s,Math.PI*.5,Math.PI*1.5); ctx.stroke(); ctx.beginPath(); ctx.arc(cx+55*s,top+30*s,22*s,-Math.PI*.5,Math.PI*.5); ctx.stroke();
+    ctx.fillRect(cx-9*s,top+98*s,18*s,26*s); ctx.fillRect(cx-36*s,top+122*s,72*s,16*s); ctx.fillRect(cx-46*s,top+136*s,92*s,14*s);
+    ctx.restore();
+  }
+  async function celImageTop4(){
+    const rows = koRankRows(); if(rows.length < 2) return null;
+    const info = celInfo(), logo = await celLoadLogo();
+    const c = document.createElement('canvas'); c.width=CEL_W; c.height=CEL_H; const ctx = c.getContext('2d');
+    celBg(ctx, [560, 1150]); celHeader(ctx, info, logo, '★  ΟΙ ΝΙΚΗΤΕΣ  ★');
+    const r1 = rows[0], r2 = rows[1], r3 = rows.filter(r=>r.pos==='3');
+    celTrophy(ctx, CEL_W/2, 400, 1.05);
+    // πρωταθλητής
+    ctx.textAlign='center'; ctx.fillStyle='#ffd166'; ctx.font='900 30px '+CEL_FONT; ctx.fillText('ΠΡΩΤΑΘΛΗΤΗΣ', CEL_W/2, 610);
+    celGoldText(ctx, celUp(r1.name), CEL_W/2, 680, celFit(ctx, celUp(r1.name), CEL_W-160, 72, 900));
+    ctx.fillStyle='#fff'; ctx.font='700 30px '+CEL_FONT; ctx.fillText('Μ.Ο. '+fmt4(r1.avg), CEL_W/2, 724);
+    // βάθρο
+    const base = 1140, P = [{x:CEL_W/2, w:300, h:250, col:['#fff1b8','#e2a51c'], lab:'1', r:r1},
+                            {x:CEL_W/2-320, w:290, h:185, col:['#f4f7fb','#9aa7b6'], lab:'2', r:r2},
+                            {x:CEL_W/2+320, w:290, h:140, col:['#ffd9b0','#b8722c'], lab:'3', r:null}];
+    P.forEach(p=>{
+      const g = ctx.createLinearGradient(0,base-p.h,0,base); g.addColorStop(0,p.col[0]); g.addColorStop(1,p.col[1]);
+      ctx.fillStyle=g; ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=18; ctx.fillRect(p.x-p.w/2, base-p.h, p.w, p.h); ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(0,0,0,.55)'; ctx.font='900 '+(p.lab==='1'?110:84)+'px '+CEL_FONT; ctx.textAlign='center'; ctx.fillText(p.lab, p.x, base-p.h/2+ (p.lab==='1'?40:30));
+    });
+    // 2ος
+    const nameAt = (r, x, y, maxW, size)=>{ ctx.fillStyle='#fff'; ctx.textAlign='center'; celFit(ctx, celUp(r.name), maxW, size, 800); ctx.fillText(celUp(r.name), x, y);
+      ctx.fillStyle='#bfe9ee'; ctx.font='600 22px '+CEL_FONT; ctx.fillText('Μ.Ο. '+fmt4(r.avg), x, y+30); };
+    ctx.fillStyle='#d9e2ec'; ctx.font='900 24px '+CEL_FONT; ctx.textAlign='center'; ctx.fillText('2ος', P[1].x, base-P[1].h-96);
+    nameAt(r2, P[1].x, base-P[1].h-60, 290, 34);
+    ctx.fillStyle='#f0b27a'; ctx.font='900 24px '+CEL_FONT; ctx.fillText(r3.length>1?'3οι':'3ος', P[2].x, base-P[2].h-(r3.length>1?150:96));
+    r3.slice(0,2).forEach((r,i)=> nameAt(r, P[2].x, base-P[2].h-(r3.length>1?114-i*62:60), 290, 30));
+    await celFooter(ctx, info);
+    return c;
+  }
+  async function celImageTop16(){
+    const rows = koRankRows(); if(rows.length < 2) return null;
+    const info = celInfo(), logo = await celLoadLogo();
+    const c = document.createElement('canvas'); c.width=CEL_W; c.height=CEL_H; const ctx = c.getContext('2d');
+    celBg(ctx, [390, CEL_H-60]); celHeader(ctx, info, logo, '★  ΤΕΛΙΚΗ ΚΑΤΑΤΑΞΗ  ★');
+    const top = 436, bottom = info.sponsors.length ? CEL_H-210 : CEL_H-80, n = Math.min(16, rows.length);
+    const rh = Math.min(52, (bottom-top)/n), x0 = 90, x1 = CEL_W-90;
+    const medal = {'1':['#fff1b8','#e2a51c'], '2':['#f4f7fb','#9aa7b6'], '3':['#ffd9b0','#b8722c']};
+    ctx.fillStyle='#ffd166'; ctx.font='800 18px '+CEL_FONT; ctx.textAlign='left'; ctx.fillText('ΘΕΣΗ', x0+8, top-10); ctx.fillText('ΠΑΙΚΤΗΣ', x0+150, top-10); ctx.textAlign='right'; ctx.fillText('Μ.Ο.', x1-14, top-10);
+    for(let i=0;i<n;i++){
+      const r = rows[i], y = top + i*rh;
+      ctx.fillStyle = i%2 ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.11)'; ctx.fillRect(x0, y+3, x1-x0, rh-6);
+      const m = medal[r.pos];
+      if(m){ const g = ctx.createLinearGradient(0,y,0,y+rh); g.addColorStop(0,m[0]); g.addColorStop(1,m[1]); ctx.fillStyle=g; ctx.fillRect(x0, y+3, 120, rh-6); ctx.fillStyle='#1a1200'; }
+      else { ctx.fillStyle='rgba(18,163,173,.55)'; ctx.fillRect(x0, y+3, 120, rh-6); ctx.fillStyle='#fff'; }
+      ctx.font='900 '+Math.round(rh*.48)+'px '+CEL_FONT; ctx.textAlign='center'; ctx.fillText(r.pos, x0+60, y+rh*.66);
+      ctx.fillStyle = m ? '#fff3c4' : '#ffffff'; ctx.textAlign='left'; celFit(ctx, celUp(r.name), x1-x0-330, Math.round(rh*.5), i<4?900:700); ctx.fillText(celUp(r.name), x0+150, y+rh*.66);
+      ctx.fillStyle='#bfe9ee'; ctx.textAlign='right'; ctx.font='700 '+Math.round(rh*.42)+'px '+CEL_FONT; ctx.fillText(fmt4(r.avg), x1-14, y+rh*.66);
+    }
+    await celFooter(ctx, info);
+    return c;
+  }
+  async function celOpen(auto){
+    const a = await celImageTop4(), b = await celImageTop16();
+    if(!a || !b){ if(!auto) alert('Οι εικόνες βγαίνουν μόλις τελειώσει ο τελικός.'); return; }
+    let md = $('#celModal');
+    if(!md){
+      md = document.createElement('div'); md.id='celModal';
+      md.innerHTML = '<div class="celCard"><button type="button" class="celX" id="celX">✕</button><h2>🎉 Το τουρνουά τελείωσε!</h2><p>Οι εικόνες είναι έτοιμες για Facebook / Instagram.</p>'+
+        '<div class="celImgs"><figure><img id="celA" alt=""><figcaption>Οι 4 πρώτοι</figcaption></figure><figure><img id="celB" alt=""><figcaption>Τελική κατάταξη 16άδας</figcaption></figure></div>'+
+        '<div class="celBtns"><button type="button" id="celShare" class="celPri">📤 Κοινοποίηση</button><button type="button" id="celDl">⬇ Λήψη εικόνων</button><a id="celFb" target="_blank" rel="noopener">📘 Σελίδα Facebook</a></div><small id="celMsg"></small></div>';
+      document.body.appendChild(md);
+      $('#celX').onclick = ()=> md.classList.remove('show');
+      md.addEventListener('click', e=>{ if(e.target===md) md.classList.remove('show'); });
+    }
+    const info = celInfo(), slug = (CLOUD_TID || 'tournoua');
+    const blobA = await new Promise(r=>a.toBlob(r,'image/png')), blobB = await new Promise(r=>b.toBlob(r,'image/png'));
+    const fA = new File([blobA], slug+'-nikites.png', {type:'image/png'}), fB = new File([blobB], slug+'-katataxi-16.png', {type:'image/png'});
+    $('#celA').src = URL.createObjectURL(blobA); $('#celB').src = URL.createObjectURL(blobB);
+    const champ = koRankRows()[0].name;
+    const text = '🏆 Πρωταθλητής του «'+info.title+'»: '+champ+'!\nΣυγχαρητήρια σε όλους τους παίκτες'+(info.club?' · '+info.club:'')+'\n#BilliardTraveller';
+    const fb = $('#celFb'), fbu = (typeof cloudFacebook==='function' && cloudFacebook()) || FB_PAGE_URL;
+    fb.href = fbu; fb.style.display = fbu ? '' : 'none';
+    const dl = ()=>{ [fA,fB].forEach((f,i)=>setTimeout(()=>{ const u = URL.createObjectURL(f), x = document.createElement('a'); x.href=u; x.download=f.name; document.body.appendChild(x); x.click(); x.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); }, i*600)); $('#celMsg').textContent='✔ Οι εικόνες κατέβηκαν — ανεβάστε τις στη σελίδα σας.'; };
+    $('#celDl').onclick = dl;
+    $('#celShare').onclick = async ()=>{
+      try{
+        if(navigator.canShare && navigator.canShare({files:[fA,fB]})){ await navigator.share({files:[fA,fB], title:info.title, text}); $('#celMsg').textContent='✔ Κοινοποιήθηκε'; return; }
+      }catch(e){ if(e && e.name==='AbortError') return; }
+      try{ await navigator.clipboard.writeText(text); }catch(e){}
+      dl(); $('#celMsg').textContent='Αυτή η συσκευή δεν ανοίγει κοινοποίηση: οι εικόνες κατέβηκαν και το κείμενο αντιγράφηκε — ανοίξτε το Facebook και κάντε ανάρτηση.';
+    };
+    $('#celMsg').textContent='';
+    md.classList.add('show');
+  }
+  // αυτόματα, μία φορά, στον αδμιν όταν βγει ο πρωταθλητής
+  function celMaybe(){
+    try{
+      const btn = $('#celOpenBtn'); if(btn) btn.style.display = champion() ? '' : 'none';
+      if(!ADMIN || !champion()) return;
+      const k = 'bt_cel_'+(CLOUD_TID||'local')+'_'+champion();
+      if(localStorage.getItem(k)) return; localStorage.setItem(k,'1');
+      setTimeout(()=>celOpen(true), 1500);
+    }catch(e){}
+  }
+  const APP_VERSION = '56';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -5960,6 +6179,7 @@ function syncFinal16ToKO(seeds){
     const vs = $('#viewerSearch'); if(vs) vs.addEventListener('input', refreshViewerSearch);
     { const ok = $('#meOk'); if(ok) ok.addEventListener('click', ()=>$('#meBig').classList.remove('show')); }
     const cpb = $('#cloudPublishBtn'); if(cpb) cpb.addEventListener('click', cloudPublish);
+    { const cb = $('#celOpenBtn'); if(cb) cb.addEventListener('click', ()=>celOpen(false)); }
     { const pe = $('#btnPrintEntries'); if(pe) pe.addEventListener('click', printEntries); }
     { const tc=$('#tbChip'), ts=$('#tbStart');
       if(tc) tc.addEventListener('click',()=>{ const sec=$('#tblSection'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'}); });
