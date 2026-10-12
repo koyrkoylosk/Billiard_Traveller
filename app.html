@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v57 (12/10/2026) — 📢 Χορηγοί & διαφημίσεις του κλαμπ στη βάση (αδμιν PIN / ιδιοκτήτης για κάθε κλαμπ) · πλαϊνά κουτιά για όλους · τέλος: 💾 Αποθήκευση + ➕ Νέο τουρνουά
   v56 (12/10/2026) — 🎉 Εικόνες νικητών (Top 4 + Τελική 16άδα) με λογότυπο, κλαμπ, χορηγούς · κοινοποίηση Facebook/Instagram
   v55 (12/10/2026) — YT: ο σύνδεσμος YouTube του τραπεζιού μπαίνει αυτόματα στον αγώνα που παίζεται εκεί (το κουμπί ανάβει)
   v54 (12/10/2026) — 🖨 Λίστα συμμετοχών για εκτύπωση (ΣΥΜΜΕΤΟΧΗ + 9 κουτάκια για χρεώσεις)
@@ -179,12 +180,13 @@
 <script>
 /* v43: άνοιγμα σαν εφαρμογή — χωρίς κωδικό τουρνουά ανοίγει το τελευταίο τουρνουά (ή η λίστα τουρνουά) */
 (function(){try{var q=new URLSearchParams(location.search);
+  if(q.get('new')==='1'){ try{ localStorage.removeItem(q.get('s')==='64'?'BT64_MENU_STATE_V1':'BT32_MENU_STATE_V1'); }catch(e){} history.replaceState(null,'',location.pathname+(q.get('s')?'?s='+q.get('s'):'')); }
   if(q.get('t')){localStorage.setItem('bt_last_tour',JSON.stringify({t:q.get('t'),s:q.get('s')||'32'}));}
   else if(q.get('app')==='1'){var l=JSON.parse(localStorage.getItem('bt_last_tour')||'null');
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+'&s='+(l.s||'32')):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v56 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v57 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -655,6 +657,31 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .tbl-card .tc-btns button{font-size:12px;padding:3px 8px}
   .tbl-badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#1e6b43;color:#fff;font-size:11px;font-weight:800;white-space:nowrap;vertical-align:middle}
   .tbl-empty{opacity:.7;font-size:14px}
+  /* v57: χορηγοί */
+  :root.cloud-mode.has-club-ads:not(.is-admin) .sponsor-col{display:flex !important}
+  [data-adtxt]:not([data-adtxt=""]){position:relative}
+  [data-adtxt]:not([data-adtxt=""])::after{content:attr(data-adtxt);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font:800 18px system-ui,sans-serif;color:#0f2a44;line-height:1.15}
+  #celModal .celEnd{border-top:1px solid rgba(255,255,255,.15);padding-top:12px}
+  #celModal .celEnd button{background:#12a3ad;color:#fff;border-color:#7fe3ea}
+  #adsMgr{display:none;position:fixed;inset:0;z-index:100060;background:rgba(2,10,16,.8);align-items:center;justify-content:center;padding:14px;overflow:auto}
+  #adsMgr.show{display:flex}
+  #adsMgr .amCard{position:relative;background:#fff;color:#0f172a;border-radius:16px;padding:18px;width:min(720px,100%);max-height:92vh;overflow:auto;font-family:system-ui,sans-serif}
+  #adsMgr h2{margin:0 0 8px;font-size:22px}
+  #adsMgr .amX{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:16px}
+  #adsMgr .amNote{color:#475569;font-size:13px;margin:6px 0}
+  #adsMgr .amRow select{font-size:16px;padding:6px;border-radius:8px;margin-left:6px}
+  #adsMgr .amItem{display:flex;align-items:center;gap:10px;border:1px solid #e2e8f0;border-radius:12px;padding:8px;margin:6px 0}
+  #adsMgr .amItem.fixed{background:#fffbeb;border-color:#f5b81c}
+  #adsMgr .amThumb{width:120px;height:72px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+  #adsMgr .amThumb img{max-width:100%;max-height:100%;object-fit:contain}
+  #adsMgr .amName{flex:1;font-weight:800}
+  #adsMgr .amName small{display:block;font-weight:500;color:#92400e}
+  #adsMgr .amBtns button{font-size:16px;padding:6px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#f8fafc;cursor:pointer;margin-left:4px}
+  #adsMgr .amAdd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;border-top:1px dashed #cbd5e1;padding-top:12px}
+  #adsMgr .amAdd input[type=text]{flex:1 1 220px;font-size:16px;padding:9px;border-radius:9px;border:1px solid #cbd5e1}
+  #adsMgr .amFile,#adsMgr #amAddBtn{font-size:15px;font-weight:800;padding:9px 14px;border-radius:9px;border:1px solid #12a3ad;background:#e6fbfc;color:#0b6f78;cursor:pointer}
+  #adsMgr #amAddBtn{background:#16a34a;border-color:#16a34a;color:#fff}
+  #adsMgr small#amMsg{display:block;margin-top:6px;color:#0b6f78;min-height:1.2em}
   /* v56: εικόνες νικητών */
   #celModal{display:none;position:fixed;inset:0;z-index:100050;background:rgba(2,10,16,.82);align-items:center;justify-content:center;padding:14px;overflow:auto}
   #celModal.show{display:flex}
@@ -1431,12 +1458,13 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v56</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v57</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
       <button id="tbStart" class="toggle" type="button" style="display:none"></button>
       <button id="installAppBtn" class="toggle" type="button" style="display:none" title="Εγκατάσταση σαν εφαρμογή">⬇ Εφαρμογή</button>
+      <button id="adsBtn" class="toggle admin-only" type="button" style="display:none" title="Χορηγοί & διαφημίσεις του κλαμπ">📢 Χορηγοί</button>
       <button id="adminBtn" class="toggle">Admin</button>
       <button id="themeBtn" class="toggle" disabled>Μενού</button>
       <label class="themePicker" title="Χρωματικό θέμα">
@@ -5365,7 +5393,8 @@ function syncFinal16ToKO(seeds){
     const club = ((typeof tblClub==='function' && tblClub()) || cloudDoc.club || cloudDoc.organizer || '').trim();
     const d = scheduleCfg.date ? new Date(scheduleCfg.date+'T12:00:00') : new Date();
     const date = isNaN(d) ? '' : d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
-    const sponsors = [];
+    const sponsors = [{img:'bt-logo.webp', name:'Billiard Traveller'}];
+    if(typeof clubAds!=='undefined' && clubAds.length){ clubAds.slice(0,5).forEach(a=>sponsors.push({img:a.img, name:a.name})); return {title, club, date, sponsors}; }
     Object.keys(sponsorCarousels||{}).forEach(k=>{ const c = sponsorCarousels[k]; const cap = (($('#'+c.captionId)||{}).textContent||'').trim();
       const img = (c.images||[])[0] || ''; const name = cap && cap!=='Χώρος διαφήμισης' ? cap : '';
       if(img || name) sponsors.push({img, name}); });
@@ -5497,9 +5526,12 @@ function syncFinal16ToKO(seeds){
       md = document.createElement('div'); md.id='celModal';
       md.innerHTML = '<div class="celCard"><button type="button" class="celX" id="celX">✕</button><h2>🎉 Το τουρνουά τελείωσε!</h2><p>Οι εικόνες είναι έτοιμες για Facebook / Instagram.</p>'+
         '<div class="celImgs"><figure><img id="celA" alt=""><figcaption>Οι 4 πρώτοι</figcaption></figure><figure><img id="celB" alt=""><figcaption>Τελική κατάταξη 16άδας</figcaption></figure></div>'+
-        '<div class="celBtns"><button type="button" id="celShare" class="celPri">📤 Κοινοποίηση</button><button type="button" id="celDl">⬇ Λήψη εικόνων</button><a id="celFb" target="_blank" rel="noopener">📘 Σελίδα Facebook</a></div><small id="celMsg"></small></div>';
+        '<div class="celBtns"><button type="button" id="celShare" class="celPri">📤 Κοινοποίηση</button><button type="button" id="celDl">⬇ Λήψη εικόνων</button><a id="celFb" target="_blank" rel="noopener">📘 Σελίδα Facebook</a></div>'+
+        '<div class="celBtns celEnd"><button type="button" id="celSave">💾 ΑΠΟΘΗΚΕΥΣΗ ΔΕΔΟΜΕΝΩΝ</button><button type="button" id="celNew">➕ ΝΕΟ ΤΟΥΡΝΟΥΑ</button></div><small id="celMsg"></small></div>';
       document.body.appendChild(md);
       $('#celX').onclick = ()=> md.classList.remove('show');
+      $('#celSave').onclick = ()=>{ const f = downloadSnapshot(buildAutosaveSnapshot(), (CLOUD_TID||'tournoua')+'_teliko'); $('#celMsg').textContent = f ? '💾 Αποθηκεύτηκε: '+f : '⚠ Η αποθήκευση δεν έγινε'; };
+      $('#celNew').onclick = ()=>{ if(confirm('Νέο τουρνουά;\n\nΤο τρέχον μένει αποθηκευμένο online (και στη λίστα «Όλα τα τουρνουά»).')) location.href = 'app.html?new=1&s='+SIZE; };
       md.addEventListener('click', e=>{ if(e.target===md) md.classList.remove('show'); });
     }
     const info = celInfo(), slug = (CLOUD_TID || 'tournoua');
@@ -5532,7 +5564,111 @@ function syncFinal16ToKO(seeds){
       setTimeout(()=>celOpen(true), 1500);
     }catch(e){}
   }
-  const APP_VERSION = '56';
+  // ================= 📢 v57: ΧΟΡΗΓΟΙ & ΔΙΑΦΗΜΙΣΕΙΣ ΤΟΥ ΚΛΑΜΠ (βάση Scoreboard: clubs/{κλαμπ}/ads) =================
+  //  · τις βάζει ο αδμιν του κλαμπ (PIN) ή ο ιδιοκτήτης (Gmail) για όποιο κλαμπ διαλέξει
+  //  · φαίνονται: πλαϊνά κουτιά χορηγών (για όλους), τραπέζια (τάιμ άουτ, ζέσταμα, καρουζέλ, YouTube), οθόνη live, εικόνες νικητών
+  //  · το λογότυπο Billiard Traveller είναι πάντα πρώτο
+  const AD_SEC = 5;
+  let clubAds = [], clubAdsClub = '', clubAdsUnsub = null, clubAdsTick = 0;
+  function adsClubOfTour(){ return String(cloudDoc.club || ((typeof tblClub==='function') ? tblClub() : '') || '').trim(); }
+  function clubAdsWatch(){
+    const club = adsClubOfTour(); if(!club || club===clubAdsClub) return;
+    const d = sbDb(); if(!d) return;
+    if(clubAdsUnsub){ try{ clubAdsUnsub(); }catch(e){} }
+    clubAdsClub = club;
+    try{
+      const M = {};
+      clubAdsUnsub = d.collection('clubs').doc(club).collection('ads').onSnapshot(sn=>{
+        sn.docChanges().forEach(ch=>{ if(ch.type==='removed') delete M[ch.doc.id]; else M[ch.doc.id] = ch.doc.data()||{}; });
+        const out = []; Object.keys(M).forEach(id=>{ const v = M[id]; if(v.active===false || !(v.img||v.name)) return; out.push({id, img:v.img||'', name:v.name||'', ord:+v.ord||0, at:+v.at||0}); });
+        out.sort((a,b)=>(a.ord-b.ord)||(a.at-b.at)); clubAds = out; document.documentElement.classList.toggle('has-club-ads', out.length>0); clubAdsPaint(true);
+      }, ()=>{});
+    }catch(e){}
+  }
+  setInterval(clubAdsWatch, 10000); setTimeout(clubAdsWatch, 2500);
+  // πλαϊνά κουτιά: Billiard Traveller + χορηγοί του κλαμπ, εναλλάξ κάθε 5″
+  function clubAdsPaint(force){
+    if(!clubAds.length) return;            // χωρίς χορηγούς στη βάση → μένουν οι εικόνες της συσκευής (όπως πριν)
+    const all = [{img:'bt-logo.webp', name:'Billiard Traveller'}].concat(clubAds);
+    if(!force) clubAdsTick++;
+    Object.keys(sponsorCarousels).forEach((k,i)=>{
+      const c = sponsorCarousels[k], a = all[(i + clubAdsTick) % all.length];
+      const panel = $('#'+c.panelId), cap = $('#'+c.captionId);
+      if(panel){ panel.style.backgroundImage = a.img ? "url('"+a.img+"')" : ''; panel.style.backgroundSize='contain'; panel.style.backgroundRepeat='no-repeat'; panel.style.backgroundPosition='center'; panel.style.backgroundColor='#fff'; }
+      if(panel) panel.setAttribute('data-adtxt', a.img ? '' : (a.name||''));
+      if(cap) cap.textContent = a.name || '';
+    });
+  }
+  setInterval(()=>clubAdsPaint(false), AD_SEC*1000);
+  // ---- διαχείριση (αδμιν) ----
+  function adsResize(file){ return new Promise((res,rej)=>{ const r = new FileReader(); r.onload = ()=>{ const im = new Image(); im.onload = ()=>{
+      let w = im.width, h = im.height; const m = Math.min(1, 900/w, 560/h); w = Math.round(w*m); h = Math.round(h*m);
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,w,h); x.drawImage(im,0,0,w,h);
+      let q = .85, d = c.toDataURL('image/webp', q); while(d.length > 380000 && q > .4){ q -= .1; d = c.toDataURL('image/webp', q); }
+      if(d.indexOf('data:image/webp')!==0){ d = c.toDataURL('image/jpeg', .8); }
+      if(d.length > 700000){ rej(new Error('Η εικόνα είναι πολύ μεγάλη')); return; } res(d); }; im.onerror = ()=>rej(new Error('Δεν διαβάστηκε η εικόνα')); im.src = r.result; };
+    r.onerror = ()=>rej(new Error('Δεν διαβάστηκε το αρχείο')); r.readAsDataURL(file); }); }
+  let adsMgrClub = '', adsMgrUnsub = null, adsMgrList = [];
+  function adsMgrOpen(){
+    if(!ADMIN){ alert('Μόνο για τον αδμιν.'); return; }
+    let md = $('#adsMgr');
+    if(!md){
+      md = document.createElement('div'); md.id = 'adsMgr';
+      md.innerHTML = '<div class="amCard"><button type="button" class="amX" id="amX">✕</button><h2>📢 Χορηγοί & Διαφημίσεις</h2>'+
+        '<div class="amRow"><label>Κλαμπ <select id="amClub"></select></label></div>'+
+        '<p class="amNote">Φαίνονται σε όλα τα τραπέζια του κλαμπ (τάιμ άουτ, ζέσταμα, οθόνη χωρίς αγώνα, YouTube), στην οθόνη live, στη σελίδα του τουρνουά και στις εικόνες νικητών. Αλλάζουν κάθε 5″.</p>'+
+        '<div id="amList"></div>'+
+        '<div class="amAdd"><input type="text" id="amName" placeholder="Όνομα χορηγού (π.χ. ΚΑΦΕ ΑΡΩΜΑ)"><label class="amFile">🖼 Εικόνα / λογότυπο<input type="file" id="amFile" accept="image/*" hidden></label><button type="button" id="amAddBtn">➕ Προσθήκη</button></div><small id="amMsg"></small></div>';
+      document.body.appendChild(md);
+      $('#amX').onclick = ()=> md.classList.remove('show');
+      md.addEventListener('click', e=>{ if(e.target===md) md.classList.remove('show'); });
+      $('#amFile').onchange = ()=>{ const f = $('#amFile').files[0]; $('#amMsg').textContent = f ? '🖼 '+f.name : ''; };
+      $('#amAddBtn').onclick = adsMgrAdd;
+      $('#amClub').onchange = ()=> adsMgrLoad($('#amClub').value);
+    }
+    const sel = $('#amClub'), cur = adsClubOfTour() || (cloudRole.pin||'');
+    if(cloudRole.super){ sel.disabled = false; clubsLoad().then(list=>{ const L = [...new Set([cur].concat(list||[]).filter(Boolean))]; sel.innerHTML = L.map(c=>'<option>'+c.replace(/</g,'&lt;')+'</option>').join(''); sel.value = cur || L[0] || ''; adsMgrLoad(sel.value); }); }
+    else { const c = cloudRole.pin || cur; sel.innerHTML = '<option>'+String(c).replace(/</g,'&lt;')+'</option>'; sel.disabled = true; adsMgrLoad(c); }
+    md.classList.add('show');
+  }
+  function adsMgrLoad(club){
+    adsMgrClub = String(club||'').trim(); const box = $('#amList');
+    if(adsMgrUnsub){ try{ adsMgrUnsub(); }catch(e){} adsMgrUnsub = null; }
+    if(!adsMgrClub){ box.innerHTML = '<p class="amNote">Δεν έχει οριστεί κλαμπ.</p>'; return; }
+    const d = sbDb(); if(!d){ box.innerHTML = '<p class="amNote">⚠ Δεν φόρτωσε η βάση.</p>'; return; }
+    const M = {};
+    adsMgrUnsub = d.collection('clubs').doc(adsMgrClub).collection('ads').onSnapshot(sn=>{
+      sn.docChanges().forEach(ch=>{ if(ch.type==='removed') delete M[ch.doc.id]; else M[ch.doc.id] = Object.assign(M[ch.doc.id]||{}, ch.doc.data()||{}); });
+      const out = []; Object.keys(M).forEach(id=>{ const v = M[id]; out.push({id, img:v.img||'', name:v.name||'', ord:+v.ord||0, at:+v.at||0}); });
+      out.sort((a,b)=>(a.ord-b.ord)||(a.at-b.at)); adsMgrList = out; adsMgrRender();
+    }, e=>{ box.innerHTML = '<p class="amNote">⚠ '+(e.code||e.message)+'</p>'; });
+  }
+  function adsMgrRender(){
+    const esc2 = x=>String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const row = (a,i,fixed)=>'<div class="amItem'+(fixed?' fixed':'')+'"><div class="amThumb">'+(a.img?'<img src="'+esc2(a.img)+'" alt="">':'<span>'+esc2(a.name)+'</span>')+'</div><div class="amName">'+esc2(a.name)+(fixed?'<small>πάντα πρώτο</small>':'')+'</div>'+
+      (fixed?'<div class="amBtns">📌</div>':'<div class="amBtns"><button type="button" data-up="'+i+'" title="Πάνω">▲</button><button type="button" data-dn="'+i+'" title="Κάτω">▼</button><button type="button" data-del="'+i+'" title="Διαγραφή">🗑</button></div>')+'</div>';
+    const box = $('#amList');
+    box.innerHTML = row({img:'bt-logo.webp', name:'Billiard Traveller'},-1,true) + (adsMgrList.length ? adsMgrList.map((a,i)=>row(a,i,false)).join('') : '<p class="amNote">Δεν υπάρχουν ακόμα χορηγοί. Προσθέστε από κάτω.</p>');
+    box.querySelectorAll('button[data-del]').forEach(b=>b.onclick = async ()=>{ const a = adsMgrList[+b.dataset.del]; if(!a || !confirm('Διαγραφή του χορηγού «'+(a.name||'χωρίς όνομα')+'»;')) return;
+      try{ await sbDb().collection('clubs').doc(adsMgrClub).collection('ads').doc(a.id).delete(); }catch(e){ alert('⚠ '+(e.code||e.message)); } });
+    const move = async (i,dir)=>{ const j = i+dir; if(j<0 || j>=adsMgrList.length) return; const L = adsMgrList.slice(); const t = L[i]; L[i] = L[j]; L[j] = t;
+      try{ const col = sbDb().collection('clubs').doc(adsMgrClub).collection('ads'); for(let k=0;k<L.length;k++) if(L[k].ord!==k) await col.doc(L[k].id).set({ord:k},{merge:true}); }catch(e){ alert('⚠ '+(e.code||e.message)); } };
+    box.querySelectorAll('button[data-up]').forEach(b=>b.onclick = ()=>move(+b.dataset.up,-1));
+    box.querySelectorAll('button[data-dn]').forEach(b=>b.onclick = ()=>move(+b.dataset.dn, 1));
+  }
+  async function adsMgrAdd(){
+    const name = ($('#amName').value||'').trim(), f = $('#amFile').files[0], msg = $('#amMsg');
+    if(!adsMgrClub){ msg.textContent = '⚠ Διαλέξτε κλαμπ'; return; }
+    if(!f && !name){ msg.textContent = '⚠ Βάλτε εικόνα ή όνομα'; return; }
+    msg.textContent = '…';
+    try{
+      const img = f ? await adsResize(f) : '';
+      const ord = adsMgrList.length ? Math.max(...adsMgrList.map(a=>a.ord))+1 : 0;
+      await sbDb().collection('clubs').doc(adsMgrClub).collection('ads').doc('ad'+Date.now().toString(36)).set({img, name, ord, at:Date.now(), active:true, by:(cloudUser && cloudUser.email) || ('PIN · '+devLabel())});
+      $('#amName').value = ''; $('#amFile').value = ''; msg.textContent = '✔ Προστέθηκε — φαίνεται σε λίγα δευτερόλεπτα σε όλα τα τραπέζια';
+    }catch(e){ msg.textContent = '⚠ '+(e.code||e.message); }
+  }
+  const APP_VERSION = '57';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -5771,6 +5907,7 @@ function syncFinal16ToKO(seeds){
 
   function rotateSponsors(){
     if(!sponsorsEnabled) return;
+    if(typeof clubAds!=='undefined' && clubAds.length) return;   // v57: χορηγοί του κλαμπ από τη βάση
     Object.keys(sponsorCarousels).forEach(k=>{
       const c = sponsorCarousels[k];
       if(!c.images.length) return;
@@ -6179,6 +6316,7 @@ function syncFinal16ToKO(seeds){
     const vs = $('#viewerSearch'); if(vs) vs.addEventListener('input', refreshViewerSearch);
     { const ok = $('#meOk'); if(ok) ok.addEventListener('click', ()=>$('#meBig').classList.remove('show')); }
     const cpb = $('#cloudPublishBtn'); if(cpb) cpb.addEventListener('click', cloudPublish);
+    { const ab = $('#adsBtn'); if(ab) ab.addEventListener('click', adsMgrOpen); }
     { const cb = $('#celOpenBtn'); if(cb) cb.addEventListener('click', ()=>celOpen(false)); }
     { const pe = $('#btnPrintEntries'); if(pe) pe.addEventListener('click', printEntries); }
     { const tc=$('#tbChip'), ts=$('#tbStart');
