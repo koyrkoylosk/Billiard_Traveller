@@ -176,9 +176,11 @@
   const SUPER_EMAILS = ['kostas.koyrkoyloss@gmail.com'];
   const SB_FB = {apiKey:"AIzaSyCHDtqdWyvW5vaYTIbtxreuAAwYlgFF08E", authDomain:"cue-club-corfu.firebaseapp.com", projectId:"cue-club-corfu",
     storageBucket:"cue-club-corfu.firebasestorage.app", messagingSenderId:"177703674870", appId:"1:177703674870:web:f694ca6b9c6f47114addd7"};
-  let me = '';
+  let me = '', pinClub = '';
+  const IN_SB = /Electron/i.test(navigator.userAgent) || (()=>{ try{ return window.top!==window.self; }catch(e){ return true; } })();   // v60: μέσα στο Scoreboard → μόνο PIN
   const isSuper = () => !!me && SUPER_EMAILS.includes(me);
-  const canAdmin = t => !!me && (isSuper() || (t.owner && t.owner===me));
+  const lc = x => String(x||'').trim().toLocaleLowerCase('el');
+  const canAdmin = t => (!!pinClub && lc(t.club)===lc(pinClub)) || (!!me && !pinClub && (isSuper() || (t.owner && t.owner===me)));
   function actBtn(txt, title, fn, rs){
     const b = document.createElement('button'); b.type='button'; b.className='cardAct'+(rs?' rs':''); b.textContent=txt; b.title=title;
     b.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); });
@@ -213,12 +215,15 @@
     const lb = $('#loginBtn'); if(!lb) return;
     if(!firebase.auth){ lb.style.display='none'; return; }
     firebase.auth().onAuthStateChanged(u=>{
-      me = u && u.email ? String(u.email).toLowerCase() : '';
-      lb.textContent = me ? '👤 '+me.split('@')[0]+' · Έξοδος' : '👤 Σύνδεση';
+      pinClub = ''; try{ if(u && u.isAnonymous) pinClub = localStorage.getItem('bt_pin_club') || ''; }catch(e){}
+      me = u && u.email ? String(u.email).toLowerCase() : (pinClub ? 'club:'+pinClub : '');
+      lb.textContent = pinClub ? ('🔑 '+pinClub+' · Έξοδος') : me ? '👤 '+me.split('@')[0]+' · Έξοδος' : (IN_SB ? '🔑 Σύνδεση με PIN' : '👤 Σύνδεση');
       render(); renderDels();
     });
+    if(IN_SB) lb.textContent = '🔑 Σύνδεση με PIN';
     lb.addEventListener('click', async ()=>{
-      if(me){ await firebase.auth().signOut(); return; }
+      if(me){ try{ localStorage.removeItem('bt_pin_club'); }catch(e){} await firebase.auth().signOut(); return; }
+      if(IN_SB){ location.href = 'app.html?pin=1'; return; }   // v60: PIN admin κλαμπ (η Google δεν ανοίγει μέσα στο Scoreboard)
       try{ await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert('Η σύνδεση δεν έγινε: '+(e.message||e.code)); }
     });
   }
