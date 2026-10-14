@@ -139,12 +139,12 @@
   function card(t){
     const a = document.createElement('a');
     a.className = 'card';
-    a.href = 'app.html?t='+encodeURIComponent(t.id)+'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:'');
+    a.href = 'app.html?t='+encodeURIComponent(t.id)+(t.format==='mosconi'?'&f=mosc':'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:''));
     const badge = t.status==='live' ? '<span class="badge b-live">Ζωντανά</span>' : t.status==='finished' ? '<span class="badge b-done">Ολοκληρώθηκε</span>' : '<span class="badge b-soon">Προσεχώς</span>';
     const upd = t.updatedAt && t.updatedAt.toDate ? t.updatedAt.toDate() : null;
     const h3 = document.createElement('h3'); h3.textContent = t.title || t.id;
     const meta = document.createElement('div'); meta.className='meta';
-    meta.textContent = [(t.game==='pool'?'Αμερικάνικο'+(t.ball?' '+t.ball+'-ball':''):'Καραμπόλα'), dateRange(t.startDate, t.days), (t.entries?t.entries+' παίκτες':''), 'ταμπλό '+(t.size||32)].filter(Boolean).join(' · ');
+    meta.textContent = [(t.format==='mosconi'?'🏆 Mosconi (ομάδες)':t.game==='pool'?'Αμερικάνικο'+(t.ball?' '+t.ball+'-ball':''):'Καραμπόλα'), dateRange(t.startDate, t.days), (t.entries?t.entries+' παίκτες':''), 'ταμπλό '+(t.size||32)].filter(Boolean).join(' · ');
     a.innerHTML = badge;
     if(canAdmin(t)) a.prepend(actBtn('🗑','Διαγραφή (με αποθήκευση — επαναφορά όποτε θέλετε)', ()=>softDelete(t), false));
     a.append(h3);
@@ -208,7 +208,7 @@
   async function restoreTour(t){
     if(!confirm('↩ Επαναφορά του τουρνουά «'+(t.title||t.id)+'»;')) return;
     try{ await firebase.firestore().collection('tournaments').doc(t.id).set({deleted:false, restoredAt:Date.now()}, {merge:true});
-      if(confirm('✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια);')) location.href='app.html?t='+encodeURIComponent(t.id)+'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:'');
+      if(confirm('✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια);')) location.href='app.html?t='+encodeURIComponent(t.id)+(t.format==='mosconi'?'&f=mosc':'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:''));
     }catch(e){ alert('❗ Η επαναφορά δεν έγινε: '+(e.code||e.message)); }
   }
   function authStart(){
@@ -232,7 +232,7 @@
     const btn = $('#delBtn'), box = $('#delList'); if(!btn || !box) return;
     btn.style.display = dels.length ? '' : 'none'; btn.textContent = '♻ Διαγραμμένα ('+dels.length+')';
     box.innerHTML = '';
-    dels.sort((a,b)=>b.at-a.at).forEach(t=>{ const a=document.createElement('a'); a.className='card'; a.href='app.html?t='+encodeURIComponent(t.id)+'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:'');
+    dels.sort((a,b)=>b.at-a.at).forEach(t=>{ const a=document.createElement('a'); a.className='card'; a.href='app.html?t='+encodeURIComponent(t.id)+(t.format==='mosconi'?'&f=mosc':'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:''));
       const h=document.createElement('h3'); h.textContent='🗑 '+t.title; a.appendChild(h);
       const m=document.createElement('div'); m.className='meta'; m.textContent=(t.organizer?'🎱 '+t.organizer+' · ':'')+(t.at?'διαγράφηκε '+new Date(t.at).toLocaleDateString('el-GR'):'')+' · πατήστε για επαναφορά'; a.appendChild(m);
       if(canAdmin(t)) a.prepend(actBtn('↩','Επαναφορά', ()=>restoreTour(t), true));
@@ -261,7 +261,7 @@
       if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
       authStart();
       firebase.firestore().collection('tournaments').onSnapshot(qs=>{
-        all = []; dels = []; qs.forEach(d=>{ const x=d.data(); if(x.deleted){ dels.push({id:d.id, title:x.title||d.id, size:x.size,koSize:x.koSize, organizer:x.organizer||'', at:+x.deletedAt||0, owner:String(x.owner||'').toLowerCase(), club:x.club||''}); return; } all.push({owner:String(x.owner||'').toLowerCase(), club:x.club||'', id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size,koSize:x.koSize, startDate:x.startDate, days:x.days, game:x.game||'carom', ball:x.ball||'', updatedAt:x.updatedAt, organizer:x.organizer||''}); });
+        all = []; dels = []; qs.forEach(d=>{ const x=d.data(); if(x.deleted){ dels.push({id:d.id, title:x.title||d.id, size:x.size,koSize:x.koSize,format:x.format||'', organizer:x.organizer||'', at:+x.deletedAt||0, owner:String(x.owner||'').toLowerCase(), club:x.club||''}); return; } all.push({owner:String(x.owner||'').toLowerCase(), club:x.club||'', id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size,koSize:x.koSize,format:x.format||'', startDate:x.startDate, days:x.days, game:x.game||'carom', ball:x.ball||'', updatedAt:x.updatedAt, organizer:x.organizer||''}); });
         render(); renderDels();
       }, err=>{ $('#status').textContent='⚠ Δεν ήταν δυνατή η ανάγνωση ('+(err.code||'σφάλμα')+').'; });
     }catch(e){ $('#status').textContent='⚠ Σφάλμα σύνδεσης.'; }

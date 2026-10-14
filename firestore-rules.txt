@@ -22,8 +22,18 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/clubadmin/$(club))
         && get(/databases/$(database)/documents/clubadmin/$(club)).data.get('uid', '') == request.auth.uid;
     }
-    // v35: ο διοργανωτής του συγκεκριμένου τουρνουά (ή ο ιδιοκτήτης πλατφόρμας) · v48: ή ο admin του κλαμπ του τουρνουά
+    // v62: admin διοργάνωσης — η συσκευή που μπήκε τελευταία με το σωστό PIN τουρνουά (directors/{tid}.uid), μόνο όσο το τουρνουά δεν έχει διαγραφεί
+    function dirAdmin(tid) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/directors/$(tid))
+        && get(/databases/$(database)/documents/directors/$(tid)).data.get('uid', '') == request.auth.uid
+        && get(/databases/$(database)/documents/tournaments/$(tid)).data.get('deleted', false) != true;
+    }
     function canManage(tid) {
+      return ownerManage(tid) || dirAdmin(tid);
+    }
+    // v35: ο διοργανωτής του συγκεκριμένου τουρνουά (ή ο ιδιοκτήτης πλατφόρμας) · v48: ή ο admin του κλαμπ του τουρνουά
+    function ownerManage(tid) {
       return isSuper()
         || (isPublisher()
             && get(/databases/$(database)/documents/tournaments/$(tid)).data.get('owner', '') == request.auth.token.email)
@@ -54,7 +64,11 @@ service cloud.firestore {
                 && request.resource.data.owner == resource.data.owner)
             || (pinAdmin(resource.data.get('club', ''))
                 && request.resource.data.get('club', '') == resource.data.get('club', '')
-                && request.resource.data.owner == resource.data.owner));
+                && request.resource.data.owner == resource.data.owner)
+            || (dirAdmin(tid)                                     // v62: admin διοργάνωσης — δεν αλλάζει κλαμπ / ιδιοκτήτη / διαγραφή
+                && request.resource.data.get('club', '') == resource.data.get('club', '')
+                && request.resource.data.owner == resource.data.owner
+                && request.resource.data.get('deleted', false) == resource.data.get('deleted', false)));
       allow delete: if isSuper()
         || (isPublisher() && resource.data.get('owner', '') == request.auth.token.email)
         || pinAdmin(resource.data.get('club', ''));
@@ -75,6 +89,17 @@ service cloud.firestore {
         allow read, delete: if canManage(tid);
         allow create, update: if tableKeyOk(tid) && request.resource.data.size() < 20;
       }
+    }
+
+    // v62: PIN διοργάνωσης ανά τουρνουά. Το ορίζει ο admin του κλαμπ / ο ιδιοκτήτης· ο διοργανωτής «μπαίνει» γράφοντας το σωστό PIN + το δικό του uid
+    match /directors/{tid} {
+      allow read: if ownerManage(tid) || (request.auth != null && resource.data.get('uid', '') == request.auth.uid);
+      allow create, delete: if ownerManage(tid);
+      allow update: if ownerManage(tid)
+        || (request.auth != null
+            && request.resource.data.get('pin', '') == resource.data.get('pin', '-')
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'at', 'label']));
     }
 
     // Λίστα διοργανωτών: τη γράφει μόνο ο ιδιοκτήτης· ο καθένας διαβάζει μόνο τη δική του γραμμή
