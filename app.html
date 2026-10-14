@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v63 (14/10/2026) — Mosconi online: τα πεδία (ομάδες, παίκτες, ρυθμίσεις) ξεκλειδώνουν μόλις συνδεθεί ο admin
   v62 (14/10/2026) — 🏆 MOSCONI (αμερικάνικο): 2 ομάδες × 5 (με αρχηγό), πρόγραμμα ανά μέρα (1-1 / 2-2 scotch / 5-5), αυτόματη κλήρωση με ισονομία, «δεν προσήλθε» με νέα μοιρασιά, χρόνος στεκιάς ±, extensions ανά ράκ · 👤 Admin διοργάνωσης (PIN τουρνουά)
   v61 (13/10/2026) — Μέσα στο Scoreboard (υπολογιστής/tablet) η σύνδεση γίνεται μόνο με PIN· η λίστα τουρνουά δείχνει «🔑 Σύνδεση με PIN» και ο PIN admin διαγράφει/επαναφέρει τουρνουά του κλαμπ του
   v60 (13/10/2026) — Νέο τουρνουά: πόντοι/race to, στεκιές και ζέσταμα ΚΕΝΑ· ο admin τα ορίζει (κόκκινα πεδία) αλλιώς δεν γίνεται ΕΝΑΡΞΗ · διόρθωση «permission-denied» (κλαμπ/ιδιοκτήτης ακριβώς όπως στη βάση) + καθαρό μήνυμα
@@ -192,7 +193,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+(l.f==='mosc'?'&f=mosc':'&s='+(l.s||'32')+(l.k?'&k='+l.k:''))):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v62 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v63 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1638,7 +1639,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v62</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v63</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -6402,7 +6403,7 @@ function syncFinal16ToKO(seeds){
     });
   }
 
-  const APP_VERSION = '62';
+  const APP_VERSION = '63';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : MOSC ? 'BTM_STATE_V1' : POOLFMT ? ('BTP'+SIZE+'K'+KO_SIZE+'_STATE_V1') : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -6529,6 +6530,7 @@ function syncFinal16ToKO(seeds){
 
   function applyAdminState(){
     const disabled = !ADMIN;
+    if(MOSC && typeof mosRender==='function') setTimeout(()=>{ try{ mosRender(); }catch(e){} }, 0);   // v63: τα πεδία του Mosconi ακολουθούν τη σύνδεση admin
 
     document.querySelectorAll('#form32 input[type=text], #form32 .seedBtn').forEach(inp=>{
       inp.disabled = disabled;
