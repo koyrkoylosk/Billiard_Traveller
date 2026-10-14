@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v65 (14/10/2026) — Μενού: καθαρή, ευκρινής εικόνα (αφαιρέθηκε το θόλωμα φόντου που θάμπωνε το μενού)
   v64 (14/10/2026) — 📋 ΤΟΥΡΝΟΥΑ ΟΜΙΛΩΝ (3-4) καραμπόλα: όμιλοι των 4/3, όλοι με όλους, νίκη 2 / ισοπαλία 1, κατάταξη βαθμοί → Μ.Ο. → μεταξύ τους → σερί, περνούν οι 2 πρώτοι (+ καλύτεροι 3οι), νοκ-άουτ 8/16 χωρίς κλήρωση (1–16, 8–9…)
   v63 (14/10/2026) — Mosconi online: τα πεδία (ομάδες, παίκτες, ρυθμίσεις) ξεκλειδώνουν μόλις συνδεθεί ο admin
   v62 (14/10/2026) — 🏆 MOSCONI (αμερικάνικο): 2 ομάδες × 5 (με αρχηγό), πρόγραμμα ανά μέρα (1-1 / 2-2 scotch / 5-5), αυτόματη κλήρωση με ισονομία, «δεν προσήλθε» με νέα μοιρασιά, χρόνος στεκιάς ±, extensions ανά ράκ · 👤 Admin διοργάνωσης (PIN τουρνουά)
@@ -195,7 +196,7 @@
     location.replace(l&&l.t?('app.html?t='+encodeURIComponent(l.t)+(l.f==='mosc'?'&f=mosc':l.f==='grp'?'&f=grp&k='+(l.k||'16'):'&s='+(l.s||'32')+(l.k?'&k='+l.k:''))):'index.html');}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v64 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v65 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1573,7 +1574,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   #mosLog{font-size:12px;max-height:220px;overflow:auto;line-height:1.6}
   @media (max-width:760px){ .mosM{grid-template-columns:36px 40px 1fr;grid-template-areas:none} .mosM .mosSA,.mosM .mosSB{text-align:left} .mos-score .msTeam{font-size:16px} .mos-score .msTeam b{font-size:38px} }
   /* ===== v59: Μενού με κατηγορίες (Billiard Traveller) ===== */
-  #adminSponsorPanel{background:rgba(4,12,24,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+  #adminSponsorPanel{background:rgba(4,12,24,.78)}   /* v65: χωρίς θόλωμα φόντου — σε μερικές οθόνες θόλωνε και το ίδιο το μενού */
   #adminSponsorPanel .btm{--bm-bg:#0d1b2e;--bm-side:#0a1626;--bm-card:#132741;--bm-line:#23405f;--bm-tx:#e9f0f8;--bm-mu:#9fb2c8;--bm-gold:#e2a31b;--bm-gold2:#f4c55a;--bm-red:#e0484e;
     width:min(1000px,96vw);max-width:none;height:min(780px,90vh);max-height:none;padding:0;overflow:hidden;display:flex;flex-direction:column;
     background:var(--bm-bg);color:var(--bm-tx);border:1px solid #2f4d70;border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.55);font-size:14px}
@@ -1668,7 +1669,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v64</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v65</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -6595,7 +6596,7 @@ function syncFinal16ToKO(seeds){
     });
   }
 
-  const APP_VERSION = '64';
+  const APP_VERSION = '65';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : MOSC ? 'BTM_STATE_V1' : GRPFMT ? ('BTG'+KO_SIZE+'_STATE_V1') : POOLFMT ? ('BTP'+SIZE+'K'+KO_SIZE+'_STATE_V1') : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
