@@ -87,7 +87,7 @@
     <div class="hbtns">
       <a class="btn fb" href="https://www.facebook.com/billiardtravellers/" target="_blank" rel="noopener">👍 Facebook</a>
       <button class="btn" id="qrBtn" type="button">🔳 QR</button>
-      <a class="btn" href="app.html" title="Για τον διοργανωτή">⚙ Admin</a>
+      <a class="btn" href="app.html?fresh=1" title="Για τον διοργανωτή">⚙ Admin</a>
       <button class="btn" id="loginBtn" type="button" title="Σύνδεση διοργανωτή για διαγραφή / επαναφορά">👤 Σύνδεση</button>
     </div>
   </div>
@@ -223,7 +223,7 @@
     if(IN_SB) lb.textContent = '🔑 Σύνδεση με PIN';
     lb.addEventListener('click', async ()=>{
       if(me){ try{ localStorage.removeItem('bt_pin_club'); }catch(e){} await firebase.auth().signOut(); return; }
-      if(IN_SB){ location.href = 'app.html?pin=1'; return; }   // v60: PIN admin κλαμπ (η Google δεν ανοίγει μέσα στο Scoreboard)
+      if(IN_SB){ location.href = 'app.html?pin=1&fresh=1'; return; }   // v60: PIN admin κλαμπ (η Google δεν ανοίγει μέσα στο Scoreboard)
       try{ await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert('Η σύνδεση δεν έγινε: '+(e.message||e.code)); }
     });
   }
@@ -270,5 +270,255 @@
 })();
 </script>
 <script>if('serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
+<script>
+/* ===== Billiard Traveller · Πληκτρολόγιο οθόνης v2 (v31.60 / Τουρνουά v69) =====
+   • Συσκευή με οθόνη αφής → ανοίγει ΠΑΝΤΑ το δικό μας πληκτρολόγιο σε κάθε πεδίο.
+   • Κανονικό PC χωρίς αφή → δεν ανοίγει ποτέ μόνο του.
+   • Αν γράψετε με πραγματικό πληκτρολόγιο (ή με των Windows) → το δικό μας αποσύρεται μέχρι να ξανανοίξει η σελίδα.
+   • Το πεδίο ανεβαίνει πάντα ακριβώς πάνω από το πληκτρολόγιο (και από των Windows).
+   • Αριθμητικά πεδία → μόνο αριθμητικό πληκτρολόγιο.
+   Ρύθμιση συσκευής: localStorage 'bt_osk' = auto | always | off   (ή ?osk=auto|always|off στη διεύθυνση) */
+(function(){
+if(window.BTOSK) return;
+var OSK={mode:'auto',el:null,orig:'',lang:'el',shift:true,sym:false,skip:null,ours:false,retreat:false,touchSeen:false,pend:null,pendAt:0,lifts:[],winKb:0};
+window.OSK=OSK;
+try{var qm=new URLSearchParams(location.search).get('osk');if(qm==='off'||qm==='always'||qm==='auto'){localStorage.setItem('bt_osk',qm);}}catch(e){}
+try{var m=localStorage.getItem('bt_osk');OSK.mode=m==='off'?'off':m==='always'?'always':'auto';}catch(e){}
+try{if(sessionStorage.getItem('bt_osk_kb')==='1') OSK.retreat=true;}catch(e){}
+var CSS="#oskBox{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:none;flex-direction:column;background:#07131a;border-top:2px solid #12a3ad;box-shadow:0 -12px 40px rgba(0,0,0,.6);font-family:'Inter',Arial,sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation;text-align:left}"+
+"#oskBox.show{display:flex}"+
+"#oskBar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#0d222b;border-bottom:1px solid #1f4650}"+
+"#oskLbl{flex:none;max-width:28%;font:700 14px 'Inter',Arial;letter-spacing:.12em;text-transform:uppercase;color:#7fd6dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"+
+"#oskVal{flex:1;min-width:0;min-height:56px;display:flex;align-items:center;padding:0 16px;border-radius:12px;background:#02090d;border:2px solid #12a3ad;color:#fff;font:700 30px 'Inter',Arial;white-space:nowrap;overflow:hidden;direction:ltr}"+
+"#oskVal span.ph{color:#4b6670;font-weight:600}"+
+"#oskVal i{display:inline-block;width:3px;height:34px;background:#f5b82e;margin-left:2px;animation:oskBlink 1s steps(1) infinite}"+
+"@keyframes oskBlink{50%{opacity:0}}"+
+"#oskBar button{flex:none;height:56px;min-width:64px;padding:0 18px;border-radius:12px;border:1px solid #2c4b55;background:#13303a;color:#fff;font:800 20px 'Inter',Arial;cursor:pointer;margin:0}"+
+"#oskBar #oskOk{background:linear-gradient(180deg,#22c55e,#15803d);border-color:#22c55e;min-width:120px}"+
+"#oskKeys{display:flex;flex-direction:column;gap:8px;padding:10px 10px 14px}"+
+".oskRow{display:flex;gap:8px;justify-content:center}"+
+".oskK{flex:1 1 0;max-width:110px;height:clamp(48px,8vh,84px);border-radius:12px;border:1px solid #24414b;background:#132a33;color:#f2f7f8;font:700 clamp(20px,3.2vh,32px) 'Inter',Arial;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin:0;box-shadow:0 3px 0 #061015;min-width:0}"+
+".oskK:active,.oskK.down{background:#1d4652;transform:translateY(2px);box-shadow:none}"+
+".oskK.fn{background:#0f2028;color:#9fd8dd;font-size:clamp(15px,2.4vh,22px);max-width:170px}"+
+".oskK.wide{flex-grow:2;max-width:200px}.oskK.space{flex-grow:6;max-width:640px}"+
+".oskK.on{background:#f5b82e;color:#1a1300;border-color:#f5b82e}"+
+".oskK.okk{background:linear-gradient(180deg,#22c55e,#15803d);color:#fff;border-color:#22c55e}"+
+"#oskBox.num #oskKeys{align-items:center}"+
+"#oskBox.num .oskRow{width:min(520px,94vw)}"+
+"#oskBox.num .oskK{max-width:none}"+
+"@media (max-width:620px){#oskLbl{display:none}#oskBar button{min-width:52px;padding:0 10px;font-size:17px}#oskBar #oskOk{min-width:80px}.oskRow{gap:4px}#oskKeys{gap:6px;padding:8px 4px 10px}.oskK{border-radius:8px;font-size:20px}}";
+function isTouch(){try{return OSK.touchSeen||(navigator.maxTouchPoints||0)>0||(window.matchMedia&&matchMedia('(any-pointer: coarse)').matches);}catch(e){return false;}}
+function wants(){if(OSK.mode==='off'||OSK.retreat) return false;if(OSK.mode==='always') return true;return isTouch();}
+function $(id){return document.getElementById(id);}
+function build(){
+  if($('oskBox')) return $('oskBox');
+  var st=document.createElement('style');st.id='oskCss';st.textContent=CSS;(document.head||document.documentElement).appendChild(st);
+  var d=document.createElement('div');d.id='oskBox';d.setAttribute('aria-hidden','true');
+  d.innerHTML='<div id="oskBar"><div id="oskLbl"></div><div id="oskVal"></div><button type="button" id="oskX" title="Άκυρο">✕</button><button type="button" id="oskOk">✔ ΟΚ</button></div><div id="oskKeys"></div>';
+  document.body.appendChild(d);return d;
+}
+function target(n){
+  if(!n||!n.tagName) return null;
+  if(n.closest&&n.closest('#oskBox')) return null;
+  if(n.closest&&n.closest('[data-no-osk]')) return null;
+  var tg=n.tagName.toLowerCase();
+  if(tg==='textarea') return n.readOnly||n.disabled?null:n;
+  if(tg!=='input') return null;
+  var ty=(n.getAttribute('type')||'text').toLowerCase();
+  if(['text','search','number','tel','email','password','url',''].indexOf(ty)<0) return null;
+  if(n.readOnly||n.disabled) return null;
+  return n;
+}
+function noNative(el){if(el.dataset.oskIm==null) el.dataset.oskIm=el.getAttribute('inputmode')||'';el.setAttribute('inputmode','none');}
+function restore(el){if(!el||el.dataset.oskIm==null) return;var v=el.dataset.oskIm;if(v) el.setAttribute('inputmode',v);else el.removeAttribute('inputmode');delete el.dataset.oskIm;}
+function restoreAll(){var a=document.querySelectorAll('[data-osk-im]');for(var i=0;i<a.length;i++) restore(a[i]);}
+function isNum(el){var ty=(el.getAttribute('type')||'').toLowerCase();if(ty==='number'||ty==='tel') return true;var im=(el.dataset.oskIm!=null?el.dataset.oskIm:el.getAttribute('inputmode'))||'';if(/numeric|decimal|tel/.test(im)) return true;var pt=el.getAttribute('pattern')||'';return /^\[0-9\]|^\\d/.test(pt);}
+function isDec(el){var im=(el.dataset.oskIm!=null?el.dataset.oskIm:el.getAttribute('inputmode'))||'';var stp=el.getAttribute('step')||'';return im==='decimal'||/\./.test(stp);}
+function label(el){
+  var s='';
+  if(el.id){var l=document.querySelector('label[for="'+el.id+'"]');if(l) s=l.textContent;}
+  if(!s){var l2=el.closest('label');if(l2) s=l2.textContent;}
+  if(!s) s=el.getAttribute('placeholder')||el.getAttribute('title')||el.getAttribute('aria-label')||'';
+  if(!s){var p=el.previousElementSibling;if(p&&/^(LABEL|SPAN|B|DIV|H\d)$/.test(p.tagName)&&p.textContent.length<60&&/[A-Za-zΑ-Ωα-ωά-ώ]/.test(p.textContent)) s=p.textContent;}
+  try{if(window.BTOSK_LABEL) s=window.BTOSK_LABEL(el,s)||s;}catch(e){}
+  return String(s).replace(/\s+/g,' ').trim();
+}
+/* ---- το πεδίο ανεβαίνει πάνω από το πληκτρολόγιο ---- */
+function scrollParents(el){var out=[],p=el.parentElement;while(p&&p!==document.body&&p!==document.documentElement){var cs=getComputedStyle(p);if(/(auto|scroll)/.test(cs.overflowY)) out.push(p);p=p.parentElement;}return out;}
+function fixedAncestor(el){var p=el;while(p&&p!==document.body){var cs=getComputedStyle(p);if(cs.position==='fixed') return p;p=p.parentElement;}return null;}
+function unlift(){
+  OSK.lifts.slice().reverse().forEach(function(L){try{
+    if(L.t==='pad'){L.n.style.paddingBottom=L.v;}
+    else if(L.t==='tr'){L.n.style.transform=L.v;L.n.style.transition=L.tv;}
+    else if(L.t==='scroll'){L.n.scrollTop=L.v;}
+    else if(L.t==='rm'){if(L.n.parentNode) L.n.parentNode.removeChild(L.n);}
+  }catch(e){}});
+  OSK.lifts=[];
+}
+function lift(el,kbH){
+  if(!el||!kbH) return;
+  var gap=14,top=function(){return window.innerHeight-kbH;};
+  var need=function(){var r=el.getBoundingClientRect();return r.bottom+gap-top();};
+  if(need()<=0) return;
+  var done=function(L){OSK.lifts.push(L);};
+  // 1) περιοχές με κύλιση (πρώτα του πεδίου, μετά της σελίδας)
+  var sp=scrollParents(el);var se=document.scrollingElement||document.documentElement;
+  sp.forEach(function(p){if(need()<=0) return;
+    done({t:'pad',n:p,v:p.style.paddingBottom});var pb=parseFloat(getComputedStyle(p).paddingBottom)||0;p.style.paddingBottom=(pb+kbH)+'px';
+    done({t:'scroll',n:p,v:p.scrollTop});p.scrollTop+=need();});
+  if(need()>0&&!fixedAncestor(el)){
+    var sx=document.createElement('div');sx.setAttribute('data-osk-spacer','');sx.style.cssText='position:absolute;left:0;width:1px;pointer-events:none;visibility:hidden;top:'+se.scrollHeight+'px;height:'+(kbH+40)+'px';document.body.appendChild(sx);
+    done({t:'rm',n:sx});done({t:'scroll',n:se,v:se.scrollTop});se.scrollTop+=need();
+  }
+  // 2) ό,τι δεν κυλάει (παράθυρα πάνω στην οθόνη) → ανεβαίνει ολόκληρο
+  var n=need();
+  if(n>0){var fa=fixedAncestor(el);
+    if(fa){var r=el.getBoundingClientRect();n=Math.min(n,Math.max(0,r.top-8));
+      if(n>0){done({t:'tr',n:fa,v:fa.style.transform,tv:fa.style.transition});fa.style.transition='none';var cur=getComputedStyle(fa).transform;cur=(cur&&cur!=='none'?' '+cur:'');
+        var b0=el.getBoundingClientRect().bottom;fa.style.transform='translateY('+(-n)+'px)'+cur;
+        var mv=b0-el.getBoundingClientRect().bottom;if(mv>1&&Math.abs(mv-n)>1) fa.style.transform='translateY('+(-n*n/mv)+'px)'+cur;}}}   // σελίδα με zoom → διόρθωση
+}
+function relift(){var box=$('oskBox');unlift();if(OSK.el&&box&&box.classList.contains('show')) lift(OSK.el,box.offsetHeight);else if(OSK.winKb>0) lift(document.activeElement&&target(document.activeElement),OSK.winKb);}
+/* ---- άνοιγμα / κλείσιμο ---- */
+function open(el){
+  if(!el) return;
+  var box=build();
+  if(OSK.el===el){if(!box.classList.contains('show')){box.classList.add('show');relift();}return;}
+  if(OSK.el) close(true,false,true);
+  noNative(el);
+  OSK.el=el;OSK.orig=el.value;OSK.sym=false;
+  box.classList.toggle('num',isNum(el));
+  $('oskLbl').textContent=label(el);
+  OSK.shift=!(el.value&&/[a-zα-ωά-ώ]/.test(el.value.slice(-1)));
+  try{var n=el.value.length;el.setSelectionRange(n,n);}catch(e){}
+  render();showVal();box.classList.add('show');box.setAttribute('aria-hidden','false');
+  unlift();requestAnimationFrame(function(){lift(el,box.offsetHeight);});
+}
+function close(commit,cancel,keepFocus){
+  var el=OSK.el;var box=$('oskBox');
+  if(box){box.classList.remove('show');box.setAttribute('aria-hidden','true');}
+  OSK.el=null;unlift();
+  if(!el) return;
+  if(cancel){el.value=OSK.orig;el.dispatchEvent(new Event('input',{bubbles:true}));}
+  else if(commit&&el.value!==OSK.orig) el.dispatchEvent(new Event('change',{bubbles:true}));
+  restore(el);
+  if(!keepFocus&&document.activeElement===el) el.blur();
+}
+var L={
+  el:[['Ε','Ρ','Τ','Υ','Θ','Ι','Ο','Π'],['Α','Σ','Δ','Φ','Γ','Η','Ξ','Κ','Λ'],['Ζ','Χ','Ψ','Ω','Β','Ν','Μ','΄']],
+  en:[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M','.']],
+  sym:[['1','2','3','4','5','6','7','8','9','0'],['-','/','&','.',',','\'','(',')','@'],['#','+','!','?',':','_','"']]
+};
+function render(){
+  var k=$('oskKeys'),el=OSK.el;if(!el) return;
+  var B=function(key,txt,cls){return '<button type="button" class="oskK '+(cls||'')+'" data-k="'+key+'">'+txt+'</button>';};
+  var h='';
+  if(isNum(el)){
+    [['1','2','3'],['4','5','6'],['7','8','9']].forEach(function(r){h+='<div class="oskRow">'+r.map(function(c){return B(c,c);}).join('')+'</div>';});
+    h+='<div class="oskRow">'+(isDec(el)?B('.',',','fn'):B('-','−','fn'))+B('0','0')+B('BS','⌫','fn')+'</div>';
+  }else{
+    var LL=OSK.sym?L.sym:L[OSK.lang];
+    var cs=function(c){return (OSK.sym||OSK.shift)?c:c.toLowerCase();};
+    var em=(el.getAttribute('type')||'')==='email';
+    h+='<div class="oskRow">'+(OSK.sym?'':B(OSK.lang==='el'?';':'-',OSK.lang==='el'?';':'-'))+LL[0].map(function(c){return B(c,cs(c));}).join('')+B('BS','⌫','fn wide')+'</div>';
+    h+='<div class="oskRow">'+LL[1].map(function(c){return B(c,cs(c));}).join('')+(OSK.lang==='el'&&!OSK.sym&&!OSK.shift?B('ς','ς'):'')+(em&&!OSK.sym?B('@','@'):'')+'</div>';
+    h+='<div class="oskRow">'+(OSK.sym?'':B('SH','⇧','fn wide'+(OSK.shift?' on':'')))+LL[2].map(function(c){return B(c,cs(c));}).join('')+(OSK.sym?'':B('SH','⇧','fn wide'+(OSK.shift?' on':'')))+'</div>';
+    h+='<div class="oskRow">'+B('SYM',OSK.sym?'ΑΒΓ':'123','fn wide')+B('LANG',OSK.lang==='el'?'🌐 EN':'🌐 ΕΛ','fn wide')+B(' ','','space')+B('CLR','ΚΑΘΑΡ.','fn')+B('OK','✔','okk wide')+'</div>';
+  }
+  k.innerHTML=h;
+}
+function showVal(){
+  var el=OSK.el,v=$('oskVal');if(!el) return;
+  var val=el.value,ph=el.getAttribute('placeholder')||'';
+  var esc=function(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});};
+  v.innerHTML=(val?esc(el.type==='password'?new Array(val.length+1).join('•'):val):'<span class="ph">'+esc(ph)+'</span>')+'<i></i>';
+  v.scrollLeft=v.scrollWidth;
+}
+var TONOS={'Α':'Ά','Ε':'Έ','Η':'Ή','Ι':'Ί','Ο':'Ό','Υ':'Ύ','Ω':'Ώ','α':'ά','ε':'έ','η':'ή','ι':'ί','ο':'ό','υ':'ύ','ω':'ώ'};
+function key(k){
+  var el=OSK.el;if(!el) return;
+  if(k==='OK'){close(true);return;}
+  if(k==='SH'){OSK.shift=!OSK.shift;render();return;}
+  if(k==='SYM'){OSK.sym=!OSK.sym;render();return;}
+  if(k==='LANG'){OSK.lang=OSK.lang==='el'?'en':'el';OSK.sym=false;render();return;}
+  var v=el.value;
+  if(k==='BS') v=v.slice(0,-1);
+  else if(k==='CLR') v='';
+  else if(k==='΄'){var last=v.slice(-1);if(TONOS[last]) v=v.slice(0,-1)+TONOS[last];}
+  else{
+    var c=k;
+    if(!isNum(el)&&!OSK.sym&&c.length===1&&c!==' ') c=OSK.shift?c.toUpperCase():c.toLowerCase();
+    if(k==='ς') c='ς';
+    var max=+el.getAttribute('maxlength')||0;if(max>0&&v.length>=max) return;
+    v+=c;
+  }
+  if(el.value!==v){
+    var type=(el.getAttribute('type')||'').toLowerCase();
+    if(type==='number'&&(v==='-'||/\.$/.test(v))){try{el.type='text';el.value=v;el.dataset.oskWasNum='1';}catch(e){}}
+    else el.value=v;
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+  try{var n=el.value.length;el.setSelectionRange(n,n);}catch(e){}
+  showVal();
+}
+function setMode(m){OSK.mode=m==='off'?'off':m==='always'?'always':'auto';try{localStorage.setItem('bt_osk',OSK.mode);}catch(e){}if(OSK.mode!=='off'){OSK.retreat=false;try{sessionStorage.removeItem('bt_osk_kb');}catch(e){}}if(OSK.mode==='off') close(false);restoreAll();}
+function retreatNow(){OSK.retreat=true;try{sessionStorage.setItem('bt_osk_kb','1');}catch(e){}}
+function init(){
+  var box=build();if(box.dataset.w) return;box.dataset.w='1';
+  // 1) πάτημα σε πεδίο: κλείνει προσωρινά το πληκτρολόγιο των Windows και ανοίγει το δικό μας στο «click»
+  document.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='touch'||e.pointerType==='pen') OSK.touchSeen=true;
+    if(box.contains(e.target)) return;
+    var el=target(e.target);
+    if(!el||OSK.skip===el||!wants()) return;
+    noNative(el);OSK.pend=el;OSK.pendAt=Date.now();
+    setTimeout(function(){if(OSK.pend===el&&OSK.el!==el){restore(el);OSK.pend=null;}},900);   // δεν άνοιξε το δικό μας → επιστρέφει το των Windows
+  },true);
+  document.addEventListener('click',function(e){
+    if(box.contains(e.target)) return;
+    var el=target(e.target);
+    if(!el){ if(OSK.el) close(true); return; }
+    if(OSK.skip===el) return;
+    if(OSK.pend===el&&Date.now()-OSK.pendAt<1500){OSK.pend=null;if(document.activeElement!==el) try{el.focus();}catch(_){}open(el);}
+  },true);
+  document.addEventListener('focusin',function(e){var el=target(e.target);if(!el) return;if(OSK.skip&&OSK.skip!==el) OSK.skip=null;
+    if(OSK.pend===el&&Date.now()-OSK.pendAt<1500&&OSK.el!==el){setTimeout(function(){if(OSK.pend===el){OSK.pend=null;open(el);}},250);}
+    if(OSK.winKb>0) setTimeout(relift,60);});
+  document.addEventListener('focusout',function(e){
+    try{var t=e.target;if(t&&t.dataset&&t.dataset.oskWasNum==='1'){t.type='number';delete t.dataset.oskWasNum;}}catch(_){}
+    setTimeout(function(){var a=document.activeElement;if(OSK.skip&&a!==OSK.skip){restore(OSK.skip);OSK.skip=null;}
+    if(!OSK.el) return;if(a===OSK.el||box.contains(a)) return;close(true);},150);});
+  // 2) γράφετε με πραγματικό πληκτρολόγιο / των Windows → το δικό μας αποσύρεται για όλη τη συνεδρία
+  var foreign=function(e){if(!e.isTrusted||OSK.ours) return;var el=OSK.el;
+    if(el&&e.target!==el) return;
+    if(!el&&!target(e.target)) return;
+    if(!el&&OSK.mode!=='always'&&!isTouch()) return;
+    retreatNow();
+    if(el){OSK.skip=el;close(false,false,true);restore(el);}
+    restoreAll();};
+  document.addEventListener('beforeinput',foreign,true);
+  document.addEventListener('keydown',function(e){if(e.key&&(e.key.length===1||e.key==='Backspace'||e.key==='Delete')&&!e.ctrlKey&&!e.metaKey&&!e.altKey) foreign(e);},true);
+  box.addEventListener('pointerdown',function(e){e.preventDefault();},true);
+  box.addEventListener('mousedown',function(e){e.preventDefault();},true);
+  $('oskX').addEventListener('click',function(){close(false,true);});
+  $('oskOk').addEventListener('click',function(){close(true);});
+  $('oskKeys').addEventListener('click',function(e){var b=e.target.closest('.oskK');if(!b) return;OSK.ours=true;try{key(b.dataset.k);}finally{OSK.ours=false;}});
+  window.addEventListener('resize',function(){if(OSK.el) setTimeout(relift,80);});
+  // 3) πληκτρολόγιο των Windows / Android: το πεδίο ανεβαίνει πάνω του
+  try{
+    if(navigator.virtualKeyboard){
+      navigator.virtualKeyboard.overlaysContent=true;
+      navigator.virtualKeyboard.addEventListener('geometrychange',function(ev){var r=ev.target.boundingRect;OSK.winKb=r&&r.height>60?Math.round(r.height):0;if(OSK.el) return;unlift();if(OSK.winKb) lift(target(document.activeElement),OSK.winKb);});
+    }else if(window.visualViewport){
+      var vv=window.visualViewport;vv.addEventListener('resize',function(){var h=Math.round(window.innerHeight-vv.height-vv.offsetTop);OSK.winKb=h>120?h:0;if(OSK.el) return;unlift();if(OSK.winKb) lift(target(document.activeElement),OSK.winKb);});
+    }
+  }catch(e){}
+}
+window.BTOSK={open:open,close:close,setMode:setMode,isTouch:isTouch,wants:wants,target:target,state:OSK,relift:relift};
+// συμβατότητα με παλιές κλήσεις του Scoreboard
+window.oskOpen=open;window.oskClose=close;window.oskWants=function(){return wants();};
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
 </body>
 </html>
