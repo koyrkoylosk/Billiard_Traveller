@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v71 (21/10/2026) — Mosconi: αρχηγός Ομάδας Β με δικό του PIN (μόνο σειρά ▲▼ και ON/OFF της ομάδας του) · μονά μόνο με αντίπαλο ίδιας θέσης ±1 · ομαδικά 5-5 με σειρά 1ος-1ος … 5ος-5ος (και στο Scoreboard).
   v70 (21/10/2026) — Μεγάλα, ευδιάκριτα κουμπιά στο πάνω μενού (Μενού / Admin / Χορηγοί), ψηλότερα μπάνερ χορηγών αριστερά-δεξιά, μηνύματα μέσα στην εφαρμογή (όχι των Windows), Mosconi: κλήρωση και με λιγότερους από 5 ON.
   v69 (20/10/2026) — Πληκτρολόγιο οθόνης σε όλα τα πεδία (οθόνες αφής), Mosconi: 6 παίκτες ανά ομάδα με ON/OFF και σειρά ▲▼, η τελευταία μέρα έχει τους περισσότερους αγώνες, αρχηγός Ομάδας Α = admin (PIN διοργανωτή), μέσα στο Scoreboard δεν σβήνει το τουρνουά.
   v68 (15/10/2026) — Άνοιγμα σαν εφαρμογή ή από το «Admin»: καθαρή σελίδα, χωρίς στοιχεία προηγούμενων τουρνουά (τα online μένουν στη λίστα, τα τοπικά κρατιούνται ως αντίγραφο).
@@ -254,7 +255,7 @@ window.alert=function(m){push('alert',m);};
   if(q.get('t')){localStorage.setItem('bt_last_tour',JSON.stringify({t:q.get('t'),s:q.get('s')||'32',k:q.get('k')||'',f:q.get('f')||''}));}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v70 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v71 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1504,6 +1505,8 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   #pinCard h3{margin:0 0 12px;font-size:22px}
   #pinCard #pinD{display:block;margin-top:12px;text-align:center;font-weight:700;color:#0b5b8a;cursor:pointer;text-decoration:underline}
   #pinBox.dir #pinClub, #pinBox.dir label[for=pinClub]{display:none}
+  #pinBox.capb #pinClub, #pinBox.capb label[for=pinClub], #pinBox.capb #pinG, #pinBox.capb #pinD{display:none !important}
+  #pinB{display:block;margin-top:8px;cursor:pointer;font-weight:800}
   .is-director .btm-tab[data-tab="spons"], .is-director #btmDelRow, .is-director #adsBtn, .is-director #btmDirCard, .is-director #btmNewTour, .is-director #cloudPublishBtn{display:none !important}
   #pinCard label{display:block;font-weight:700;font-size:14px;margin:10px 0 4px}
   #pinCard select,#pinCard input{width:100%;box-sizing:border-box;font-size:18px;padding:10px;border-radius:10px;border:1px solid #cbd5e1}
@@ -1634,6 +1637,12 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   .mosPl.out input:not([type=radio]){text-decoration:line-through;opacity:.6}
   .mosNo{font-weight:900;min-width:26px;opacity:.75}
   .mosCap{display:flex;align-items:center;gap:2px;font-weight:900;font-size:12px}
+  .mosLineup{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;opacity:.85;padding:2px 0 0 4px}
+  .mosLineup i{font-style:normal;font-weight:900;margin-right:4px;color:#e11d48}
+  .mosRankW{display:inline-block;margin-left:6px;font-size:11px;font-weight:900;color:#b45309}
+  .mosCapPend{font-size:12px;font-weight:800;color:#b45309}
+  :root.is-capb #mosSetup{display:block !important}
+  :root.is-capb:not(.is-admin) #mosSetup > :not(#mosTeams){display:none !important}
   .mosOnOff{font:900 12px Arial;min-width:46px;padding:5px 8px;border-radius:7px;border:1px solid #16a34a;background:#16a34a;color:#fff;cursor:pointer;text-align:center}
   .mosOnOff.off{background:transparent;color:#e11d48;border-color:#e11d48}
   .mosOrd{display:flex;gap:2px}.mosOrd button{font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--t-border,#cbd5e1);background:transparent;color:inherit;cursor:pointer}.mosOrd button:disabled{opacity:.3;cursor:default}
@@ -1834,7 +1843,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v70</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v71</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -2222,6 +2231,12 @@ Handicap	 -  No handicap
               <p class="btm-help">Ένα δεύτερο πρόσωπο (π.χ. διαιτητής) που ελέγχει <b>μόνο αυτό το τουρνουά</b>: κλήρωση, αλλαγές, έναρξη, αποτελέσματα. Δεν βλέπει χορηγούς, ρυθμίσεις κλαμπ ή άλλα τουρνουά. Το PIN παύει να ισχύει όταν διαγραφεί το τουρνουά.</p>
               <div class="btm-acts"><input type="text" id="btmDirPin" inputmode="numeric" maxlength="8" placeholder="Νέο PIN (4–8 ψηφία)" style="max-width:220px"><button type="button" class="btm-btn" id="btmDirSet">Ορισμός PIN</button><button type="button" class="btm-btn ghost" id="btmDirDel">Κατάργηση</button></div>
               <small class="btm-help" id="btmDirMsg">Διαθέσιμο αφού το τουρνουά δημοσιευτεί online.</small>
+            </div>
+            <div class="btm-card" id="btmCapCard" style="display:none">
+              <div class="btm-ct">🅱 Αρχηγός Ομάδας Β — PIN</div>
+              <p class="btm-help">Ο αρχηγός της δεύτερης ομάδας μπαίνει με δικό του PIN και αλλάζει <b>μόνο</b> τη σειρά δυναμικότητας (▲▼) και ποιοι παίζουν (ON / OFF) της ομάδας του. Το σκορ περνά αυτόματα από τα τραπέζια.</p>
+              <div class="btm-acts"><input type="text" id="btmCapPin" inputmode="numeric" maxlength="8" placeholder="Νέο PIN (4–8 ψηφία)" style="max-width:220px"><button type="button" class="btm-btn" id="btmCapSet">Ορισμός PIN</button><button type="button" class="btm-btn ghost" id="btmCapDel">Κατάργηση</button></div>
+              <small class="btm-help" id="btmCapMsg">Διαθέσιμο αφού το τουρνουά δημοσιευτεί online.</small>
             </div>
             <div class="btm-card btm-row">
               <div><div class="btm-ct">🎱 Τραπέζια</div><p class="btm-help">Κλαμπ, πόντοι, ζέσταμα, αυτόματη ανάθεση και η λίστα των τραπεζιών.</p></div>
@@ -2758,6 +2773,8 @@ Handicap	 -  No handicap
       // v62: admin διοργάνωσης (PIN τουρνουά) — μόνο για το συγκεκριμένο τουρνουά
       let dt = ''; try{ dt = localStorage.getItem('bt_dir') || ''; }catch(e){}
       if(dt && dt===CLOUD_TID){ try{ const ds = await fbDb.collection('directors').doc(dt).get(); if(ds.exists && (ds.data()||{}).uid===u.uid){ r.director = true; r.directorTid = dt; r.name = 'Διοργανωτής'; } }catch(e){} }
+      if(!r.director){ let cb = ''; try{ cb = localStorage.getItem('bt_capb') || ''; }catch(e){}   // v71: αρχηγός Ομάδας Β
+        if(cb && cb===CLOUD_TID){ try{ const cs = await fbDb.collection('captains').doc(cb).get(); if(cs.exists && (cs.data()||{}).uid===u.uid){ r.capb = true; r.name = 'Αρχηγός Β'; } }catch(e){} } }
       return r; }
     if(isSuperUser(u)){ r.super = true; r.name = 'Billiard Traveller'; r.facebook = FB_PAGE_URL; }
     try{
@@ -2902,10 +2919,12 @@ Handicap	 -  No handicap
       cloudRoleReady = resolveRole(u).then(r=>{
         if(cloudUser !== (u||null)) return;
         cloudRole = r;
-        if(u && u.isAnonymous && !r.pin && !r.director){ if(!pinBusy) fbAuth.signOut(); return; }
+        if(u && u.isAnonymous && !r.pin && !r.director && !r.capb){ if(!pinBusy) fbAuth.signOut(); return; }
         document.documentElement.classList.toggle('is-director', !!r.director);
+        document.documentElement.classList.toggle('is-capb', !!r.capb);
         if(r.director) dirWatch();
-        if(u && !canPublishRole() && !r.director){
+        if(r.capb){ capWatch(); setTimeout(()=>{ try{ mosRender(); }catch(e){} }, 0); }
+        if(u && !canPublishRole() && !r.director && !r.capb){
           alert('Ο λογαριασμός '+u.email+' δεν έχει άδεια δημοσίευσης τουρνουά.\n\nΓια άδεια επικοινώνησε με το Billiard Traveller.');
           fbAuth.signOut(); return;
         }
@@ -3121,7 +3140,8 @@ Handicap	 -  No handicap
     const box = $('#pinBox'), sel = $('#pinClub'), err = $('#pinErr'), code = $('#pinCode');
     err.textContent = ''; code.value = '';
     { const g=$('#pinG'); if(g) g.style.display = IN_SB ? 'none' : ''; }
-    box.classList.remove('dir'); { const h=box.querySelector('h3'); if(h) h.textContent='🔑 Σύνδεση Admin'; const lc=box.querySelector('label[for=pinCode]'); if(lc) lc.textContent='PIN admin'; const pd=$('#pinD'); if(pd) pd.style.display = CLOUD_TID ? '' : 'none'; }
+    box.classList.remove('dir'); box.classList.remove('capb'); { const pb=$('#pinB'); if(pb) pb.style.display = (CLOUD_TID && MOSC) ? '' : 'none'; }
+    { const h=box.querySelector('h3'); if(h) h.textContent='🔑 Σύνδεση Admin'; const lc=box.querySelector('label[for=pinCode]'); if(lc) lc.textContent='PIN admin'; const pd=$('#pinD'); if(pd) pd.style.display = CLOUD_TID ? '' : 'none'; }
     const fixed = CLOUD_TID && cloudDoc.loaded && cloudDoc.club ? ((await clubExact(cloudDoc.club)) || cloudDoc.club) : '';
     if(fixed){ sel.innerHTML = '<option>'+fixed.replace(/</g,'&lt;')+'</option>'; sel.disabled = true; }
     else { sel.disabled = false; sel.innerHTML = '<option>Φόρτωση…</option>'; const list = await clubsLoad();
@@ -3131,6 +3151,7 @@ Handicap	 -  No handicap
     box.classList.add('show'); setTimeout(()=>{ try{ code.focus(); }catch(e){} }, 80);
   }
   async function pinLogin(){
+    if($('#pinBox').classList.contains('capb')) return capLogin();   // v71
     if($('#pinBox').classList.contains('dir')) return dirLogin();   // v62
     const club = $('#pinClub').value, pin = $('#pinCode').value.replace(/\D/g,''), err = $('#pinErr');
     if(!club){ err.textContent = 'Διαλέξτε κλαμπ'; return; }
@@ -3169,6 +3190,7 @@ Handicap	 -  No handicap
     code.addEventListener('keydown', e=>{ if(e.key==='Enter') pinLogin(); });
     $('#pinGo').addEventListener('click', pinLogin);
     { const pd=$('#pinD'); if(pd) pd.addEventListener('click', ()=>{ const box=$('#pinBox'); box.classList.add('dir'); box.querySelector('h3').textContent='👤 Admin διοργάνωσης'; box.querySelector('label[for=pinCode]').textContent='PIN διοργάνωσης (το δίνει ο admin του κλαμπ)'; pd.style.display='none'; $('#pinErr').textContent=''; $('#pinCode').value=''; $('#pinCode').focus(); }); }
+    { const pb=$('#pinB'); if(pb) pb.addEventListener('click', ()=>{ const box=$('#pinBox'); box.classList.remove('dir'); box.classList.add('capb'); box.querySelector('h3').textContent='🅱 Αρχηγός Ομάδας Β'; box.querySelector('label[for=pinCode]').textContent='PIN αρχηγού Β (το δίνει ο admin του τουρνουά)'; $('#pinErr').textContent=''; try{ $('#pinCode').focus(); }catch(e){} }); }
     $('#pinX').addEventListener('click', ()=>$('#pinBox').classList.remove('show'));
     $('#pinG').addEventListener('click', async ()=>{ $('#pinBox').classList.remove('show'); try{ localStorage.removeItem(PIN_KEY); }catch(e){} if(cloudUser) await fbAuth.signOut(); await cloudSignIn(); });
   }
@@ -5570,7 +5592,7 @@ function syncFinal16ToKO(seeds){
     const pool = POOLFMT || MOSC;
     const a = {match:+mno, a:x.a, b:x.b, dist:tblDist(+mno), inn:pool?0:tblInn(+mno), eq:pool?false:TBL.cfg.eq!==false, warm:Math.max(0,+TBL.cfg.warm||0), phase:tblPhase(+mno), title:cloudTitle||'', seq:Date.now(),
                game:pool?'pool':'carom', ball:pool?String(TBL.cfg.ball||'9'):'', brk:pool?(TBL.cfg.brk==='win'?'win':'alt'):''};
-    if(MOSC && x.mos){ const sc = mosScore(); a.brk = 'alt'; a.shot = Math.max(10, +MOS.shot||30); a.ext = x.m.t==='S' ? (+MOS.extS||0) : (+MOS.extD||0); a.team = {a:mosTeamName(0), b:mosTeamName(1), sa:sc[0], sb:sc[1], to:+MOS.target||11}; a.mtype = x.m.t; }
+    if(MOSC && x.mos){ const sc = mosScore(); a.brk = 'alt'; a.shot = Math.max(10, +MOS.shot||30); a.ext = x.m.t==='S' ? (+MOS.extS||0) : (+MOS.extD||0); a.team = {a:mosTeamName(0), b:mosTeamName(1), sa:sc[0], sb:sc[1], to:+MOS.target||11}; a.mtype = x.m.t; if(x.m.t==='T'){ const L = mosLineup(x.m); if(L) a.line = L; } }
     TBL.assign[tno] = a;
     try{ await tblRef().collection('assign').doc(String(tno)).set(a); tblMsg('✔ #'+mno+' → Τραπέζι '+tno); }
     catch(e){ tblMsg('⚠ Η ανάθεση δεν έγινε ('+(e.code||e.message)+')'); }
@@ -6607,7 +6629,8 @@ function syncFinal16ToKO(seeds){
     if(!arr.length) return '';
     return arr.map(pi=>(MOS.teams[ti].p[pi]||'').trim() || ('Π'+(pi+1))).join(' / ');
   }
-  function mosSyncNames(){ (MOS.matches||[]).forEach(m=>{ if(m.done || m.running) return; m.playerA.name = mosSideName(m,'a'); m.playerB.name = mosSideName(m,'b'); }); }
+  function mosSyncNames(){ (MOS.matches||[]).forEach(m=>{ if(m.done || m.running) return; if(m.t==='T' && !m.fixed){ m.a = mosActiveOrd(0); m.b = mosActiveOrd(1); } m.playerA.name = mosSideName(m,'a'); m.playerB.name = mosSideName(m,'b'); }); }
+  function mosLineup(m){ if(!m || m.t!=='T') return null; const n = (ti,j)=>(MOS.teams[ti].p[j]||'').trim() || ('Π'+(j+1)); return {a:(m.a||[]).map(j=>n(0,j)), b:(m.b||[]).map(j=>n(1,j))}; }
   function mosScore(){ let a=0,b=0; (MOS.matches||[]).forEach(m=>{ if(!m.done) return; const pa=+m.playerA.points||0, pb=+m.playerB.points||0; if(pa>pb) a++; else if(pb>pa) b++; }); return [a,b]; }
   function mosWinner(){ if(!MOSC || !MOS) return ''; const [a,b] = mosScore(), T = +MOS.target||11; return a>=T ? mosTeamName(0) : b>=T ? mosTeamName(1) : ''; }
   function mosStarted(){ return !!(MOS && (MOS.matches||[]).some(m=>m.done || m.running || (+m.playerA.points||0) || (+m.playerB.points||0))); }
@@ -6637,25 +6660,39 @@ function syncFinal16ToKO(seeds){
       const pairs = {}; M.forEach(m=>{ if(m.t==='D' && m[side].length===2){ const k=m[side].slice().sort().join('-'); pairs[k]=(pairs[k]||0)+1; } });
       Object.values(pairs).forEach(n=>{ if(n>1) c += (n-1)*3; });
     }
+    M.forEach(m=>{ if(m.t==='S' && !mosRankOk(m)) c += 60; });   // v71: κανόνας θέσης (±1) στα μονά
     const opp = {}; M.forEach(m=>{ if(m.t==='S' && m.a.length && m.b.length){ const k=m.a[0]+'-'+m.b[0]; opp[k]=(opp[k]||0)+1; } });
     Object.values(opp).forEach(n=>{ if(n>1) c += (n-1)*2; });
     return c;
   }
+  // v71: σειρά δυναμικότητας ανάμεσα στους ενεργούς (ON) · στα μονά αντίπαλος ίδιας θέσης ή ±1
+  function mosActiveOrd(ti){ const T = MOS.teams[ti]; return T.ord.filter(j=>!T.out.includes(j)); }
+  function mosRank(ti){ const r = {}; mosActiveOrd(ti).forEach((j,k)=>{ r[j] = k; }); return r; }
+  function mosRankOk(m){ if(!m || m.t!=='S' || !(m.a||[]).length || !(m.b||[]).length) return true; const ra = mosRank(0)[m.a[0]], rb = mosRank(1)[m.b[0]]; return ra==null || rb==null || Math.abs(ra-rb)<=1; }
   function mosDrawOnce(base, sides){
+    sides = sides || ['a','b'];
     const M = base.map(m=>({...m, a:m.a.slice(), b:m.b.slice()}));
-    for(const side of (sides||['a','b'])){
-      const ti = side==='a'?0:1, av = mosAvail(ti), tot = {}, dc = {}, last = {};
-      av.forEach(p=>{ tot[p]=0; dc[p]={}; last[p]=-9; });
-      M.forEach((m,i)=>{ if(!(m.done||m.running||m.fixed)) return; (m[side]||[]).forEach(p=>{ if(!(p in tot)) return; if(m.t!=='T') tot[p]++; dc[p][m.day]=(dc[p][m.day]||0)+1; last[p]=i; }); });
-      M.forEach((m,i)=>{
-        if(m.done || m.running || m.fixed) return;
-        if(m.t==='T'){ m[side] = av.slice(); av.forEach(p=>{ dc[p][m.day]=(dc[p][m.day]||0)+1; }); return; }
-        const need = Math.min(MOS_TYPES[m.t].need, av.length);
-        const pick = mosShuffle(av.slice()).sort((p,q)=>((dc[p][m.day]||0)-(dc[q][m.day]||0)) || (tot[p]-tot[q]) || ((last[p]===i-1)-(last[q]===i-1)));
-        m[side] = pick.slice(0, need);
-        m[side].forEach(p=>{ tot[p]++; dc[p][m.day]=(dc[p][m.day]||0)+1; last[p]=i; });
-      });
-    }
+    const st = {};
+    ['a','b'].forEach(side=>{ const ti = side==='a'?0:1, av = mosActiveOrd(ti), S = {av, tot:{}, dc:{}, last:{}};
+      av.forEach(p=>{ S.tot[p]=0; S.dc[p]={}; S.last[p]=-9; });
+      M.forEach((m,i)=>{ if(!(m.done||m.running||m.fixed) && sides.includes(side)) return; (m[side]||[]).forEach(p=>{ if(!(p in S.tot)) return; if(m.t!=='T') S.tot[p]++; S.dc[p][m.day]=(S.dc[p][m.day]||0)+1; S.last[p]=i; }); });
+      st[side] = S; });
+    const RA = mosRank(0), RB = mosRank(1);
+    const sc = (S,p,m,i)=> (S.dc[p][m.day]||0)*100 + S.tot[p]*10 + (S.last[p]===i-1?6:0) + Math.random()*3;
+    const use = (S,p,m,i,cnt)=>{ if(!(p in S.tot)) return; if(cnt) S.tot[p]++; S.dc[p][m.day]=(S.dc[p][m.day]||0)+1; S.last[p]=i; };
+    M.forEach((m,i)=>{
+      if(m.done || m.running || m.fixed) return;
+      if(m.t==='T'){ sides.forEach(sd=>{ const S = st[sd]; m[sd] = S.av.slice(); S.av.forEach(p=>use(S,p,m,i,false)); }); return; }   // 5-5: 1ος με 1ο, 2ος με 2ο…
+      if(m.t==='D'){ sides.forEach(sd=>{ const S = st[sd], need = Math.min(2, S.av.length); m[sd] = S.av.slice().sort((p,q)=>sc(S,p,m,i)-sc(S,q,m,i)).slice(0,need); m[sd].forEach(p=>use(S,p,m,i,true)); }); return; }
+      const A = st.a, B = st.b, fa = sides.includes('a'), fb = sides.includes('b');
+      const cA = fa ? A.av : (m.a.length ? [m.a[0]] : A.av), cB = fb ? B.av : (m.b.length ? [m.b[0]] : B.av);
+      let best = null, bs = Infinity;
+      cA.forEach(p=>cB.forEach(q=>{ const ra = RA[p], rb = RB[q], ok = ra==null || rb==null || Math.abs(ra-rb)<=1;
+        const v = (ok?0:1e6) + (fa?sc(A,p,m,i):0) + (fb?sc(B,q,m,i):0); if(v<bs){ bs=v; best=[p,q]; } }));
+      if(!best) return;
+      if(fa){ m.a = [best[0]]; use(A,best[0],m,i,true); }
+      if(fb){ m.b = [best[1]]; use(B,best[1],m,i,true); }
+    });
     return M;
   }
   function mosDraw(keep, sides){   // v69: sides = μόνο η ομάδα που άλλαξε (η άλλη μένει όπως ήταν)
@@ -6689,13 +6726,16 @@ function syncFinal16ToKO(seeds){
     $('#mosScore').innerHTML = '<div class="msTeam'+(sa>sb?' lead':'')+'"><span>'+mosEsc(mosTeamName(0))+'</span><b>'+sa+'</b></div><div class="msMid"><small>MOSCONI</small><em>έως '+(+MOS.target||11)+'</em>'+(win?'<strong>🏆 '+mosEsc(win)+'</strong>':'')+'</div><div class="msTeam'+(sb>sa?' lead':'')+'"><b>'+sb+'</b><span>'+mosEsc(mosTeamName(1))+'</span></div>';
     // ομάδες
     const tb = $('#mosTeams');
-    if(tb) tb.innerHTML = '<div class="mosCapInfo">👤 Ο <b>αρχηγός της '+mosEsc(mosTeamName(0))+'</b> είναι ο admin του τουρνουά: μπαίνει με το <b>PIN διοργανωτή</b> (Μενού → Online &amp; Τραπέζια → «Admin διοργάνωσης») και κάνει όλες τις αλλαγές και των δύο ομάδων.</div>'+[0,1].map(ti=>{ const T = MOS.teams[ti], nOn = mosActiveN(ti);
+    const capB = !adm && capIsB(), cv = capB ? capView() : null;
+    if(adm) setTimeout(capAdminWatch, 0);
+    if(tb) tb.innerHTML = '<div class="mosCapInfo">'+(capB ? '🅱 Είστε ο <b>αρχηγός της '+mosEsc(mosTeamName(1))+'</b>: αλλάζετε μόνο τη σειρά δυναμικότητας (▲▼) και ποιοι παίζουν (ON / OFF) της ομάδας σας. Το σκορ περνά αυτόματα από τα τραπέζια.'+(cv.pend?' <span class="mosCapPend">⏳ Στάλθηκε — περνά μόλις το δει ο admin.</span>':'')
+        : '👤 Ο <b>αρχηγός της '+mosEsc(mosTeamName(0))+'</b> είναι ο admin του τουρνουά (<b>PIN διοργανωτή</b>). Ο <b>αρχηγός της '+mosEsc(mosTeamName(1))+'</b> έχει δικό του PIN και αλλάζει μόνο τη σειρά και τα ON / OFF της ομάδας του (Μενού → Online &amp; Τραπέζια).')+'</div>'+[0,1].map(ti=>{ const T0 = MOS.teams[ti], T = (capB && ti===1) ? Object.assign({}, T0, {ord:cv.ord, out:cv.out}) : T0, nOn = (capB && ti===1) ? cv.ord.filter(j=>!cv.out.includes(j)).length : mosActiveN(ti), ctl = adm || (capB && ti===1);
       return '<div class="mosTeamBox"><label class="mosTn">Ομάδα '+(ti?'Β':'Α')+'<input data-tn="'+ti+'" value="'+mosEsc(T.name)+'" '+(adm?'':'disabled')+'></label>'+
         '<div class="mosOnInfo'+(nOn===MOS_ACT?'':' bad')+'">Ενεργοί (ON): <b>'+nOn+'</b> / '+MOS_ACT+' · ▲▼ = σειρά δυναμικότητας</div>'+
         T.ord.map((j,r)=>{ const n = T.p[j], off = T.out.includes(j), played = mosPlayed(ti,j);
           return '<div class="mosPl'+(off?' out':'')+'"><span class="mosNo">'+(r+1)+'</span><input data-pn="'+ti+'-'+j+'" value="'+mosEsc(n)+'" placeholder="'+(r===MOS_N-1?'Αναπληρωματικός (προαιρετικό)':'Όνομα παίκτη')+'" '+(adm && (!locked || !played)?'':'disabled')+'>'+
           '<label class="mosCap" title="Αρχηγός (captain)"><input type="radio" name="mosCap'+ti+'" data-cap="'+ti+'-'+j+'" '+(T.cap===j?'checked':'')+' '+(adm?'':'disabled')+'>C</label>'+
-          (adm ? '<span class="mosOrd"><button type="button" data-mv="'+ti+'-'+r+'-1" title="Πιο ψηλά" '+(r===0?'disabled':'')+'>▲</button><button type="button" data-mv="'+ti+'-'+r+'-0" title="Πιο χαμηλά" '+(r===MOS_N-1?'disabled':'')+'>▼</button></span>'+
+          (ctl ? '<span class="mosOrd"><button type="button" data-mv="'+ti+'-'+r+'-1" title="Πιο ψηλά" '+(r===0?'disabled':'')+'>▲</button><button type="button" data-mv="'+ti+'-'+r+'-0" title="Πιο χαμηλά" '+(r===MOS_N-1?'disabled':'')+'>▼</button></span>'+
             '<button type="button" class="mosOnOff '+(off?'off':'on')+'" data-onoff="'+ti+'-'+j+'" title="'+(off?'Εκτός — πατήστε για να μπει':'Παίζει — πατήστε για να βγει')+'">'+(off?'OFF':'ON')+'</button>' : (off?'<span class="mosOnOff off">OFF</span>':''))+'</div>'; }).join('')+'</div>'; }).join('');
     // ρυθμίσεις
     const setv = (id,v)=>{ const e=$(id); if(e && document.activeElement!==e) e.value = v; };
@@ -6742,7 +6782,9 @@ function syncFinal16ToKO(seeds){
       : (adm && !notNeeded ? '<span class="mosSc ed"><input type="number" min="0" max="99" data-pa="'+m.id+'" value="'+(pa||'')+'" placeholder="0">–<input type="number" min="0" max="99" data-pb="'+m.id+'" value="'+(pb||'')+'" placeholder="0"></span>' : '<span class="mosSc">–</span>');
     const st = m.done ? '✔' : m.running ? '▶ παίζεται' : notNeeded ? 'δεν χρειάστηκε' : '';
     const act = adm ? (m.done ? '<button type="button" data-reopen="'+m.id+'" title="Άνοιγμα ξανά (διόρθωση)">✎</button>' : (!notNeeded ? '<button type="button" data-close="'+m.id+'" title="Τέλος αγώνα με αυτό το σκορ">⛔</button>' : '')) : '';
-    return '<div class="'+cls+'"><span class="mosNo">#'+m.id+'</span><span class="mosTy">'+MOS_TYPES[m.t].lbl+'</span><span class="mosSA">'+side('a',0)+'</span>'+score+'<span class="mosSB">'+side('b',1)+'</span><span class="mosSt">'+st+'</span>'+act+'</div>';
+    const L = mosLineup(m), lu = L && L.a.length ? '<div class="mosLineup">'+L.a.map((x,k)=>'<span><i>'+(k+1)+'</i>'+mosEsc(x)+' – '+mosEsc(L.b[k]||'—')+'</span>').join('')+'</div>' : '';
+    const rw = m.t==='S' && !mosRankOk(m) ? '<span class="mosRankW" title="Οι θέσεις δυναμικότητας απέχουν πάνω από 1">⚠ θέσεις</span>' : '';
+    return '<div class="'+cls+'"><span class="mosNo">#'+m.id+'</span><span class="mosTy">'+MOS_TYPES[m.t].lbl+'</span><span class="mosSA">'+side('a',0)+'</span>'+score+'<span class="mosSB">'+side('b',1)+rw+'</span><span class="mosSt">'+st+'</span>'+act+lu+'</div>';
   }
   function mosSave(){ mosSyncNames(); mosRender(); saveAutosaveSnapshot(); if(typeof tblScheduleDispatch==='function') tblScheduleDispatch(); }
   function mosCloseMatch(m, tno){
@@ -6770,6 +6812,92 @@ function syncFinal16ToKO(seeds){
       }
     }catch(e){}
   }
+  // ===================== v71: ΑΡΧΗΓΟΣ ΟΜΑΔΑΣ Β — δικό του PIN, μόνο σειρά ▲▼ και ON / OFF της ομάδας του =====================
+  // captains/{tid} = {pin, uid, at, label, ord:[…6], out:[…], rat}. Ο αρχηγός Β γράφει μόνο ord/out/rat· ο admin (αρχηγός Α / κλαμπ) τα περνά στο τουρνουά.
+  let capDoc = null, capUnsub = null, capAdmUnsub = null, capAdmTid = '';
+  function capIsB(){ return !!(MOSC && CLOUD_TID && cloudRole && cloudRole.capb); }
+  function capView(){ const T = MOS.teams[1], d = capDoc;
+    if(d && Array.isArray(d.ord) && d.ord.length===MOS_N && (+d.rat||0) > (+T.capAt||0)) return {ord:d.ord.slice(), out:(d.out||[]).slice(), pend:true};
+    return {ord:T.ord.slice(), out:T.out.slice(), pend:false}; }
+  async function capEdit(D){
+    const v = capView(), T = MOS.teams[1];
+    if(D.mv){ const [ti,r,up] = D.mv.split('-').map(Number), r2 = up ? r-1 : r+1; if(r2<0 || r2>=v.ord.length) return; [v.ord[r],v.ord[r2]] = [v.ord[r2],v.ord[r]]; }
+    else if(D.onoff){ const j = +D.onoff.split('-')[1], wasOff = v.out.includes(j), nOn = v.ord.filter(x=>!v.out.includes(x)).length;
+      if(wasOff){ if(!String(T.p[j]||'').trim()){ alert('Το όνομα του παίκτη το γράφει ο admin.'); return; } if(nOn>=MOS_ACT){ alert('Παίζουν ήδη '+MOS_ACT+'.\n\nΒάλτε πρώτα OFF αυτόν που βγαίνει και μετά ON αυτόν που μπαίνει.'); return; } }
+      else if(nOn<=2){ alert('Πρέπει να μείνουν τουλάχιστον 2 παίκτες ON.'); return; }
+      v.out = wasOff ? v.out.filter(x=>x!==j) : v.out.concat(j); }
+    const rat = Date.now();
+    capDoc = Object.assign({}, capDoc||{}, {ord:v.ord, out:v.out, rat}); mosRender();
+    try{ await fbDb.collection('captains').doc(CLOUD_TID).update({ord:v.ord, out:v.out, rat}); }
+    catch(e){ alert('⚠ Η αλλαγή δεν στάλθηκε ('+(e.code||e.message)+').'); }
+  }
+  async function capLogin(){
+    const pin = $('#pinCode').value.replace(/\D/g,''), err = $('#pinErr');
+    if(!CLOUD_TID || !MOSC){ err.textContent = 'Ανοίξτε πρώτα το τουρνουά Mosconi'; return; }
+    if(pin.length < 4){ err.textContent = 'Γράψτε το PIN (4–8 ψηφία)'; return; }
+    err.textContent = '…'; pinBusy = true;
+    try{
+      if(cloudUser && !cloudUser.isAnonymous) await fbAuth.signOut();
+      if(!fbAuth.currentUser) await fbAuth.signInAnonymously();
+      const uid = fbAuth.currentUser.uid;
+      try{ await fbDb.collection('captains').doc(CLOUD_TID).update({pin, uid, at:Date.now(), label:devLabel()}); }
+      catch(e){ pinBusy = false; err.textContent = '✖ Λάθος PIN (ή δεν έχει οριστεί PIN αρχηγού Β για αυτό το τουρνουά)'; return; }
+      try{ localStorage.removeItem(PIN_KEY); localStorage.removeItem('bt_dir'); localStorage.setItem('bt_capb', CLOUD_TID); }catch(e){}
+      cloudUser = fbAuth.currentUser;
+      cloudRole = {super:false, publisher:false, name:'Αρχηγός Β', facebook:'', club:'', pin:'', capb:true};
+      document.documentElement.classList.add('is-capb');
+      $('#pinBox').classList.remove('show'); pinBusy = false;
+      capWatch(); cloudRecomputeAdmin(); mosRender();
+      const ms = $('#moscSection'); if(ms) setTimeout(()=>ms.scrollIntoView({behavior:'smooth', block:'start'}), 300);
+    }catch(e){ pinBusy = false; err.textContent = '⚠ '+(e.code||e.message); }
+  }
+  function capLogout(){ try{ localStorage.removeItem('bt_capb'); }catch(e){} if(capUnsub){ try{ capUnsub(); }catch(e){} capUnsub = null; } capDoc = null;
+    cloudRole = {super:false, publisher:false, name:'', facebook:'', club:'', pin:''}; document.documentElement.classList.remove('is-capb'); try{ fbAuth.signOut(); }catch(e){} cloudRecomputeAdmin(); mosRender(); }
+  function capWatch(){
+    if(capUnsub){ try{ capUnsub(); }catch(e){} capUnsub = null; }
+    if(!capIsB() || !cloudUser) return;
+    const uid = cloudUser.uid;
+    capUnsub = fbDb.collection('captains').doc(CLOUD_TID).onSnapshot(ds=>{ const d = ds.exists ? ds.data() : null;
+      if(!d || d.uid!==uid){ alert('🅱 Η σύνδεση αρχηγού Β έληξε (μπήκε άλλη συσκευή ή άλλαξε το PIN).'); capLogout(); return; }
+      capDoc = d; mosRender(); }, ()=>{});
+  }
+  // ο admin (αρχηγός Α / κλαμπ) περνά τις αλλαγές του αρχηγού Β στο τουρνουά
+  function capAdminWatch(){
+    if(!MOSC || !CLOUD_TID || !ADMIN || typeof fbDb==='undefined' || !fbDb){ if(capAdmUnsub){ try{ capAdmUnsub(); }catch(e){} capAdmUnsub = null; capAdmTid=''; } return; }
+    if(capAdmUnsub && capAdmTid===CLOUD_TID) return;
+    capAdmTid = CLOUD_TID;
+    capAdmUnsub = fbDb.collection('captains').doc(CLOUD_TID).onSnapshot(ds=>{ const d = ds.exists ? ds.data() : null; capPinInfo(d);
+      if(!d || !ADMIN || !Array.isArray(d.ord)) return; const T = MOS.teams[1], rat = +d.rat||0;
+      if(!rat || rat <= (+T.capAt||0)) return;
+      const ord = d.ord.map(Number), out = (d.out||[]).map(Number);
+      const okOrd = ord.length===MOS_N && MOS_IDX.every(j=>ord.includes(j)), okOut = out.every(j=>j>=0 && j<MOS_N), nOn = MOS_IDX.filter(j=>!out.includes(j)).length;
+      const okNames = MOS_IDX.every(j=>out.includes(j) || String(T.p[j]||'').trim());
+      T.capAt = rat;
+      if(!okOrd || !okOut || nOn>MOS_ACT || nOn<2 || !okNames){ mosLog('Αρχηγός Β: η αλλαγή δεν πέρασε (μη έγκυρη)'); mosSave(); return; }
+      const before = JSON.stringify([T.ord, T.out.slice().sort()]);
+      T.ord = ord; T.out = out;
+      if(before === JSON.stringify([T.ord, T.out.slice().sort()])){ mosSave(); return; }
+      if(MOS.drawn){ MOS.matches.forEach(m=>{ if(!m.done && !m.running && m.t!=='T') m.fixed = false; }); mosDraw(true, ['b']); }
+      mosLog('🅱 Αρχηγός '+mosTeamName(1)+': σειρά '+mosActiveOrd(1).map(j=>mosPName(1,j)).join(' › ')+(out.length?' · OFF: '+out.map(j=>mosPName(1,j)).join(', '):''));
+      mosSave(); }, ()=>{});
+  }
+  function capPinInfo(d){ const m = $('#btmCapMsg'); if(!m) return; m.textContent = !d ? 'Δεν έχει οριστεί PIN αρχηγού Β.' : d.uid ? '✔ Ο αρχηγός Β είναι συνδεδεμένος'+(d.label?' ('+d.label+')':'')+'.' : '✔ PIN ορισμένο — ο αρχηγός Β δεν έχει μπει ακόμα.'; }
+  async function capSetPin(){
+    if(!CLOUD_TID || !ADMIN || !MOSC) return;
+    const v = ($('#btmCapPin').value||'').replace(/\D/g,''), msg = $('#btmCapMsg');
+    if(v.length < 4){ msg.textContent = '⚠ Το PIN πρέπει να έχει 4–8 ψηφία'; return; }
+    const T = MOS.teams[1];
+    try{ await fbDb.collection('captains').doc(CLOUD_TID).set({pin:v, uid:'', at:Date.now(), label:'', ord:T.ord.slice(), out:T.out.slice(), rat:0, by:(cloudUser && (cloudUser.email || ('PIN · '+devLabel())))||''});
+      msg.textContent = '✔ Ορίστηκε. Δώστε το PIN «'+v+'» στον αρχηγό της '+mosTeamName(1)+': μπαίνει από «Admin» → «Είμαι ο αρχηγός της Ομάδας Β».'; $('#btmCapPin').value=''; setTimeout(capAdminWatch, 300); }
+    catch(e){ msg.textContent = '⚠ Δεν αποθηκεύτηκε ('+(e.code||e.message)+') — έχουν ενημερωθεί οι κανόνες Firebase (v71);'; }
+  }
+  async function capRemove(){
+    if(!CLOUD_TID || !ADMIN) return;
+    if(!(await btAsk('Κατάργηση του PIN αρχηγού Β; Ο αρχηγός Β αποσυνδέεται αμέσως.'))) return;
+    const msg = $('#btmCapMsg');
+    try{ await fbDb.collection('captains').doc(CLOUD_TID).delete(); msg.textContent = '✔ Καταργήθηκε.'; }catch(e){ msg.textContent = '⚠ '+(e.code||e.message); }
+  }
+
   function mosWire(){
     const sec = $('#moscSection'); if(!sec || sec.dataset.w) return; sec.dataset.w = '1';
     const num = (id, key, lo, hi, allowEmpty)=>{ const e=$(id); if(!e) return; e.addEventListener('change',()=>{ if(!ADMIN) return;
@@ -6792,7 +6920,8 @@ function syncFinal16ToKO(seeds){
         if(t.dataset.pa) m.playerA.points = Math.max(0, parseInt(t.value,10)||0); else m.playerB.points = Math.max(0, parseInt(t.value,10)||0); saveAutosaveSnapshot(); }
     });
     sec.addEventListener('click', async e=>{
-      const b = e.target.closest('button'); if(!b || !ADMIN) return;
+      const b = e.target.closest('button'); if(!b) return;
+      if(!ADMIN){ const k = b.dataset.onoff || b.dataset.mv; if(k && /^1-/.test(k) && capIsB()) capEdit(b.dataset); return; }   // v71: αρχηγός Β
       const D = b.dataset;
       if(D.add){ const [d,t] = D.add.split('-'); MOS.plan[+d].push(t); MOS.drawn=false; MOS.matches=[]; mosSave(); }
       else if(D.del){ const [d,i] = D.del.split('-').map(Number); MOS.plan[d].splice(i,1); MOS.drawn=false; MOS.matches=[]; mosSave(); }
@@ -6805,7 +6934,9 @@ function syncFinal16ToKO(seeds){
         if(MOS.drawn){ const sd = ti?'b':'a'; MOS.matches.forEach(m=>{ if(!m.done && !m.running && m.t!=='T') m.fixed = false; }); mosDraw(true, [sd]); }
         mosLog((wasOff?'ON (μπαίνει): ':'OFF (βγαίνει): ')+mosPName(ti,j)+' · '+mosTeamName(ti)+(MOS.drawn?' — νέα μοιρασιά στους αγώνες που δεν παίχτηκαν':'')); mosSave(); }
       else if(D.mv){ const [ti,r,up] = D.mv.split('-').map(Number), o = MOS.teams[ti].ord, r2 = up ? r-1 : r+1;
-        if(r2<0 || r2>=o.length) return; [o[r],o[r2]] = [o[r2],o[r]]; mosLog('Σειρά '+mosTeamName(ti)+': '+o.map(j=>mosPName(ti,j)).join(' › ')); mosSave(); }
+        if(r2<0 || r2>=o.length) return; [o[r],o[r2]] = [o[r2],o[r]];
+        if(MOS.drawn){ MOS.matches.forEach(m=>{ if(!m.done && !m.running && m.t!=='T') m.fixed = false; }); mosDraw(true, [ti?'b':'a']); }   // v71: νέα σειρά → οι αγώνες που δεν παίχτηκαν ακολουθούν τον κανόνα θέσης
+        mosLog('Σειρά '+mosTeamName(ti)+': '+o.map(j=>mosPName(ti,j)).join(' › ')); mosSave(); }
       else if(D.close){ const m = MOS.matches[+D.close-1]; if(m && !m.done){ if(mosCloseMatch(m)){ const own = Object.keys(TBL.assign||{}).find(t=>tblAssignedMatch(t)===m.id); if(own) tblClear(+own); } else alert('Ισοπαλία ή χωρίς σκορ — γράψτε το τελικό σκορ.'); } }
       else if(D.reopen){ const m = MOS.matches[+D.reopen-1]; if(m && (await btAsk('Άνοιγμα ξανά του αγώνα #'+m.id+' για διόρθωση;'))){ m.done=false; mosLog('Άνοιξε ξανά για διόρθωση: #'+m.id); mosSave(); } }
       else if(D.nextday){ MOS.dayOpen = +D.nextday; mosLog('▶ Έναρξη μέρας '+(MOS.dayOpen+1)); mosSave(); }
@@ -6815,7 +6946,7 @@ function syncFinal16ToKO(seeds){
     });
   }
 
-  const APP_VERSION = '70';
+  const APP_VERSION = '71';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : MOSC ? 'BTM_STATE_V1' : GRPFMT ? ('BTG'+KO_SIZE+(KO_SIZE===32?'X':'')+'_STATE_V1') : CAROMK ? ('BTCAR'+SIZE+'K'+KO_SIZE+'_STATE_V1') : POOLFMT ? ('BTP'+SIZE+'K'+KO_SIZE+'_STATE_V1') : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -7229,6 +7360,7 @@ function syncFinal16ToKO(seeds){
       adminBtn.addEventListener('click', async ()=>{
         // Online (σελίδα στο internet): σύνδεση μόνο με Google — ο κωδικός δεν ισχύει
         if(cloudReady() && HOSTED){
+          if(cloudRole && cloudRole.capb){ if(await btAsk('Αποσύνδεση αρχηγού Ομάδας Β;')) capLogout(); return; }   // v71
           if(!cloudUser || (cloudUser.isAnonymous && !cloudRole.pin && !cloudRole.director)){ pinOpen(); }
           else if(ADMIN){ if((await btAsk('Αποσύνδεση από admin;'))){ try{ localStorage.removeItem(PIN_KEY); localStorage.removeItem('bt_dir'); }catch(e){} cloudRole.pin=''; cloudRole.director=false; document.documentElement.classList.remove('is-director'); await fbAuth.signOut(); } }
           else if((await btAsk('Είσαι συνδεδεμένος ως '+(cloudUser.email||('admin «'+cloudRole.pin+'»'))+' χωρίς δικαίωμα αλλαγών σε αυτό το τουρνουά.\n\nΑποσύνδεση;'))){ try{ localStorage.removeItem(PIN_KEY); }catch(e){} await fbAuth.signOut(); }
@@ -7330,6 +7462,7 @@ function syncFinal16ToKO(seeds){
       mirror('#themeSelect','#btmTheme'); mirror('#paperSelect','#btmPaper');
       P.querySelectorAll('#btmLang .seg-btn').forEach(b=>b.addEventListener('click',()=>{ if(LANG!==b.dataset.lang) $('#langBtn').click(); btmRefresh(); }));
       $('#btmDirSet').addEventListener('click', dirSetPin); $('#btmDirDel').addEventListener('click', dirRemove);
+      { const cc = $('#btmCapCard'); if(cc && MOSC) cc.style.display = ''; const cs = $('#btmCapSet'), cd = $('#btmCapDel'); if(cs) cs.addEventListener('click', capSetPin); if(cd) cd.addEventListener('click', capRemove); }
       $('#btmPrint').addEventListener('click',()=>{ try{ printEntries(); }catch(e){ alert('⚠ '+e.message); } });
       $('#btmGoTables').addEventListener('click',()=>{ const t=$('#tblSection');
         if(!t || t.style.display==='none'){ alert('Τα τραπέζια εμφανίζονται όταν το τουρνουά είναι online.\n\nΠατήστε πρώτα «☁ Δημοσίευση online».'); return; }
@@ -7620,6 +7753,7 @@ function syncFinal16ToKO(seeds){
   <div id="pinErr"></div>
   <button type="button" id="pinGo">ΣΥΝΔΕΣΗ</button>
   <a id="pinD">👤 Είμαι ο διοργανωτής αυτού του τουρνουά (PIN διοργάνωσης)</a>
+  <a id="pinB" style="display:none">🅱 Είμαι ο αρχηγός της Ομάδας Β (Mosconi)</a>
   <a id="pinG">Σύνδεση με Google (Billiard Traveller / διοργανωτής)</a>
 </div></div>
 <div id="meBig"><div><div class="b1" id="meB1"></div><div class="b2" id="meB2"></div><button type="button" id="meOk">OK</button></div></div>
