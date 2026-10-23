@@ -102,6 +102,23 @@ service cloud.firestore {
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'at', 'label']));
     }
 
+    // v71: αρχηγός Ομάδας Β (Mosconi) — δικό του PIN. Μπαίνει γράφοντας το σωστό PIN + το uid του·
+    //      μετά αλλάζει ΜΟΝΟ τη σειρά (ord) και τα ON/OFF (out) της ομάδας του· τα περνά στο τουρνουά ο admin.
+    match /captains/{tid} {
+      allow read: if canManage(tid) || (request.auth != null && resource.data.get('uid', '') == request.auth.uid);
+      allow create, delete: if canManage(tid);
+      allow update: if canManage(tid)
+        || (request.auth != null
+            && request.resource.data.get('pin', '') == resource.data.get('pin', '-')
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'at', 'label']))
+        || (request.auth != null
+            && resource.data.get('uid', '') == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ord', 'out', 'rat'])
+            && request.resource.data.ord is list && request.resource.data.ord.size() == 6
+            && request.resource.data.out is list && request.resource.data.out.size() <= 6);
+    }
+
     // Λίστα διοργανωτών: τη γράφει μόνο ο ιδιοκτήτης· ο καθένας διαβάζει μόνο τη δική του γραμμή
     match /publishers/{email} {
       allow read: if isSuper()

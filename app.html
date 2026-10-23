@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v72 (23/10/2026) — ⬆ Φόρτωση συμμετοχών από αρχείο (CSV / TXT / JSON — το ίδιο αρχείο με τη Βάση Παικτών του Scoreboard): συμπλήρωση κενών ή αντικατάσταση όλων, χωρίς διπλά, μεγάλα ονόματα → ΕΠΩΝΥΜΟ + αρχικό.
   v71 (21/10/2026) — Mosconi: αρχηγός Ομάδας Β με δικό του PIN (μόνο σειρά ▲▼ και ON/OFF της ομάδας του) · μονά μόνο με αντίπαλο ίδιας θέσης ±1 · ομαδικά 5-5 με σειρά 1ος-1ος … 5ος-5ος (και στο Scoreboard).
   v70 (21/10/2026) — Μεγάλα, ευδιάκριτα κουμπιά στο πάνω μενού (Μενού / Admin / Χορηγοί), ψηλότερα μπάνερ χορηγών αριστερά-δεξιά, μηνύματα μέσα στην εφαρμογή (όχι των Windows), Mosconi: κλήρωση και με λιγότερους από 5 ON.
   v69 (20/10/2026) — Πληκτρολόγιο οθόνης σε όλα τα πεδία (οθόνες αφής), Mosconi: 6 παίκτες ανά ομάδα με ON/OFF και σειρά ▲▼, η τελευταία μέρα έχει τους περισσότερους αγώνες, αρχηγός Ομάδας Α = admin (PIN διοργανωτή), μέσα στο Scoreboard δεν σβήνει το τουρνουά.
@@ -221,17 +222,23 @@ function next(){if(cur||!Q.length) return;if(!document.body){document.addEventLi
   inp.type=/password|κωδικ/i.test(String(cur.msg||''))?'password':'text';inp.value=cur.def==null?'':String(cur.def);
   document.getElementById('btDlgNo').style.display=cur.kind==='alert'?'none':'';
   document.getElementById('btDlgOk').textContent=cur.kind==='confirm'?'ΝΑΙ':'OK';
+  var bx=document.getElementById('btDlgBtns');[].slice.call(bx.querySelectorAll('.btDlgX')).forEach(function(b){b.remove();});
+  document.getElementById('btDlgOk').style.display=cur.kind==='choose'?'none':'';
+  if(cur.kind==='choose'){(cur.def||[]).forEach(function(t,i){var b=document.createElement('button');b.type='button';b.className='btDlgX';b.textContent=t;
+    if(i===0){b.style.background='linear-gradient(180deg,#22c55e,#15803d)';b.style.borderColor='#22c55e';}
+    b.addEventListener('click',function(){done(i);});bx.appendChild(b);});}
   try{if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();}catch(e){}
   d.classList.add('show');
   setTimeout(function(){try{if(cur&&cur.kind==='prompt'){inp.focus();inp.select();}else document.getElementById('btDlgOk').focus();}catch(e){}},40);}
 function done(ok){var c=cur;if(!c) return;cur=null;document.getElementById('btDlg').classList.remove('show');
   try{var v=document.getElementById('btDlgIn').value;try{if(window.BTOSK) BTOSK.close(false);}catch(_){}
-    c.res(c.kind==='confirm'?!!ok:c.kind==='prompt'?(ok?v:null):undefined);}catch(e){}
+    c.res(c.kind==='choose'?(typeof ok==='number'?ok:(ok===true?0:-1)):c.kind==='confirm'?!!ok:c.kind==='prompt'?(ok?v:null):undefined);}catch(e){}
   setTimeout(next,60);}
 function push(kind,msg,def){return new Promise(function(res){Q.push({kind:kind,msg:msg,def:def,res:res});next();});}
 window.btAlert=function(m){return push('alert',m);};
 window.btAsk=function(m){return push('confirm',m);};
 window.btPrompt=function(m,d){return push('prompt',m,d);};
+window.btChoose=function(m,opts){return push('choose',m,opts||[]);};   /* v72: επιλογή από κουμπιά → αριθμός (ή -1 = άκυρο) */
 window.alert=function(m){push('alert',m);};
 })();
 </script>
@@ -255,7 +262,7 @@ window.alert=function(m){push('alert',m);};
   if(q.get('t')){localStorage.setItem('bt_last_tour',JSON.stringify({t:q.get('t'),s:q.get('s')||'32',k:q.get('k')||'',f:q.get('f')||''}));}
 }catch(e){}})();
 </script>
-<title>Billiard Traveller 32 PRO v71 — Full + Knockout + Stats + FF</title>
+<title>Billiard Traveller 32 PRO v72 — Full + Knockout + Stats + FF</title>
 <script>try{var L=localStorage.getItem("BT32_LAYOUT")==="cards"?"cards":"lines";document.documentElement.classList.add("layout-"+L);}catch(e){document.documentElement.classList.add("layout-lines");}
 try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAttribute("data-theme",t);var pp=localStorage.getItem("BT32_PAPER");if(pp)document.documentElement.setAttribute("data-paper",pp);}catch(e){}</script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1843,7 +1850,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v71</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v72</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -1946,10 +1953,11 @@ Handicap	 -  No handicap
       <div class="section">
         <h2 id="hParticipants">📝 Φόρμα Συμμετοχών (32)</h2>
         <div class="grid-2" id="form32"></div>
-        <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button id="btnReseed" class="btn">Αναδιάταξη (τυχαία)</button>
           <button id="btnLockEntries" class="btn lock-btn admin-only" type="button">🔓 Κλείδωμα συμμετοχών</button>
           <button id="btnPrintEntries" class="btn admin-only" type="button" title="Χαρτί για τον αδμιν: ποιος πλήρωσε συμμετοχή + χρεώσεις μπαρ">🖨 Λίστα συμμετοχών</button>
+          <label id="btnImportEntries" class="btn admin-only" title="Φόρτωση ονομάτων από αρχείο CSV / TXT / JSON (π.χ. εξαγωγή Βάσης Παικτών του Scoreboard)" style="cursor:pointer">⬆ Φόρτωση από αρχείο<input type="file" id="entriesFileInput" accept=".csv,.txt,.json,text/csv,text/plain,application/json" hidden></label>
           <small id="seedHint" style="color:#5a6f82">
             * Επεξεργάζεσαι ονόματα και μπορείς να ξαναπατήσεις αναδιάταξη.
           </small>
@@ -3622,6 +3630,86 @@ Handicap	 -  No handicap
       if(o===m && nameKey(side==='A'?o.playerB.name:o.playerA.name)===k) return o.id;
     }
     return 0;
+  }
+
+
+  // ================= v72: ⬆ Φόρτωση συμμετοχών από αρχείο =================
+  // Δέχεται: CSV/TXT (ένα όνομα ανά γραμμή — «όνομα;χώρα;λίστα», ή με κόμμα/tab) και JSON (Βάση Παικτών Scoreboard).
+  function entParseFile(txt){
+    txt = String(txt||'').replace(/^﻿/,'');
+    const out = [];
+    const t = txt.trim();
+    if(/^[\[{]/.test(t)){
+      try{
+        const j = JSON.parse(t);
+        const arr = Array.isArray(j) ? j : (j && (j.players || j.participants || j.list)) || [];
+        arr.forEach(x=>{ const n = typeof x==='string' ? x : (x && (x.name || x.nm || x.n)); if(n) out.push(String(n)); });
+        return out;
+      }catch(e){}
+    }
+    txt.split(/\r?\n/).forEach((ln,k)=>{
+      ln = ln.trim(); if(!ln || ln[0]==='#') return;
+      const sep = ln.includes(';') ? ';' : ln.includes('\t') ? '\t' : ln.includes(',') ? ',' : null;
+      let n = (sep ? ln.split(sep)[0] : ln).trim().replace(/^"(.*)"$/,'$1').trim();
+      if(!n) return;
+      if(/^(όνομα|ονομα|ονοματεπώνυμο|ονοματεπωνυμο|name|player|παίκτης|παικτης)$/i.test(n)) return;   // επικεφαλίδα
+      n = n.replace(/^\d+\s*[.)\-]\s+/,'');   // «1. ΟΝΟΜΑ» → «ΟΝΟΜΑ»
+      if(n) out.push(n);
+    });
+    return out;
+  }
+  function entFitName(n, max){
+    n = String(n||'').trim().replace(/\s+/g,' ');
+    if(n.length<=max) return n;
+    const w = n.split(' ');
+    if(w.length>1){ const s = w[0]+' '+w.slice(1).map(x=>x[0]+'.').join(''); if(s.length<=max) return s; }
+    return n.slice(0,max).trim();
+  }
+  const entEmptySlot = n => { n = String(n||'').trim(); return !n || /^player\s*\d+$/i.test(n); };
+  async function importEntriesFile(file){
+    if(!ADMIN || !file) return;
+    if(MOSC){ alert('Στο Mosconi οι παίκτες γράφονται στις ομάδες.'); return; }
+    if(entriesLocked()){ alert('🔒 Οι συμμετοχές είναι κλειδωμένες — δεν γίνεται φόρτωση από αρχείο.'); return; }
+    let txt = '';
+    try{ txt = await file.text(); }catch(e){ alert('Δεν διαβάστηκε το αρχείο.'); return; }
+    const raw = entParseFile(txt);
+    if(!raw.length){ alert('Δεν βρέθηκαν ονόματα στο αρχείο «'+file.name+'».\n\nΜορφή: ένα όνομα σε κάθε γραμμή (CSV / TXT) ή αρχείο εξαγωγής της Βάσης Παικτών (JSON).'); return; }
+    const MAXLEN = 20, CAP = SIZE===256 ? 160 : SIZE;
+    let shortened = 0; const seenK = {}, dupFile = [], names = [];
+    raw.forEach(n0=>{
+      const n = entFitName(n0, MAXLEN); if(n!==String(n0).trim().replace(/\s+/g,' ')) shortened++;
+      if(!isRealName(n)) return;
+      const k = nameKey(n); if(seenK[k]){ dupFile.push(n); return; } seenK[k]=1; names.push(n);
+    });
+    const existing = participants.slice(0,CAP).filter(n=>!entEmptySlot(n) && isRealName(n)).length;
+    let mode = 1;   // 0 = συμπλήρωση κενών, 1 = αντικατάσταση όλων
+    if(existing){
+      const c = await btChoose('📂 Βρέθηκαν '+names.length+' παίκτες στο αρχείο «'+file.name+'».\n\nΗ φόρμα έχει ήδη '+existing+' ονόματα.\n\n➕ Συμπλήρωση κενών: όσοι υπάρχουν μένουν, οι νέοι μπαίνουν στις κενές θέσεις.\n🔁 Αντικατάσταση όλων: η φόρμα αδειάζει και γεμίζει μόνο από το αρχείο.',
+        ['➕ ΣΥΜΠΛΗΡΩΣΗ ΚΕΝΩΝ','🔁 ΑΝΤΙΚΑΤΑΣΤΑΣΗ ΟΛΩΝ']);
+      if(c<0) return; mode = c;
+    }else{
+      if(!(await btAsk('📂 Βρέθηκαν '+names.length+' παίκτες στο αρχείο «'+file.name+'».\n\nΝα μπουν στη Φόρμα Συμμετοχών ('+CAP+' θέσεις);'))) return;
+    }
+    if(mode===1){ for(let i=0;i<SIZE;i++){ participants[i]=''; seeded[i]=false; } }
+    const inForm = {}; participants.forEach(n=>{ if(!entEmptySlot(n) && isRealName(n)) inForm[nameKey(n)]=1; });
+    const already = [], left = []; let added = 0, slot = 0;
+    names.forEach(n=>{
+      if(inForm[nameKey(n)]){ already.push(n); return; }
+      while(slot<CAP && !entEmptySlot(participants[slot])) slot++;
+      if(slot>=CAP){ left.push(n); return; }
+      participants[slot] = n; seeded[slot] = false; inForm[nameKey(n)]=1; added++; slot++;
+    });
+    renderForm(); applyEntriesLock();
+    try{ refreshCapacity(); }catch(e){}
+    saveAutosaveSnapshot();
+    const lst = a => a.slice(0,8).join(', ')+(a.length>8?' … (+'+(a.length-8)+')':'');
+    let msg = '✅ Μπήκαν '+added+' παίκτες στη Φόρμα Συμμετοχών.';
+    if(already.length) msg += '\n\n• Υπήρχαν ήδη στη φόρμα ('+already.length+'): '+lst(already);
+    if(dupFile.length) msg += '\n\n• Διπλοί μέσα στο αρχείο ('+dupFile.length+'): '+lst(dupFile);
+    if(left.length) msg += '\n\n⚠ Δεν χώρεσαν ('+left.length+' — το τουρνουά έχει '+CAP+' θέσεις): '+lst(left);
+    if(shortened) msg += '\n\n• '+shortened+' μεγάλα ονόματα γράφτηκαν σύντομα (ΕΠΩΝΥΜΟ + αρχικό), γιατί η θέση χωράει έως '+MAXLEN+' γράμματα.';
+    msg += '\n\nΣτο τέλος πάτα «Αναδιάταξη (τυχαία)» για την κλήρωση.';
+    await btAlert(msg);
   }
 
   function renderForm(){
@@ -6946,7 +7034,7 @@ function syncFinal16ToKO(seeds){
     });
   }
 
-  const APP_VERSION = '71';
+  const APP_VERSION = '72';
   const LOCAL_KEY = CLOUD_TID ? ('BTC_'+CLOUD_TID) : MOSC ? 'BTM_STATE_V1' : GRPFMT ? ('BTG'+KO_SIZE+(KO_SIZE===32?'X':'')+'_STATE_V1') : CAROMK ? ('BTCAR'+SIZE+'K'+KO_SIZE+'_STATE_V1') : POOLFMT ? ('BTP'+SIZE+'K'+KO_SIZE+'_STATE_V1') : (SIZE===64 ? 'BT64_MENU_STATE_V1' : 'BT32_MENU_STATE_V1');   // κάθε μέγεθος έχει το δικό του τουρνουά
 
   function buildAutosaveSnapshot(){
@@ -7690,6 +7778,7 @@ function syncFinal16ToKO(seeds){
     { const ab = $('#adsBtn'); if(ab) ab.addEventListener('click', adsMgrOpen); }
     { const cb = $('#celOpenBtn'); if(cb) cb.addEventListener('click', ()=>celOpen(false)); }
     { const pe = $('#btnPrintEntries'); if(pe) pe.addEventListener('click', printEntries); }
+    { const fi = $('#entriesFileInput'); if(fi) fi.addEventListener('change', ()=>{ const f = fi.files && fi.files[0]; fi.value=''; if(f) importEntriesFile(f); }); }   // v72
     { const tc=$('#tbChip'), ts=$('#tbStart');
       if(tc) tc.addEventListener('click',()=>{ const sec=$('#tblSection'); if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'}); });
       if(ts) ts.addEventListener('click',()=>{
