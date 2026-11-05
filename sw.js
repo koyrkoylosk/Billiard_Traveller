@@ -1,7 +1,7 @@
 // Billiard Traveller Τουρνουά — service worker (v43)
 // Σελίδες: πρώτα από το internet (για να έρχονται αμέσως οι αναβαθμίσεις), αλλιώς από την αποθήκευση.
-const VERSION = 'bt-tour-v74';
-const CORE = ['./app.html', './index.html', './manifest.webmanifest', './tour-icon-192.png', './tour-icon-512.png'];
+const VERSION = 'bt-tour-v75';
+const CORE = ['./app.html', './index.html', './info.html', './manifest.webmanifest', './tour-icon-192.png', './tour-icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).catch(() => {}));
   self.skipWaiting();

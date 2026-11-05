@@ -4,6 +4,7 @@ BILLIARD TRAVELLER ONLINE — ΟΔΗΓΙΕΣ ΕΓΚΑΤΑΣΤΑΣΗΣ (μία φ
 Αρχεία του πακέτου
   index.html          -> κεντρική σελίδα με όλα τα τουρνουά
   app.html            -> η εφαρμογή (admin) + σελίδα παικτών (app.html?t=κωδικός)
+  info.html           -> v75: σελίδα προκήρυξης τουρνουά (info.html?t=κωδικός)
   firestore-rules.txt -> κανόνες ασφαλείας της βάσης
 
 A. Κανόνες ασφαλείας (Firebase)
