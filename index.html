@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="el">
-<head><!-- Billiard Traveller © 2026 — all rights reserved. Unauthorized copying, modification or redistribution is prohibited. -->
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="manifest" href="manifest.webmanifest">
@@ -121,15 +121,557 @@
   </div>
 </div>
 
-<script>(function(){const D={apiKey:"AIzaSyAJmOe7Woh92qMCDTy0HtepvJJDcrFgSfE",authDomain:"billiard-traveller.firebaseapp.com",projectId:"billiard-traveller",storageBucket:"billiard-traveller.firebasestorage.app",messagingSenderId:"481554679650",appId:"1:481554679650:web:d9d13e5d21ca89b11ace3b"},l=e=>document.querySelector(e),E=["Κυρ","Δευ","Τρί","Τετ","Πέμ","Παρ","Σάβ"];let p=[],u=[],f="";function L(){const e=l("#cities");if(!e)return;const o={};p.forEach(n=>{const i=n.promo&&n.promo.on&&String(n.promo.city||"").trim();i&&n.status!=="finished"&&(o[g(i)]=o[g(i)]||i)});const t=Object.keys(o).sort((n,i)=>o[n].localeCompare(o[i],"el"));if(t.length<2&&!f){e.innerHTML="";return}e.innerHTML="";const r=(n,i)=>{const a=document.createElement("button");a.type="button",a.className="chip"+(f===n?" on":""),a.textContent=i,a.addEventListener("click",()=>{f=n,b()}),e.appendChild(a)};r("","📍 Όλες οι πόλεις"),t.forEach(n=>r(n,o[n]))}function x(e,o){if(!e)return"";const[t,r,n]=e.split("-").map(Number);if(!t)return"";const i=new Date(t,r-1,n),a=new Date(t,r-1,n+Math.max(1,o||3)-1),c=s=>E[s.getDay()]+" "+s.getDate()+"/"+(s.getMonth()+1);return(o||3)>1?c(i)+" – "+c(a)+" "+a.getFullYear():c(i)+" "+i.getFullYear()}const g=e=>String(e||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");function A(e){const o=document.createElement("a");o.className="card",o.href="app.html?t="+encodeURIComponent(e.id)+(e.format==="mosconi"?"&f=mosc":e.format==="groups"?"&f=grp&k="+(e.koSize||16):e.format==="carom"?"&f=car&s="+(e.size||32)+"&k="+(e.koSize||16):"&s="+(e.size||32)+(e.koSize?"&k="+e.koSize:""));const t=e.status==="live"?'<span class="badge b-live">Ζωντανά</span>':e.status==="finished"?'<span class="badge b-done">Ολοκληρώθηκε</span>':'<span class="badge b-soon">Προσεχώς</span>',r=e.updatedAt&&e.updatedAt.toDate?e.updatedAt.toDate():null,n=document.createElement("h3");n.textContent=e.title||e.id;const i=document.createElement("div");if(i.className="meta",i.textContent=[e.format==="mosconi"?"🏆 Mosconi (ομάδες)":e.format==="groups"?"🎯 Γαλλικό · Όμιλοι (3-4)":e.format==="carom"?"🎯 Γαλλικό · Διπλή πυραμίδα":e.game==="pool"?"Αμερικάνικο"+(e.ball?" "+e.ball+"-ball":""):"Γαλλικό",x(e.startDate,e.days),e.entries?e.entries+" παίκτες":"","ταμπλό "+(e.size||32)].filter(Boolean).join(" · "),o.innerHTML=t,S(e)&&o.prepend(v("🗑","Διαγραφή (με αποθήκευση — επαναφορά όποτε θέλετε)",()=>R(e),!1)),o.append(n),e.organizer){const a=document.createElement("div");a.className="org",a.textContent="🎱 "+e.organizer,o.appendChild(a)}if(o.append(i),e.promo&&e.promo.on){const a=e.promo,c=document.createElement("div");if(c.className="promo",c.textContent=["📍 "+[a.venue,a.city].filter(Boolean).join(" · "),a.fee!==void 0&&a.fee!==""?"💶 "+(+a.fee?String(+a.fee).replace(".",",")+" €":"Δωρεάν"):"",a.max?"👥 "+(e.entries||0)+"/"+a.max:""].filter(s=>s&&s.length>3).join("   "),o.appendChild(c),e.status!=="live"&&e.status!=="finished"){o.href="info.html?t="+encodeURIComponent(e.id);const s=document.createElement("div");s.className="promoGo",s.textContent="📣 Προκήρυξη & συμμετοχή →",o.appendChild(s)}}if(e.champion){const a=document.createElement("div");a.className="champ",a.textContent="🏆 Νικητής: "+e.champion,o.appendChild(a)}if(r){const a=document.createElement("div");a.className="meta",a.textContent="Ενημέρωση: "+r.getDate()+"/"+(r.getMonth()+1)+" "+String(r.getHours()).padStart(2,"0")+":"+String(r.getMinutes()).padStart(2,"0"),o.appendChild(a)}return o}function b(){const e=g(l("#q").value.trim()),o=p.filter(n=>(!e||g((n.title||"")+" "+n.id+" "+(n.champion||"")+" "+(n.organizer||"")+" "+(n.promo&&n.promo.on?[n.promo.city,n.promo.venue].join(" "):"")).includes(e))&&(!f||g(n.promo&&n.promo.on?n.promo.city:"")===f));L();const t={live:[],upcoming:[],finished:[]};o.forEach(n=>(t[n.status]||t.upcoming).push(n)),t.live.sort((n,i)=>(i.startDate||"").localeCompare(n.startDate||"")),t.upcoming.sort((n,i)=>(n.startDate||"").localeCompare(i.startDate||"")),t.finished.sort((n,i)=>(i.startDate||"").localeCompare(n.startDate||"")),[["live","#gLive","#sLive"],["upcoming","#gSoon","#sSoon"],["finished","#gDone","#sDone"]].forEach(([n,i,a])=>{const c=l(i);c.innerHTML="",t[n].forEach(s=>c.appendChild(A(s))),l(a).style.display=t[n].length?"":"none"});const r=l("#status");p.length?o.length?r.style.display="none":(r.style.display="",r.textContent="Κανένα τουρνουά δεν ταιριάζει στην αναζήτηση."):(r.style.display="",r.textContent="Δεν υπάρχουν ακόμα δημοσιευμένα τουρνουά.")}const I=["kostas.koyrkoyloss@gmail.com"],N={apiKey:"AIzaSyCHDtqdWyvW5vaYTIbtxreuAAwYlgFF08E",authDomain:"cue-club-corfu.firebaseapp.com",projectId:"cue-club-corfu",storageBucket:"cue-club-corfu.firebasestorage.app",messagingSenderId:"177703674870",appId:"1:177703674870:web:f694ca6b9c6f47114addd7"};let d="",m="";const y=/Electron/i.test(navigator.userAgent)||(()=>{try{return window.top!==window.self}catch{return!0}})(),M=()=>!!d&&I.includes(d),C=e=>String(e||"").trim().toLocaleLowerCase("el"),S=e=>!!m&&C(e.club)===C(m)||!!d&&!m&&(M()||e.owner&&e.owner===d);function v(e,o,t,r){const n=document.createElement("button");return n.type="button",n.className="cardAct"+(r?" rs":""),n.textContent=e,n.title=o,n.addEventListener("click",i=>{i.preventDefault(),i.stopPropagation(),t()}),n}function q(e,o){try{const t=new Blob([JSON.stringify(e,null,2)],{type:"application/json"}),r=URL.createObjectURL(t),n=document.createElement("a");n.href=r,n.download=o,document.body.appendChild(n),n.click(),n.remove(),setTimeout(()=>URL.revokeObjectURL(r),4e3)}catch{}}async function R(e){if(!confirm("🗑 Διαγραφή του τουρνουά «"+(e.title||e.id)+`»;
+<script>
+(function(){
+  const FB_CONFIG = {
+    apiKey: "AIzaSyAJmOe7Woh92qMCDTy0HtepvJJDcrFgSfE",
+    authDomain: "billiard-traveller.firebaseapp.com",
+    projectId: "billiard-traveller",
+    storageBucket: "billiard-traveller.firebasestorage.app",
+    messagingSenderId: "481554679650",
+    appId: "1:481554679650:web:d9d13e5d21ca89b11ace3b"
+  };
+  const $ = s => document.querySelector(s);
+  const DAYS = ['Κυρ','Δευ','Τρί','Τετ','Πέμ','Παρ','Σάβ'];
+  let all = [], dels = [], cityF = '';
+  // v75: φίλτρο πόλης (από τις προκηρύξεις)
+  function renderCities(){
+    const box = $('#cities'); if(!box) return;
+    const m = {}; all.forEach(t=>{ const c = t.promo && t.promo.on && String(t.promo.city||'').trim(); if(c && t.status!=='finished') m[norm(c)] = m[norm(c)] || c; });
+    const keys = Object.keys(m).sort((a,b)=>m[a].localeCompare(m[b],'el'));
+    if(keys.length<2 && !cityF){ box.innerHTML=''; return; }
+    box.innerHTML = '';
+    const mk = (k,lbl)=>{ const b=document.createElement('button'); b.type='button'; b.className='chip'+(cityF===k?' on':''); b.textContent=lbl; b.addEventListener('click',()=>{ cityF=k; render(); }); box.appendChild(b); };
+    mk('', '📍 Όλες οι πόλεις'); keys.forEach(k=>mk(k, m[k]));
+  }
 
-Κρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται.
-Τα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».`))return;const o=firebase.firestore(),t=o.collection("tournaments").doc(e.id);try{const r=await t.get(),n=r.exists?r.data():null;if(n&&n.state){let a=null;try{a=JSON.parse(n.state)}catch{}const c=new Date,s=h=>(h<10?"0":"")+h;a&&q(a,"billiard_traveller_"+e.id+"_diagrafi_"+c.getFullYear()+s(c.getMonth()+1)+s(c.getDate())+"_"+s(c.getHours())+s(c.getMinutes())+".json")}const i=String(n&&n.club||e.club||"").trim();if(i)try{const a=((firebase.apps||[]).find(s=>s.name==="btsb")||firebase.initializeApp(N,"btsb")).firestore(),c=i.toLocaleUpperCase("el");for(const s of c!==i?[i,c]:[i])try{await a.collection("clubs").doc(s).collection("tour").doc("current").set({tid:e.id,active:!1,at:Date.now()})}catch{}}catch{}for(const a of["assign","live","tables"])try{const c=await t.collection(a).get();for(const s of c.docs)try{await t.collection(a).doc(s.id).delete()}catch{}}catch{}await t.set({deleted:!0,deletedAt:Date.now(),deletedBy:d},{merge:!0})}catch(r){alert("❗ Η διαγραφή δεν έγινε: "+(r.code||r.message))}}async function B(e){if(confirm("↩ Επαναφορά του τουρνουά «"+(e.title||e.id)+"»;"))try{await firebase.firestore().collection("tournaments").doc(e.id).set({deleted:!1,restoredAt:Date.now()},{merge:!0}),confirm("✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια);")&&(location.href="app.html?t="+encodeURIComponent(e.id)+(e.format==="mosconi"?"&f=mosc":e.format==="groups"?"&f=grp&k="+(e.koSize||16):e.format==="carom"?"&f=car&s="+(e.size||32)+"&k="+(e.koSize||16):"&s="+(e.size||32)+(e.koSize?"&k="+e.koSize:"")))}catch(o){alert("❗ Η επαναφορά δεν έγινε: "+(o.code||o.message))}}function _(){const e=l("#loginBtn");if(e){if(!firebase.auth){e.style.display="none";return}firebase.auth().onAuthStateChanged(o=>{m="";try{o&&o.isAnonymous&&(m=localStorage.getItem("bt_pin_club")||"")}catch{}d=o&&o.email?String(o.email).toLowerCase():m?"club:"+m:"",e.textContent=m?"🔑 "+m+" · Έξοδος":d?"👤 "+d.split("@")[0]+" · Έξοδος":y?"🔑 Σύνδεση με PIN":"👤 Σύνδεση",b(),w()}),y&&(e.textContent="🔑 Σύνδεση με PIN"),e.addEventListener("click",async()=>{if(d){try{localStorage.removeItem("bt_pin_club")}catch{}await firebase.auth().signOut();return}if(y){location.href="app.html?pin=1&fresh=1";return}try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider)}catch(o){alert("Η σύνδεση δεν έγινε: "+(o.message||o.code))}})}}function w(){const e=l("#delBtn"),o=l("#delList");!e||!o||(e.style.display=u.length?"":"none",e.textContent="♻ Διαγραμμένα ("+u.length+")",o.innerHTML="",u.sort((t,r)=>r.at-t.at).forEach(t=>{const r=document.createElement("a");r.className="card",r.href="app.html?t="+encodeURIComponent(t.id)+(t.format==="mosconi"?"&f=mosc":t.format==="groups"?"&f=grp&k="+(t.koSize||16):t.format==="carom"?"&f=car&s="+(t.size||32)+"&k="+(t.koSize||16):"&s="+(t.size||32)+(t.koSize?"&k="+t.koSize:""));const n=document.createElement("h3");n.textContent="🗑 "+t.title,r.appendChild(n);const i=document.createElement("div");i.className="meta",i.textContent=(t.organizer?"🎱 "+t.organizer+" · ":"")+(t.at?"διαγράφηκε "+new Date(t.at).toLocaleDateString("el-GR"):"")+" · πατήστε για επαναφορά",r.appendChild(i),S(t)&&r.prepend(v("↩","Επαναφορά",()=>B(t),!0)),o.appendChild(r)}))}function z(e,o){e.innerHTML="";try{if(typeof QRCode<"u"){new QRCode(e,{text:o,width:220,height:220});return}}catch{}const t=document.createElement("img");t.width=220,t.height=220,t.alt="QR",t.src="https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data="+encodeURIComponent(o),e.appendChild(t)}function k(){if(["#sLive","#sSoon","#sDone"].forEach(e=>l(e).style.display="none"),l("#q").addEventListener("input",b),l("#qrBtn").addEventListener("click",()=>{const e=location.href.split("?")[0].split("#")[0];z(l("#qrH"),e),l("#qrHU").textContent=e,z(l("#qrF"),"https://www.facebook.com/billiardtravellers/"),l("#qrModal").classList.remove("hidden")}),l("#qrClose").addEventListener("click",()=>l("#qrModal").classList.add("hidden")),l("#qrPrint").addEventListener("click",()=>window.print()),typeof firebase>"u"){l("#status").textContent="⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.";return}try{firebase.apps.length||firebase.initializeApp(D),_(),firebase.firestore().collection("tournaments").onSnapshot(e=>{p=[],u=[],e.forEach(o=>{const t=o.data();if(t.deleted){u.push({id:o.id,title:t.title||o.id,size:t.size,koSize:t.koSize,format:t.format||"",organizer:t.organizer||"",at:+t.deletedAt||0,owner:String(t.owner||"").toLowerCase(),club:t.club||""});return}p.push({promo:t.promo||null,owner:String(t.owner||"").toLowerCase(),club:t.club||"",id:o.id,title:t.title,status:t.status,champion:t.champion,entries:t.entries,size:t.size,koSize:t.koSize,format:t.format||"",startDate:t.startDate,days:t.days,game:t.game||"carom",ball:t.ball||"",updatedAt:t.updatedAt,organizer:t.organizer||""})}),b(),w()},e=>{l("#status").textContent="⚠ Δεν ήταν δυνατή η ανάγνωση ("+(e.code||"σφάλμα")+")."})}catch{l("#status").textContent="⚠ Σφάλμα σύνδεσης."}}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",k):k()})();</script>
-<script>"serviceWorker"in navigator&&location.protocol==="https:"&&navigator.serviceWorker.register("sw.js").catch(function(){});</script>
-<script>(function(){if(window.BTOSK)return;var e={mode:"auto",el:null,orig:"",lang:"el",shift:!0,sym:!1,skip:null,ours:!1,retreat:!1,touchSeen:!1,pend:null,pendAt:0,lifts:[],winKb:0};window.OSK=e;try{var x=new URLSearchParams(location.search).get("osk");(x==="off"||x==="always"||x==="auto")&&localStorage.setItem("bt_osk",x)}catch{}try{var T=localStorage.getItem("bt_osk");e.mode=T==="off"?"off":T==="always"?"always":"auto"}catch{}try{sessionStorage.getItem("bt_osk_kb")==="1"&&(e.retreat=!0)}catch{}var P="#oskBox{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:none;flex-direction:column;background:#07131a;border-top:2px solid #12a3ad;box-shadow:0 -12px 40px rgba(0,0,0,.6);font-family:'Inter',Arial,sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation;text-align:left}#oskBox.show{display:flex}#oskBar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#0d222b;border-bottom:1px solid #1f4650}#oskLbl{flex:none;max-width:28%;font:700 14px 'Inter',Arial;letter-spacing:.12em;text-transform:uppercase;color:#7fd6dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#oskVal{flex:1;min-width:0;min-height:56px;display:flex;align-items:center;padding:0 16px;border-radius:12px;background:#02090d;border:2px solid #12a3ad;color:#fff;font:700 30px 'Inter',Arial;white-space:nowrap;overflow:hidden;direction:ltr}#oskVal span.ph{color:#4b6670;font-weight:600}#oskVal i{display:inline-block;width:3px;height:34px;background:#f5b82e;margin-left:2px;animation:oskBlink 1s steps(1) infinite}@keyframes oskBlink{50%{opacity:0}}#oskBar button{flex:none;height:56px;min-width:64px;padding:0 18px;border-radius:12px;border:1px solid #2c4b55;background:#13303a;color:#fff;font:800 20px 'Inter',Arial;cursor:pointer;margin:0}#oskBar #oskOk{background:linear-gradient(180deg,#22c55e,#15803d);border-color:#22c55e;min-width:120px}#oskBar .oskC{min-width:0;padding:0 14px;font-size:16px;letter-spacing:.04em;background:#0f2a33;color:#bfeef2}#oskBar .oskC.on{background:#f5b82e;color:#1a1300;border-color:#f5b82e}#oskVal.all{background:#0b3d52}#oskVal.all b{background:#2f7fd1;color:#fff;border-radius:4px;padding:0 4px;font-weight:700}#oskMsg{position:absolute;left:50%;top:-46px;transform:translateX(-50%);background:#0d222b;border:1px solid #12a3ad;color:#eaf6f7;font:700 16px 'Inter',Arial;padding:8px 16px;border-radius:10px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}#oskMsg.show{opacity:1}#oskKeys{display:flex;flex-direction:column;gap:8px;padding:10px 10px 14px}.oskRow{display:flex;gap:8px;justify-content:center}.oskK{flex:1 1 0;max-width:110px;height:clamp(48px,8vh,84px);border-radius:12px;border:1px solid #24414b;background:#132a33;color:#f2f7f8;font:700 clamp(20px,3.2vh,32px) 'Inter',Arial;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin:0;box-shadow:0 3px 0 #061015;min-width:0}.oskK:active,.oskK.down{background:#1d4652;transform:translateY(2px);box-shadow:none}.oskK.fn{background:#0f2028;color:#9fd8dd;font-size:clamp(15px,2.4vh,22px);max-width:170px}.oskK.wide{flex-grow:2;max-width:200px}.oskK.space{flex-grow:6;max-width:640px}.oskK.on{background:#f5b82e;color:#1a1300;border-color:#f5b82e}.oskK.okk{background:linear-gradient(180deg,#22c55e,#15803d);color:#fff;border-color:#22c55e}#oskBox.num #oskKeys{align-items:center}#oskBox.num .oskRow{width:min(520px,94vw)}#oskBox.num .oskK{max-width:none}@media (max-width:900px){#oskBar .oskC span{display:none}#oskBar .oskC{padding:0 12px;font-size:20px}}@media (max-width:620px){#oskLbl{display:none}#oskBar button{min-width:52px;padding:0 10px;font-size:17px}#oskBar #oskOk{min-width:80px}.oskRow{gap:4px}#oskKeys{gap:6px;padding:8px 4px 10px}.oskK{border-radius:8px;font-size:20px}}";function L(){try{return e.touchSeen||(navigator.maxTouchPoints||0)>0||window.matchMedia&&matchMedia("(any-pointer: coarse)").matches}catch{return!1}}function S(){return e.mode==="off"||e.retreat?!1:e.mode==="always"?!0:L()}function l(t){return document.getElementById(t)}function R(){if(l("oskBox"))return l("oskBox");var t=document.createElement("style");t.id="oskCss",t.textContent=P,(document.head||document.documentElement).appendChild(t);var n=document.createElement("div");return n.id="oskBox",n.setAttribute("aria-hidden","true"),n.innerHTML='<div id="oskMsg"></div><div id="oskBar"><div id="oskLbl"></div><div id="oskVal"></div><button type="button" class="oskC" id="oskAll" title="Επιλογή όλων">▣<span> ΟΛΑ</span></button><button type="button" class="oskC" id="oskCopy" title="Αντιγραφή">⧉<span> ΑΝΤΙΓΡΑΦΗ</span></button><button type="button" class="oskC" id="oskPaste" title="Επικόλληση">📋<span> ΕΠΙΚΟΛΛΗΣΗ</span></button><button type="button" class="oskC" id="oskEye" title="Εμφάνιση κωδικού" style="display:none">👁</button><button type="button" id="oskX" title="Άκυρο">✕</button><button type="button" id="oskOk">✔ ΟΚ</button></div><div id="oskKeys"></div>',document.body.appendChild(n),n}function p(t){if(!t||!t.tagName||t.closest&&t.closest("#oskBox")||t.closest&&t.closest("[data-no-osk]"))return null;var n=t.tagName.toLowerCase();if(n==="textarea")return t.readOnly||t.disabled?null:t;if(n!=="input")return null;var o=(t.getAttribute("type")||"text").toLowerCase();return["text","search","number","tel","email","password","url",""].indexOf(o)<0||t.readOnly||t.disabled?null:t}function I(t){t.dataset.oskIm==null&&(t.dataset.oskIm=t.getAttribute("inputmode")||""),t.setAttribute("inputmode","none")}function h(t){if(!(!t||t.dataset.oskIm==null)){var n=t.dataset.oskIm;n?t.setAttribute("inputmode",n):t.removeAttribute("inputmode"),delete t.dataset.oskIm}}function O(){for(var t=document.querySelectorAll("[data-osk-im]"),n=0;n<t.length;n++)h(t[n])}function E(t){var n=(t.getAttribute("type")||"").toLowerCase();if(n==="number"||n==="tel")return!0;var o=(t.dataset.oskIm!=null?t.dataset.oskIm:t.getAttribute("inputmode"))||"";if(/numeric|decimal|tel/.test(o))return!0;var i=t.getAttribute("pattern")||"";return/^\[0-9\]|^\\d/.test(i)}function M(t){var n=(t.dataset.oskIm!=null?t.dataset.oskIm:t.getAttribute("inputmode"))||"",o=t.getAttribute("step")||"";return n==="decimal"||/\./.test(o)}function z(t){var n="";if(t.id){var o=document.querySelector('label[for="'+t.id+'"]');o&&(n=o.textContent)}if(!n){var i=t.closest("label");i&&(n=i.textContent)}if(n||(n=t.getAttribute("placeholder")||t.getAttribute("title")||t.getAttribute("aria-label")||""),!n){var r=t.previousElementSibling;r&&/^(LABEL|SPAN|B|DIV|H\d)$/.test(r.tagName)&&r.textContent.length<60&&/[A-Za-zΑ-Ωα-ωά-ώ]/.test(r.textContent)&&(n=r.textContent)}try{window.BTOSK_LABEL&&(n=window.BTOSK_LABEL(t,n)||n)}catch{}return String(n).replace(/\s+/g," ").trim()}function H(t){for(var n=[],o=t.parentElement;o&&o!==document.body&&o!==document.documentElement;){var i=getComputedStyle(o);/(auto|scroll)/.test(i.overflowY)&&n.push(o),o=o.parentElement}return n}function N(t){for(var n=t;n&&n!==document.body;){var o=getComputedStyle(n);if(o.position==="fixed")return n;n=n.parentElement}return null}function k(){e.lifts.slice().reverse().forEach(function(t){try{t.t==="pad"?t.n.style.paddingBottom=t.v:t.t==="tr"?(t.n.style.transform=t.v,t.n.style.transition=t.tv):t.t==="scroll"?t.n.scrollTop=t.v:t.t==="rm"&&t.n.parentNode&&t.n.parentNode.removeChild(t.n)}catch{}}),e.lifts=[]}function w(t,n){if(!(!t||!n)){var o=14,i=function(){return window.innerHeight-n},r=function(){var d=t.getBoundingClientRect();return d.bottom+o-i()};if(!(r()<=0)){var s=function(d){e.lifts.push(d)},m=H(t),a=document.scrollingElement||document.documentElement;if(m.forEach(function(d){if(!(r()<=0)){s({t:"pad",n:d,v:d.style.paddingBottom});var q=parseFloat(getComputedStyle(d).paddingBottom)||0;d.style.paddingBottom=q+n+"px",s({t:"scroll",n:d,v:d.scrollTop}),d.scrollTop+=r()}}),r()>0&&!N(t)){var u=document.createElement("div");u.setAttribute("data-osk-spacer",""),u.style.cssText="position:absolute;left:0;width:1px;pointer-events:none;visibility:hidden;top:"+a.scrollHeight+"px;height:"+(n+40)+"px",document.body.appendChild(u),s({t:"rm",n:u}),s({t:"scroll",n:a,v:a.scrollTop}),a.scrollTop+=r()}var f=r();if(f>0){var v=N(t);if(v){var J=t.getBoundingClientRect();if(f=Math.min(f,Math.max(0,J.top-8)),f>0){s({t:"tr",n:v,v:v.style.transform,tv:v.style.transition}),v.style.transition="none";var b=getComputedStyle(v).transform;b=b&&b!=="none"?" "+b:"";var Q=t.getBoundingClientRect().bottom;v.style.transform="translateY("+-f+"px)"+b;var K=Q-t.getBoundingClientRect().bottom;K>1&&Math.abs(K-f)>1&&(v.style.transform="translateY("+-f*f/K+"px)"+b)}}}}}}function A(){var t=l("oskBox");k(),e.el&&t&&t.classList.contains("show")?w(e.el,t.offsetHeight):e.winKb>0&&w(document.activeElement&&p(document.activeElement),e.winKb)}function C(t){if(t){var n=R();if(e.el===t){n.classList.contains("show")||(n.classList.add("show"),A());return}e.el&&c(!0,!1,!0),I(t),e.el=t,e.orig=t.value,e.sym=!1,e.eye=!1,e.all=!!t.value&&(t.getAttribute("type")||"").toLowerCase()==="password",/^(password|email|url)$/.test((t.getAttribute("type")||"").toLowerCase())&&e.lang!=="en"&&(e.langWas=e.lang,e.lang="en");try{l("oskEye").style.display=(t.getAttribute("type")||"").toLowerCase()==="password"?"":"none",l("oskEye").classList.remove("on"),l("oskAll").classList.remove("on")}catch{}n.classList.toggle("num",E(t)),l("oskLbl").textContent=z(t),e.shift=!(t.value&&/[a-zα-ωά-ώ]/.test(t.value.slice(-1)));try{var o=t.value.length;t.setSelectionRange(o,o)}catch{}B(),y(),n.classList.add("show"),n.setAttribute("aria-hidden","false"),k(),requestAnimationFrame(function(){w(t,n.offsetHeight)})}}function c(t,n,o){var i=e.el,r=l("oskBox");r&&(r.classList.remove("show"),r.setAttribute("aria-hidden","true")),e.el=null,k(),e.langWas&&(e.lang=e.langWas,e.langWas=null),i&&(n?(i.value=e.orig,i.dispatchEvent(new Event("input",{bubbles:!0}))):t&&i.value!==e.orig&&i.dispatchEvent(new Event("change",{bubbles:!0})),h(i),!o&&document.activeElement===i&&i.blur())}var D={el:[["Ε","Ρ","Τ","Υ","Θ","Ι","Ο","Π"],["Α","Σ","Δ","Φ","Γ","Η","Ξ","Κ","Λ"],["Ζ","Χ","Ψ","Ω","Β","Ν","Μ","΄"]],en:[["Q","W","E","R","T","Y","U","I","O","P"],["A","S","D","F","G","H","J","K","L"],["Z","X","C","V","B","N","M","."]],sym:[["1","2","3","4","5","6","7","8","9","0"],["-","/","&",".",",","'","(",")","@"],["#","+","!","?",":","_",'"']]};function B(){var t=l("oskKeys"),n=e.el;if(n){var o=function(a,u,f){return'<button type="button" class="oskK '+(f||"")+'" data-k="'+a+'">'+u+"</button>"},i="";if(E(n))[["1","2","3"],["4","5","6"],["7","8","9"]].forEach(function(a){i+='<div class="oskRow">'+a.map(function(u){return o(u,u)}).join("")+"</div>"}),i+='<div class="oskRow">'+(M(n)?o(".",",","fn"):o("-","−","fn"))+o("0","0")+o("BS","⌫","fn")+"</div>";else{var r=e.sym?D.sym:D[e.lang],s=function(a){return e.sym||e.shift?a:a.toLowerCase()},m=(n.getAttribute("type")||"")==="email";i+='<div class="oskRow">'+(e.sym?"":o(e.lang==="el"?";":"-",e.lang==="el"?";":"-"))+r[0].map(function(a){return o(a,s(a))}).join("")+o("BS","⌫","fn wide")+"</div>",i+='<div class="oskRow">'+r[1].map(function(a){return o(a,s(a))}).join("")+(e.lang==="el"&&!e.sym&&!e.shift?o("ς","ς"):"")+(m&&!e.sym?o("@","@"):"")+"</div>",i+='<div class="oskRow">'+(e.sym?"":o("SH","⇧","fn wide"+(e.shift?" on":"")))+r[2].map(function(a){return o(a,s(a))}).join("")+(e.sym?"":o("SH","⇧","fn wide"+(e.shift?" on":"")))+"</div>",i+='<div class="oskRow">'+o("SYM",e.sym?"ΑΒΓ":"123","fn wide")+o("LANG",e.lang==="el"?"🌐 EN":"🌐 ΕΛ","fn wide")+o(" ","","space")+o("CLR","ΚΑΘΑΡ.","fn")+o("OK","✔","okk wide")+"</div>"}t.innerHTML=i}}function y(){var t=e.el,n=l("oskVal");if(t){var o=t.value,i=t.getAttribute("placeholder")||"",r=function(m){return String(m).replace(/[&<>]/g,function(a){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[a]})};o||(e.all=!1);var s=t.type==="password"&&!e.eye?new Array(o.length+1).join("•"):o;n.classList.toggle("all",!!e.all);try{l("oskAll").classList.toggle("on",!!e.all)}catch{}n.innerHTML=(o?e.all?"<b>"+r(s)+"</b>":r(s):'<span class="ph">'+r(i)+"</span>")+"<i></i>",n.scrollLeft=n.scrollWidth}}var V={Α:"Ά",Ε:"Έ",Η:"Ή",Ι:"Ί",Ο:"Ό",Υ:"Ύ",Ω:"Ώ",α:"ά",ε:"έ",η:"ή",ι:"ί",ο:"ό",υ:"ύ",ω:"ώ"};function j(t){var n=e.el;if(n){if(t==="OK"){c(!0);return}if(t==="SH"){e.shift=!e.shift,B();return}if(t==="SYM"){e.sym=!e.sym,B();return}if(t==="LANG"){e.lang=e.lang==="el"?"en":"el",e.sym=!1,B();return}var o=n.value;if(e.all&&(e.all=!1,t==="BS"||t==="CLR"||t==="΄"?(o="",t="NOP"):o=""),t!=="NOP")if(t==="BS")o=o.slice(0,-1);else if(t==="CLR")o="";else if(t==="΄"){var i=o.slice(-1);V[i]&&(o=o.slice(0,-1)+V[i])}else{var r=t;!E(n)&&!e.sym&&r.length===1&&r!==" "&&(r=e.shift?r.toUpperCase():r.toLowerCase()),t==="ς"&&(r="ς");var s=+n.getAttribute("maxlength")||0;if(s>0&&o.length>=s)return;o+=r}if(n.value!==o){var m=(n.getAttribute("type")||"").toLowerCase();if(m==="number"&&(o==="-"||/\.$/.test(o)))try{n.type="text",n.value=o,n.dataset.oskWasNum="1"}catch{}else n.value=o;n.dispatchEvent(new Event("input",{bubbles:!0}))}try{var a=n.value.length;n.setSelectionRange(a,a)}catch{}y()}}function g(t){var n=l("oskMsg");n&&(n.textContent=t,n.classList.add("show"),clearTimeout(e.msgT),e.msgT=setTimeout(function(){n.classList.remove("show")},2200))}function _(){var t=document.createElement("textarea");return t.setAttribute("data-no-osk",""),t.setAttribute("aria-hidden","true"),t.style.cssText="position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;",l("oskBox").appendChild(t),t}function Y(){var t=window.btDesktop;return Promise.resolve().then(function(){if(t&&t.clipRead)return t.clipRead();throw 0}).catch(function(){if(navigator.clipboard&&navigator.clipboard.readText)return navigator.clipboard.readText();throw 0}).catch(function(){var n=e.el,o=_(),i=null;try{o.focus(),document.execCommand("paste")&&(i=o.value)}catch{}o.remove();try{n&&n.focus({preventScroll:!0})}catch{}if(i==null)throw 0;return i})}function X(t){var n=window.btDesktop;return Promise.resolve().then(function(){if(n&&n.clipWrite)return n.clipWrite(t).then(function(o){if(!o)throw 0});throw 0}).catch(function(){if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);throw 0}).catch(function(){var o=e.el,i=_(),r=!1;i.value=t;try{i.select(),r=document.execCommand("copy")}catch{}i.remove();try{o&&o.focus({preventScroll:!0})}catch{}if(!r)throw 0})}function $(t,n){var o=(t.getAttribute("type")||"").toLowerCase();t.value=n,t.dispatchEvent(new Event("input",{bubbles:!0}));try{if(o!=="number"){var i=t.value.length;t.setSelectionRange(i,i)}}catch{}y()}function F(){var t=e.el;t&&Y().then(function(n){if(!(!e.el||e.el!==t)){if(n=String(n??"").replace(/[\r\n\t]+/g," ").trim(),!n){g("Το πρόχειρο είναι άδειο");return}if(E(t)&&(n=n.replace(M(t)?/[^0-9.,\-]/g:/[^0-9\-]/g,"").replace(",","."),!n)){g("Το πρόχειρο δεν έχει αριθμό");return}var o=e.all?n:t.value+n;e.all=!1;var i=+t.getAttribute("maxlength")||0;i>0&&o.length>i&&(o=o.slice(0,i)),$(t,o),g("✔ Επικολλήθηκε")}}).catch(function(){g("Δεν επιτρέπεται η επικόλληση εδώ — πατήστε Ctrl+V")})}function G(){var t=e.el;if(t){var n=t.value||"";if(!n){g("Το πεδίο είναι άδειο");return}X(n).then(function(){g("✔ Αντιγράφηκε")}).catch(function(){g("Δεν έγινε αντιγραφή")})}}function U(t){e.mode=t==="off"?"off":t==="always"?"always":"auto";try{localStorage.setItem("bt_osk",e.mode)}catch{}if(e.mode!=="off"){e.retreat=!1;try{sessionStorage.removeItem("bt_osk_kb")}catch{}}e.mode==="off"&&c(!1),O()}function Z(){e.retreat=!0;try{sessionStorage.setItem("bt_osk_kb","1")}catch{}}function W(){var t=R();if(!t.dataset.w){t.dataset.w="1",document.addEventListener("pointerdown",function(i){if((i.pointerType==="touch"||i.pointerType==="pen")&&(e.touchSeen=!0),!t.contains(i.target)){var r=p(i.target);!r||e.skip===r||!S()||(I(r),e.pend=r,e.pendAt=Date.now(),setTimeout(function(){e.pend===r&&e.el!==r&&(h(r),e.pend=null)},900))}},!0),document.addEventListener("click",function(i){if(!t.contains(i.target)){var r=p(i.target);if(!r){e.el&&c(!0);return}if(e.skip!==r&&e.pend===r&&Date.now()-e.pendAt<1500){if(e.pend=null,document.activeElement!==r)try{r.focus()}catch{}C(r)}}},!0),document.addEventListener("focusin",function(i){var r=p(i.target);r&&(e.skip&&e.skip!==r&&(e.skip=null),e.pend===r&&Date.now()-e.pendAt<1500&&e.el!==r&&setTimeout(function(){e.pend===r&&(e.pend=null,C(r))},250),e.winKb>0&&setTimeout(A,60))}),document.addEventListener("focusout",function(i){try{var r=i.target;r&&r.dataset&&r.dataset.oskWasNum==="1"&&(r.type="number",delete r.dataset.oskWasNum)}catch{}setTimeout(function(){var s=document.activeElement;e.skip&&s!==e.skip&&(h(e.skip),e.skip=null),e.el&&(s===e.el||t.contains(s)||c(!0))},150)});var n=function(i){if(!(!i.isTrusted||e.ours)){var r=e.el;r&&i.target!==r||!r&&!p(i.target)||!r&&e.mode!=="always"&&!L()||(Z(),r&&(e.skip=r,c(!1,!1,!0),h(r)),O())}};document.addEventListener("beforeinput",n,!0),document.addEventListener("keydown",function(i){i.key&&(i.key.length===1||i.key==="Backspace"||i.key==="Delete")&&!i.ctrlKey&&!i.metaKey&&!i.altKey&&n(i)},!0),t.addEventListener("pointerdown",function(i){i.preventDefault()},!0),t.addEventListener("mousedown",function(i){i.preventDefault()},!0),l("oskX").addEventListener("click",function(){c(!1,!0)}),l("oskAll").addEventListener("click",function(){e.el&&(e.all=!e.all&&!!e.el.value,y())}),l("oskCopy").addEventListener("click",G),l("oskPaste").addEventListener("click",F),l("oskEye").addEventListener("click",function(){e.eye=!e.eye,l("oskEye").classList.toggle("on",e.eye),y()}),l("oskOk").addEventListener("click",function(){c(!0)}),l("oskKeys").addEventListener("click",function(i){var r=i.target.closest(".oskK");if(r){e.ours=!0;try{j(r.dataset.k)}finally{e.ours=!1}}}),window.addEventListener("resize",function(){e.el&&setTimeout(A,80)});try{if(navigator.virtualKeyboard)navigator.virtualKeyboard.overlaysContent=!0,navigator.virtualKeyboard.addEventListener("geometrychange",function(i){var r=i.target.boundingRect;e.winKb=r&&r.height>60?Math.round(r.height):0,!e.el&&(k(),e.winKb&&w(p(document.activeElement),e.winKb))});else if(window.visualViewport){var o=window.visualViewport;o.addEventListener("resize",function(){var i=Math.round(window.innerHeight-o.height-o.offsetTop);e.winKb=i>120?i:0,!e.el&&(k(),e.winKb&&w(p(document.activeElement),e.winKb))})}}catch{}}}window.BTOSK={open:C,close:c,setMode:U,isTouch:L,wants:S,target:p,state:e,relift:A},window.oskOpen=C,window.oskClose=c,window.oskWants=function(){return S()},document.readyState==="loading"?document.addEventListener("DOMContentLoaded",W):W()})();</script>
-<script>(function(){if(window.BTI18N)return;var c=/[Ͱ-Ͽἀ-῿]/,s=/[A-Za-zͰ-Ͽἀ-῿]/,l={},f=null,o=!1,d=!1,g=new WeakMap,w=new WeakMap,h=[],m=null,T='script,style,textarea,[data-no-i18n],[contenteditable="true"]';function S(e){return e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}function N(e){l=e||{};var n=Object.keys(l).filter(function(r){return r.length>=2&&c.test(r)}).sort(function(r,t){return t.length-r.length});f=n.length?new RegExp(n.map(S).join("|"),"g"):null}function u(e){if(!o||e==null||(e=String(e),!c.test(e)))return e;var n=e.match(/^(\s*)([\s\S]*?)(\s*)$/),r=n[2].replace(/[ \t ]+/g," ");if(l[r]!=null)return n[1]+l[r]+n[3];var t=r.replace(/\s?[;\u037e]$/,"");if(t!==r&&l[t]!=null)return n[1]+l[t]+"?"+n[3];var a=r.replace(/(\d+)\s?άδα(ς)?/g,"$1");return l[a]!=null?n[1]+l[a]+n[3]:f?(a=r,a.indexOf(`
-`)>=0?n[1]+a.split(`
-`).map(function(i){return u(i)}).join(`
-`)+n[3]:(a=a.replace(f,function(i,v,E){var y=E.charAt(v-1),C=E.charAt(v+i.length);return y&&s.test(y)&&s.test(i.charAt(0))||C&&s.test(C)&&s.test(i.charAt(i.length-1))?i:l[i]}),a=a.replace(/(\d+)\s?άδα(ς)?/g,"$1"),a=a.replace(/([A-Za-z0-9»)…])\s?[;\u037e](?=\s|$)/g,"$1?"),n[1]+a+n[3])):e}function p(e){if(["placeholder","title","aria-label"].forEach(function(r){var t=e.getAttribute&&e.getAttribute(r);if(t&&c.test(t)){var a=u(t);a!==t&&(e.hasAttribute("data-i18n-"+r)||e.setAttribute("data-i18n-"+r,t),e.setAttribute(r,a))}}),e.tagName==="INPUT"&&(e.type==="button"||e.type==="submit")&&c.test(e.value)){var n=u(e.value);n!==e.value&&(e.setAttribute("data-i18n-value",e.value),e.value=n)}e.tagName==="OPTION"&&c.test(e.textContent)}function b(e){if(!(!o||!e)){if(e.nodeType===3){var n=e.parentElement;if(!n||n.closest(T))return;var r=e.nodeValue;if(!c.test(r))return;var t=u(r);t!==r&&(d=!0,g.has(e)||h.push(e),g.set(e,r),w.set(e,t),e.nodeValue=t,d=!1);return}if(e.nodeType===1&&e.tagName==="TEXTAREA"){p(e);return}if(!(e.nodeType!==1||e.closest&&e.closest(T))){p(e);for(var a=document.createTreeWalker(e,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT),i;i=a.nextNode();)i.nodeType===3?b(i):(i.tagName==="TEXTAREA"||!(i.closest&&i.closest(T)))&&p(i)}}}function L(){d=!0,h.splice(0).forEach(function(e){var n=g.get(e);n!=null&&e.isConnected&&e.nodeValue===w.get(e)&&(e.nodeValue=n),g.delete(e),w.delete(e)}),["placeholder","title","aria-label","value"].forEach(function(e){document.querySelectorAll("[data-i18n-"+e+"]").forEach(function(n){var r=n.getAttribute("data-i18n-"+e);e==="value"?n.value=r:n.setAttribute(e,r),n.removeAttribute("data-i18n-"+e)})}),d=!1}function I(e){if(e=!!e,!(e===o&&!e)){if(o=e,m&&m.disconnect(),document.documentElement.lang=o?"en":"el",!o){L();return}b(document.body),m||(m=new MutationObserver(function(n){if(!(d||!o)){for(var r=0;r<n.length;r++){var t=n[r];t.type==="characterData"?b(t.target):t.type==="attributes"?t.attributeName.indexOf("data-i18n")!==0&&p(t.target):t.addedNodes.forEach(b)}if(h.length>6e3)for(var a=h.length-1;a>=0;a--)h[a].isConnected||h.splice(a,1)}})),m.observe(document.body,{subtree:!0,childList:!0,characterData:!0,attributes:!0,attributeFilter:["placeholder","title","aria-label"]})}}(function(){var e=window.alert,n=window.confirm,r=window.prompt;window.alert=function(t){return e.call(window,u(String(t??"")))},window.confirm=function(t){return n.call(window,u(String(t??"")))},window.prompt=function(t,a){return r.call(window,u(String(t??"")),a)}})();function A(){["btAlert","btAsk","btPrompt"].forEach(function(r){var t=window[r];if(typeof t=="function"&&!t.__i18n){var a=function(i,v){return t.call(window,u(i==null?"":String(i)),v)};a.__i18n=1,window[r]=a}});var e=window.btChoose;if(typeof e=="function"&&!e.__i18n){var n=function(r,t){return e.call(window,u(r==null?"":String(r)),(t||[]).map(function(a){return u(a)}))};n.__i18n=1,window.btChoose=n}}A(),document.readyState==="loading"&&document.addEventListener("DOMContentLoaded",A),window.BTI18N={setDict:N,set:I,t:u,on:function(){return o}}})(),BTI18N.setDict({"Τουρνουά μπιλιάρδου — πρόγραμμα & ζωντανά αποτελέσματα":"Billiard tournaments — schedule & live results","Billiard Traveller — Τουρνουά":"Billiard Traveller — Tournaments","✔ ΟΚ":"✔ OK",Αντιγραφή:"Copy","Δεν επιτρέπεται η επικόλληση εδώ — πατήστε Ctrl+V":"Pasting is not allowed here — press Ctrl+V",ταμπλό:"bracket","🔍 Αναζήτηση τουρνουά ή διοργανωτή":"🔍 Search tournament or organiser","Κρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται.":"It is hidden from the list and the tables disconnect.","🎯 Γαλλικό · Όμιλοι (3-4)":"🎯 Carom · Groups (3-4)",Δευ:"Mon",Τρί:"Tue","🖨 Εκτύπωση":"🖨 Print","Επιλογή όλων":"Select all",παίκτες:"players",Προσεχώς:"Upcoming","🏆 Όλα τα τουρνουά":"🏆 All tournaments","Για τον διοργανωτή":"For the organiser",ΑΝΤΙΓΡΑΦΗ:"COPY",Πέμ:"Thu",Κλείσιμο:"Close","🌐 ΕΛ":"🌐 EL","❗ Η επαναφορά δεν έγινε:":"❗ Restore did not happen:",ή:"or","Δεν έγινε αντιγραφή":"Copy failed",Κυρ:"Sun","»; Κρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται. Τα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».":"»? It is hidden from the list and the tables disconnect. The data is SAVED — restore from «♻ Deleted».","Τα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».":"The data is SAVED — restore from «♻ Deleted».","🎯 Γαλλικό · Διπλή πυραμίδα":"🎯 Carom · Double elimination","❗ Η διαγραφή δεν έγινε:":"❗ Deletion did not happen:","✔ Επικολλήθηκε":"✔ Pasted","👤 Σύνδεση":"👤 Log in","🏆 Νικητής:":"🏆 Winner:",Δωρεάν:"Free","· πατήστε για επαναφορά":"· tap to restore","Σύνδεση διοργανωτή για διαγραφή / επαναφορά":"Organiser sign-in for delete / restore",Αμερικάνικο:"Pool","📅 Προσεχώς":"📅 Upcoming",Τετ:"Wed","Ενημέρωση:":"Updated:",Σάβ:"Sat",Άκυρο:"Cancel","♻ Διαγραμμένα (":"♻ Deleted (","Δεν υπάρχουν ακόμα δημοσιευμένα τουρνουά.":"No tournaments published yet.",Π:"P",ΕΠΙΚΟΛΛΗΣΗ:"PASTE",Σ:"I",Ολοκληρώθηκε:"Finished","⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.":"⚠ Could not connect. Check the internet and reload the page.","Κανένα τουρνουά δεν ταιριάζει στην αναζήτηση.":"No tournament matches the search.",Επικόλληση:"Paste","🏁 Ολοκληρωμένα":"🏁 Finished","🗑 Διαγραφή του τουρνουά «":"🗑 Delete the tournament «","⚠ Δεν ήταν δυνατή η ανάγνωση (":"⚠ Could not read (","Το πρόχειρο είναι άδειο":"The clipboard is empty","✔ Αντιγράφηκε":"✔ Copied",σφάλμα:"error","✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια)":"✔ The tournament is back. Open it now (so the tables reconnect)","🟢 Σε εξέλιξη":"🟢 In progress","Εμφάνιση κωδικού":"Show code",Γαλλικό:"Carom",Επαναφορά:"Restore",Παρ:"Fri","Η σύνδεση δεν έγινε:":"Connection failed:","🏆 Mosconi (ομάδες)":"🏆 Mosconi (teams)","♻ Διαγραμμένα":"♻ Deleted","Το πεδίο είναι άδειο":"The field is empty","· Έξοδος":"· Log out","ΚΑΘΑΡ.":"CLEAR","Φόρτωση τουρνουά…":"Loading tournaments…",ΟΛΑ:"ALL","📣 Προκήρυξη & συμμετοχή →":"📣 Proclamation & entry →",διαγράφηκε:"deleted","📍 Όλες οι πόλεις":"📍 All cities","Διαγραφή (με αποθήκευση — επαναφορά όποτε θέλετε)":"Delete (saved — restore whenever you want)","⚠ Σφάλμα σύνδεσης.":"⚠ Connection error.","Το πρόχειρο δεν έχει αριθμό":"The clipboard has no number","↩ Επαναφορά του τουρνουά «":"↩ Restore the tournament «","🔑 Σύνδεση με PIN":"🔑 Log in with PIN",Ζωντανά:"Live",ΝΑΙ:"YES",ΑΚΥΡΟ:"CANCEL","Ομάδα Α":"Team A","Ομάδα Β":"Team B","ΟΜΑΔΑ Α":"TEAM A","ΟΜΑΔΑ Β":"TEAM B"}),(function(){var c="bt_tour_lang";function s(){var o=document.getElementById("btLangBtn");o&&(o.textContent=BTI18N.on()?"ΕΛ":"EN")}function l(o){try{localStorage.setItem(c,o?"en":"el")}catch{}BTI18N.set(o),s()}function f(){var o="el";try{o=new URLSearchParams(location.search).get("lang")||localStorage.getItem(c)||"el"}catch{}o==="en"&&BTI18N.set(!0),s();var d=document.getElementById("btLangBtn");d&&d.addEventListener("click",function(){l(!BTI18N.on())})}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",f):f()})();</script>
+  function dateRange(start, days){
+    if(!start) return '';
+    const [y,m,d] = start.split('-').map(Number); if(!y) return '';
+    const a = new Date(y,m-1,d), b = new Date(y,m-1,d+Math.max(1,days||3)-1);
+    const f = x => DAYS[x.getDay()]+' '+x.getDate()+'/'+(x.getMonth()+1);
+    return (days||3)>1 ? f(a)+' – '+f(b)+' '+b.getFullYear() : f(a)+' '+a.getFullYear();
+  }
+  const norm = x => String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  function card(t){
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = 'app.html?t='+encodeURIComponent(t.id)+(t.format==='mosconi'?'&f=mosc':t.format==='groups'?'&f=grp&k='+(t.koSize||16):t.format==='carom'?'&f=car&s='+(t.size||32)+'&k='+(t.koSize||16):'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:''));
+    const badge = t.status==='live' ? '<span class="badge b-live">Ζωντανά</span>' : t.status==='finished' ? '<span class="badge b-done">Ολοκληρώθηκε</span>' : '<span class="badge b-soon">Προσεχώς</span>';
+    const upd = t.updatedAt && t.updatedAt.toDate ? t.updatedAt.toDate() : null;
+    const h3 = document.createElement('h3'); h3.textContent = t.title || t.id;
+    const meta = document.createElement('div'); meta.className='meta';
+    meta.textContent = [(t.format==='mosconi'?'🏆 Mosconi (ομάδες)':t.format==='groups'?'🎯 Γαλλικό · Όμιλοι (3-4)':t.format==='carom'?'🎯 Γαλλικό · Διπλή πυραμίδα':t.game==='pool'?'Αμερικάνικο'+(t.ball?' '+t.ball+'-ball':''):'Γαλλικό'), dateRange(t.startDate, t.days), (t.entries?t.entries+' παίκτες':''), 'ταμπλό '+(t.size||32)].filter(Boolean).join(' · ');
+    a.innerHTML = badge;
+    if(canAdmin(t)) a.prepend(actBtn('🗑','Διαγραφή (με αποθήκευση — επαναφορά όποτε θέλετε)', ()=>softDelete(t), false));
+    a.append(h3);
+    if(t.organizer){ const o=document.createElement('div'); o.className='org'; o.textContent='🎱 '+t.organizer; a.appendChild(o); }
+    a.append(meta);
+    if(t.promo && t.promo.on){ const p=t.promo, pr=document.createElement('div'); pr.className='promo';   // v75: προκήρυξη
+      pr.textContent=['📍 '+[p.venue,p.city].filter(Boolean).join(' · '), (p.fee!==undefined && p.fee!=='' ? '💶 '+(+p.fee ? String(+p.fee).replace('.',',')+' €' : 'Δωρεάν') : ''), (p.max ? '👥 '+(t.entries||0)+'/'+p.max : '')].filter(x=>x && x.length>3).join('   ');
+      a.appendChild(pr);
+      if(t.status!=='live' && t.status!=='finished'){ a.href='info.html?t='+encodeURIComponent(t.id); const go=document.createElement('div'); go.className='promoGo'; go.textContent='📣 Προκήρυξη & συμμετοχή →'; a.appendChild(go); } }
+    if(t.champion){ const c=document.createElement('div'); c.className='champ'; c.textContent='🏆 Νικητής: '+t.champion; a.appendChild(c); }
+    if(upd){ const u=document.createElement('div'); u.className='meta'; u.textContent='Ενημέρωση: '+upd.getDate()+'/'+(upd.getMonth()+1)+' '+String(upd.getHours()).padStart(2,'0')+':'+String(upd.getMinutes()).padStart(2,'0'); a.appendChild(u); }
+    return a;
+  }
+  function render(){
+    const q = norm($('#q').value.trim());
+    const list = all.filter(t => (!q || norm((t.title||'')+' '+t.id+' '+(t.champion||'')+' '+(t.organizer||'')+' '+((t.promo&&t.promo.on)?[t.promo.city,t.promo.venue].join(' '):'')).includes(q))
+      && (!cityF || norm(t.promo&&t.promo.on?t.promo.city:'')===cityF));
+    renderCities();
+    const groups = {live:[], upcoming:[], finished:[]};
+    list.forEach(t => (groups[t.status]||groups.upcoming).push(t));
+    groups.live.sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||''));
+    groups.upcoming.sort((a,b)=>(a.startDate||'').localeCompare(b.startDate||''));
+    groups.finished.sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||''));
+    [['live','#gLive','#sLive'],['upcoming','#gSoon','#sSoon'],['finished','#gDone','#sDone']].forEach(([k,g,sec])=>{
+      const box = $(g); box.innerHTML='';
+      groups[k].forEach(t=>box.appendChild(card(t)));
+      $(sec).style.display = groups[k].length ? '' : 'none';
+    });
+    const st = $('#status');
+    if(!all.length){ st.style.display=''; st.textContent='Δεν υπάρχουν ακόμα δημοσιευμένα τουρνουά.'; }
+    else if(!list.length){ st.style.display=''; st.textContent='Κανένα τουρνουά δεν ταιριάζει στην αναζήτηση.'; }
+    else st.style.display='none';
+  }
+  // ---- v45: διαχείριση από τη λίστα (σύνδεση Google: ιδιοκτήτης πλατφόρμας ή διοργανωτής του τουρνουά) ----
+  const SUPER_EMAILS = ['kostas.koyrkoyloss@gmail.com'];
+  const SB_FB = {apiKey:"AIzaSyCHDtqdWyvW5vaYTIbtxreuAAwYlgFF08E", authDomain:"cue-club-corfu.firebaseapp.com", projectId:"cue-club-corfu",
+    storageBucket:"cue-club-corfu.firebasestorage.app", messagingSenderId:"177703674870", appId:"1:177703674870:web:f694ca6b9c6f47114addd7"};
+  let me = '', pinClub = '';
+  const IN_SB = /Electron/i.test(navigator.userAgent) || (()=>{ try{ return window.top!==window.self; }catch(e){ return true; } })();   // v60: μέσα στο Scoreboard → μόνο PIN
+  const isSuper = () => !!me && SUPER_EMAILS.includes(me);
+  const lc = x => String(x||'').trim().toLocaleLowerCase('el');
+  const canAdmin = t => (!!pinClub && lc(t.club)===lc(pinClub)) || (!!me && !pinClub && (isSuper() || (t.owner && t.owner===me)));
+  function actBtn(txt, title, fn, rs){
+    const b = document.createElement('button'); b.type='button'; b.className='cardAct'+(rs?' rs':''); b.textContent=txt; b.title=title;
+    b.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fn(); });
+    return b;
+  }
+  function dlJson(obj, name){
+    try{ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const u=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); }catch(e){}
+  }
+  async function softDelete(t){
+    if(!confirm('🗑 Διαγραφή του τουρνουά «'+(t.title||t.id)+'»;\n\nΚρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται.\nΤα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».')) return;
+    const db = firebase.firestore(), ref = db.collection('tournaments').doc(t.id);
+    try{
+      const ds = await ref.get(); const x = ds.exists ? ds.data() : null;
+      if(x && x.state){ let st=null; try{ st=JSON.parse(x.state); }catch(e){}
+        const d=new Date(), p=n=>(n<10?'0':'')+n;
+        if(st) dlJson(st, 'billiard_traveller_'+t.id+'_diagrafi_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+'.json'); }
+      const club = String((x && x.club) || t.club || '').trim();
+      if(club){ try{ const sb=((firebase.apps||[]).find(a=>a.name==='btsb')||firebase.initializeApp(SB_FB,'btsb')).firestore();
+        const up=club.toLocaleUpperCase('el'); for(const n of (up!==club?[club,up]:[club])){ try{ await sb.collection('clubs').doc(n).collection('tour').doc('current').set({tid:t.id, active:false, at:Date.now()}); }catch(e){} } }catch(e){} }
+      for(const col of ['assign','live','tables']){ try{ const sn=await ref.collection(col).get(); for(const c of sn.docs){ try{ await ref.collection(col).doc(c.id).delete(); }catch(e){} } }catch(e){} }
+      await ref.set({deleted:true, deletedAt:Date.now(), deletedBy:me}, {merge:true});
+    }catch(e){ alert('❗ Η διαγραφή δεν έγινε: '+(e.code||e.message)); }
+  }
+  async function restoreTour(t){
+    if(!confirm('↩ Επαναφορά του τουρνουά «'+(t.title||t.id)+'»;')) return;
+    try{ await firebase.firestore().collection('tournaments').doc(t.id).set({deleted:false, restoredAt:Date.now()}, {merge:true});
+      if(confirm('✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια);')) location.href='app.html?t='+encodeURIComponent(t.id)+(t.format==='mosconi'?'&f=mosc':t.format==='groups'?'&f=grp&k='+(t.koSize||16):t.format==='carom'?'&f=car&s='+(t.size||32)+'&k='+(t.koSize||16):'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:''));
+    }catch(e){ alert('❗ Η επαναφορά δεν έγινε: '+(e.code||e.message)); }
+  }
+  function authStart(){
+    const lb = $('#loginBtn'); if(!lb) return;
+    if(!firebase.auth){ lb.style.display='none'; return; }
+    firebase.auth().onAuthStateChanged(u=>{
+      pinClub = ''; try{ if(u && u.isAnonymous) pinClub = localStorage.getItem('bt_pin_club') || ''; }catch(e){}
+      me = u && u.email ? String(u.email).toLowerCase() : (pinClub ? 'club:'+pinClub : '');
+      lb.textContent = pinClub ? ('🔑 '+pinClub+' · Έξοδος') : me ? '👤 '+me.split('@')[0]+' · Έξοδος' : (IN_SB ? '🔑 Σύνδεση με PIN' : '👤 Σύνδεση');
+      render(); renderDels();
+    });
+    if(IN_SB) lb.textContent = '🔑 Σύνδεση με PIN';
+    lb.addEventListener('click', async ()=>{
+      if(me){ try{ localStorage.removeItem('bt_pin_club'); }catch(e){} await firebase.auth().signOut(); return; }
+      if(IN_SB){ location.href = 'app.html?pin=1&fresh=1'; return; }   // v60: PIN admin κλαμπ (η Google δεν ανοίγει μέσα στο Scoreboard)
+      try{ await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ alert('Η σύνδεση δεν έγινε: '+(e.message||e.code)); }
+    });
+  }
+  // v44: διαγραμμένα τουρνουά (αποθηκευμένα — ο διοργανωτής τα ανοίγει και πατά «↩ ΕΠΑΝΑΦΟΡΑ»)
+  function renderDels(){
+    const btn = $('#delBtn'), box = $('#delList'); if(!btn || !box) return;
+    btn.style.display = dels.length ? '' : 'none'; btn.textContent = '♻ Διαγραμμένα ('+dels.length+')';
+    box.innerHTML = '';
+    dels.sort((a,b)=>b.at-a.at).forEach(t=>{ const a=document.createElement('a'); a.className='card'; a.href='app.html?t='+encodeURIComponent(t.id)+(t.format==='mosconi'?'&f=mosc':t.format==='groups'?'&f=grp&k='+(t.koSize||16):t.format==='carom'?'&f=car&s='+(t.size||32)+'&k='+(t.koSize||16):'&s='+(t.size||32)+(t.koSize?'&k='+t.koSize:''));
+      const h=document.createElement('h3'); h.textContent='🗑 '+t.title; a.appendChild(h);
+      const m=document.createElement('div'); m.className='meta'; m.textContent=(t.organizer?'🎱 '+t.organizer+' · ':'')+(t.at?'διαγράφηκε '+new Date(t.at).toLocaleDateString('el-GR'):'')+' · πατήστε για επαναφορά'; a.appendChild(m);
+      if(canAdmin(t)) a.prepend(actBtn('↩','Επαναφορά', ()=>restoreTour(t), true));
+      box.appendChild(a); });
+  }
+  function drawQR(el, text){
+    el.innerHTML='';
+    try{ if(typeof QRCode!=='undefined'){ new QRCode(el,{text,width:220,height:220}); return; } }catch(e){}
+    const img=document.createElement('img'); img.width=220; img.height=220; img.alt='QR';
+    img.src='https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data='+encodeURIComponent(text);
+    el.appendChild(img);
+  }
+  function start(){
+    ['#sLive','#sSoon','#sDone'].forEach(s=>$(s).style.display='none');
+    $('#q').addEventListener('input', render);
+    $('#qrBtn').addEventListener('click', ()=>{
+      const url = location.href.split('?')[0].split('#')[0];
+      drawQR($('#qrH'), url); $('#qrHU').textContent = url;
+      drawQR($('#qrF'), 'https://www.facebook.com/billiardtravellers/');
+      $('#qrModal').classList.remove('hidden');
+    });
+    $('#qrClose').addEventListener('click', ()=>$('#qrModal').classList.add('hidden'));
+    $('#qrPrint').addEventListener('click', ()=>window.print());
+    if(typeof firebase==='undefined'){ $('#status').textContent='⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.'; return; }
+    try{
+      if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+      authStart();
+      firebase.firestore().collection('tournaments').onSnapshot(qs=>{
+        all = []; dels = []; qs.forEach(d=>{ const x=d.data(); if(x.deleted){ dels.push({id:d.id, title:x.title||d.id, size:x.size,koSize:x.koSize,format:x.format||'', organizer:x.organizer||'', at:+x.deletedAt||0, owner:String(x.owner||'').toLowerCase(), club:x.club||''}); return; } all.push({promo:x.promo||null, owner:String(x.owner||'').toLowerCase(), club:x.club||'', id:d.id, title:x.title, status:x.status, champion:x.champion, entries:x.entries, size:x.size,koSize:x.koSize,format:x.format||'', startDate:x.startDate, days:x.days, game:x.game||'carom', ball:x.ball||'', updatedAt:x.updatedAt, organizer:x.organizer||''}); });
+        render(); renderDels();
+      }, err=>{ $('#status').textContent='⚠ Δεν ήταν δυνατή η ανάγνωση ('+(err.code||'σφάλμα')+').'; });
+    }catch(e){ $('#status').textContent='⚠ Σφάλμα σύνδεσης.'; }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
+<script>
+/* ===== Billiard Traveller · Πληκτρολόγιο οθόνης v2 (v31.60 / Τουρνουά v69) =====
+   • Συσκευή με οθόνη αφής → ανοίγει ΠΑΝΤΑ το δικό μας πληκτρολόγιο σε κάθε πεδίο.
+   • Κανονικό PC χωρίς αφή → δεν ανοίγει ποτέ μόνο του.
+   • Αν γράψετε με πραγματικό πληκτρολόγιο (ή με των Windows) → το δικό μας αποσύρεται μέχρι να ξανανοίξει η σελίδα.
+   • Το πεδίο ανεβαίνει πάντα ακριβώς πάνω από το πληκτρολόγιο (και από των Windows).
+   • Αριθμητικά πεδία → μόνο αριθμητικό πληκτρολόγιο.
+   Ρύθμιση συσκευής: localStorage 'bt_osk' = auto | always | off   (ή ?osk=auto|always|off στη διεύθυνση) */
+(function(){
+if(window.BTOSK) return;
+var OSK={mode:'auto',el:null,orig:'',lang:'el',shift:true,sym:false,skip:null,ours:false,retreat:false,touchSeen:false,pend:null,pendAt:0,lifts:[],winKb:0};
+window.OSK=OSK;
+try{var qm=new URLSearchParams(location.search).get('osk');if(qm==='off'||qm==='always'||qm==='auto'){localStorage.setItem('bt_osk',qm);}}catch(e){}
+try{var m=localStorage.getItem('bt_osk');OSK.mode=m==='off'?'off':m==='always'?'always':'auto';}catch(e){}
+try{if(sessionStorage.getItem('bt_osk_kb')==='1') OSK.retreat=true;}catch(e){}
+var CSS="#oskBox{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:none;flex-direction:column;background:#07131a;border-top:2px solid #12a3ad;box-shadow:0 -12px 40px rgba(0,0,0,.6);font-family:'Inter',Arial,sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation;text-align:left}"+
+"#oskBox.show{display:flex}"+
+"#oskBar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#0d222b;border-bottom:1px solid #1f4650}"+
+"#oskLbl{flex:none;max-width:28%;font:700 14px 'Inter',Arial;letter-spacing:.12em;text-transform:uppercase;color:#7fd6dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}"+
+"#oskVal{flex:1;min-width:0;min-height:56px;display:flex;align-items:center;padding:0 16px;border-radius:12px;background:#02090d;border:2px solid #12a3ad;color:#fff;font:700 30px 'Inter',Arial;white-space:nowrap;overflow:hidden;direction:ltr}"+
+"#oskVal span.ph{color:#4b6670;font-weight:600}"+
+"#oskVal i{display:inline-block;width:3px;height:34px;background:#f5b82e;margin-left:2px;animation:oskBlink 1s steps(1) infinite}"+
+"@keyframes oskBlink{50%{opacity:0}}"+
+"#oskBar button{flex:none;height:56px;min-width:64px;padding:0 18px;border-radius:12px;border:1px solid #2c4b55;background:#13303a;color:#fff;font:800 20px 'Inter',Arial;cursor:pointer;margin:0}"+
+"#oskBar #oskOk{background:linear-gradient(180deg,#22c55e,#15803d);border-color:#22c55e;min-width:120px}"+
+"#oskBar .oskC{min-width:0;padding:0 14px;font-size:16px;letter-spacing:.04em;background:#0f2a33;color:#bfeef2}"+
+"#oskBar .oskC.on{background:#f5b82e;color:#1a1300;border-color:#f5b82e}"+
+"#oskVal.all{background:#0b3d52}#oskVal.all b{background:#2f7fd1;color:#fff;border-radius:4px;padding:0 4px;font-weight:700}"+
+"#oskMsg{position:absolute;left:50%;top:-46px;transform:translateX(-50%);background:#0d222b;border:1px solid #12a3ad;color:#eaf6f7;font:700 16px 'Inter',Arial;padding:8px 16px;border-radius:10px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}#oskMsg.show{opacity:1}"+
+"#oskKeys{display:flex;flex-direction:column;gap:8px;padding:10px 10px 14px}"+
+".oskRow{display:flex;gap:8px;justify-content:center}"+
+".oskK{flex:1 1 0;max-width:110px;height:clamp(48px,8vh,84px);border-radius:12px;border:1px solid #24414b;background:#132a33;color:#f2f7f8;font:700 clamp(20px,3.2vh,32px) 'Inter',Arial;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;margin:0;box-shadow:0 3px 0 #061015;min-width:0}"+
+".oskK:active,.oskK.down{background:#1d4652;transform:translateY(2px);box-shadow:none}"+
+".oskK.fn{background:#0f2028;color:#9fd8dd;font-size:clamp(15px,2.4vh,22px);max-width:170px}"+
+".oskK.wide{flex-grow:2;max-width:200px}.oskK.space{flex-grow:6;max-width:640px}"+
+".oskK.on{background:#f5b82e;color:#1a1300;border-color:#f5b82e}"+
+".oskK.okk{background:linear-gradient(180deg,#22c55e,#15803d);color:#fff;border-color:#22c55e}"+
+"#oskBox.num #oskKeys{align-items:center}"+
+"#oskBox.num .oskRow{width:min(520px,94vw)}"+
+"#oskBox.num .oskK{max-width:none}"+
+"@media (max-width:900px){#oskBar .oskC span{display:none}#oskBar .oskC{padding:0 12px;font-size:20px}}"+
+"@media (max-width:620px){#oskLbl{display:none}#oskBar button{min-width:52px;padding:0 10px;font-size:17px}#oskBar #oskOk{min-width:80px}.oskRow{gap:4px}#oskKeys{gap:6px;padding:8px 4px 10px}.oskK{border-radius:8px;font-size:20px}}";
+function isTouch(){try{return OSK.touchSeen||(navigator.maxTouchPoints||0)>0||(window.matchMedia&&matchMedia('(any-pointer: coarse)').matches);}catch(e){return false;}}
+function wants(){if(OSK.mode==='off'||OSK.retreat) return false;if(OSK.mode==='always') return true;return isTouch();}
+function $(id){return document.getElementById(id);}
+function build(){
+  if($('oskBox')) return $('oskBox');
+  var st=document.createElement('style');st.id='oskCss';st.textContent=CSS;(document.head||document.documentElement).appendChild(st);
+  var d=document.createElement('div');d.id='oskBox';d.setAttribute('aria-hidden','true');
+  d.innerHTML='<div id="oskMsg"></div><div id="oskBar"><div id="oskLbl"></div><div id="oskVal"></div><button type="button" class="oskC" id="oskAll" title="Επιλογή όλων">▣<span> ΟΛΑ</span></button><button type="button" class="oskC" id="oskCopy" title="Αντιγραφή">⧉<span> ΑΝΤΙΓΡΑΦΗ</span></button><button type="button" class="oskC" id="oskPaste" title="Επικόλληση">📋<span> ΕΠΙΚΟΛΛΗΣΗ</span></button><button type="button" class="oskC" id="oskEye" title="Εμφάνιση κωδικού" style="display:none">👁</button><button type="button" id="oskX" title="Άκυρο">✕</button><button type="button" id="oskOk">✔ ΟΚ</button></div><div id="oskKeys"></div>';
+  document.body.appendChild(d);return d;
+}
+function target(n){
+  if(!n||!n.tagName) return null;
+  if(n.closest&&n.closest('#oskBox')) return null;
+  if(n.closest&&n.closest('[data-no-osk]')) return null;
+  var tg=n.tagName.toLowerCase();
+  if(tg==='textarea') return n.readOnly||n.disabled?null:n;
+  if(tg!=='input') return null;
+  var ty=(n.getAttribute('type')||'text').toLowerCase();
+  if(['text','search','number','tel','email','password','url',''].indexOf(ty)<0) return null;
+  if(n.readOnly||n.disabled) return null;
+  return n;
+}
+function noNative(el){if(el.dataset.oskIm==null) el.dataset.oskIm=el.getAttribute('inputmode')||'';el.setAttribute('inputmode','none');}
+function restore(el){if(!el||el.dataset.oskIm==null) return;var v=el.dataset.oskIm;if(v) el.setAttribute('inputmode',v);else el.removeAttribute('inputmode');delete el.dataset.oskIm;}
+function restoreAll(){var a=document.querySelectorAll('[data-osk-im]');for(var i=0;i<a.length;i++) restore(a[i]);}
+function isNum(el){var ty=(el.getAttribute('type')||'').toLowerCase();if(ty==='number'||ty==='tel') return true;var im=(el.dataset.oskIm!=null?el.dataset.oskIm:el.getAttribute('inputmode'))||'';if(/numeric|decimal|tel/.test(im)) return true;var pt=el.getAttribute('pattern')||'';return /^\[0-9\]|^\\d/.test(pt);}
+function isDec(el){var im=(el.dataset.oskIm!=null?el.dataset.oskIm:el.getAttribute('inputmode'))||'';var stp=el.getAttribute('step')||'';return im==='decimal'||/\./.test(stp);}
+function label(el){
+  var s='';
+  if(el.id){var l=document.querySelector('label[for="'+el.id+'"]');if(l) s=l.textContent;}
+  if(!s){var l2=el.closest('label');if(l2) s=l2.textContent;}
+  if(!s) s=el.getAttribute('placeholder')||el.getAttribute('title')||el.getAttribute('aria-label')||'';
+  if(!s){var p=el.previousElementSibling;if(p&&/^(LABEL|SPAN|B|DIV|H\d)$/.test(p.tagName)&&p.textContent.length<60&&/[A-Za-zΑ-Ωα-ωά-ώ]/.test(p.textContent)) s=p.textContent;}
+  try{if(window.BTOSK_LABEL) s=window.BTOSK_LABEL(el,s)||s;}catch(e){}
+  return String(s).replace(/\s+/g,' ').trim();
+}
+/* ---- το πεδίο ανεβαίνει πάνω από το πληκτρολόγιο ---- */
+function scrollParents(el){var out=[],p=el.parentElement;while(p&&p!==document.body&&p!==document.documentElement){var cs=getComputedStyle(p);if(/(auto|scroll)/.test(cs.overflowY)) out.push(p);p=p.parentElement;}return out;}
+function fixedAncestor(el){var p=el;while(p&&p!==document.body){var cs=getComputedStyle(p);if(cs.position==='fixed') return p;p=p.parentElement;}return null;}
+function unlift(){
+  OSK.lifts.slice().reverse().forEach(function(L){try{
+    if(L.t==='pad'){L.n.style.paddingBottom=L.v;}
+    else if(L.t==='tr'){L.n.style.transform=L.v;L.n.style.transition=L.tv;}
+    else if(L.t==='scroll'){L.n.scrollTop=L.v;}
+    else if(L.t==='rm'){if(L.n.parentNode) L.n.parentNode.removeChild(L.n);}
+  }catch(e){}});
+  OSK.lifts=[];
+}
+function lift(el,kbH){
+  if(!el||!kbH) return;
+  var gap=14,top=function(){return window.innerHeight-kbH;};
+  var need=function(){var r=el.getBoundingClientRect();return r.bottom+gap-top();};
+  if(need()<=0) return;
+  var done=function(L){OSK.lifts.push(L);};
+  // 1) περιοχές με κύλιση (πρώτα του πεδίου, μετά της σελίδας)
+  var sp=scrollParents(el);var se=document.scrollingElement||document.documentElement;
+  sp.forEach(function(p){if(need()<=0) return;
+    done({t:'pad',n:p,v:p.style.paddingBottom});var pb=parseFloat(getComputedStyle(p).paddingBottom)||0;p.style.paddingBottom=(pb+kbH)+'px';
+    done({t:'scroll',n:p,v:p.scrollTop});p.scrollTop+=need();});
+  if(need()>0&&!fixedAncestor(el)){
+    var sx=document.createElement('div');sx.setAttribute('data-osk-spacer','');sx.style.cssText='position:absolute;left:0;width:1px;pointer-events:none;visibility:hidden;top:'+se.scrollHeight+'px;height:'+(kbH+40)+'px';document.body.appendChild(sx);
+    done({t:'rm',n:sx});done({t:'scroll',n:se,v:se.scrollTop});se.scrollTop+=need();
+  }
+  // 2) ό,τι δεν κυλάει (παράθυρα πάνω στην οθόνη) → ανεβαίνει ολόκληρο
+  var n=need();
+  if(n>0){var fa=fixedAncestor(el);
+    if(fa){var r=el.getBoundingClientRect();n=Math.min(n,Math.max(0,r.top-8));
+      if(n>0){done({t:'tr',n:fa,v:fa.style.transform,tv:fa.style.transition});fa.style.transition='none';var cur=getComputedStyle(fa).transform;cur=(cur&&cur!=='none'?' '+cur:'');
+        var b0=el.getBoundingClientRect().bottom;fa.style.transform='translateY('+(-n)+'px)'+cur;
+        var mv=b0-el.getBoundingClientRect().bottom;if(mv>1&&Math.abs(mv-n)>1) fa.style.transform='translateY('+(-n*n/mv)+'px)'+cur;}}}   // σελίδα με zoom → διόρθωση
+}
+function relift(){var box=$('oskBox');unlift();if(OSK.el&&box&&box.classList.contains('show')) lift(OSK.el,box.offsetHeight);else if(OSK.winKb>0) lift(document.activeElement&&target(document.activeElement),OSK.winKb);}
+/* ---- άνοιγμα / κλείσιμο ---- */
+function open(el){
+  if(!el) return;
+  var box=build();
+  if(OSK.el===el){if(!box.classList.contains('show')){box.classList.add('show');relift();}return;}
+  if(OSK.el) close(true,false,true);
+  noNative(el);
+  OSK.el=el;OSK.orig=el.value;OSK.sym=false;OSK.eye=false;OSK.all=!!el.value&&(el.getAttribute('type')||'').toLowerCase()==='password';   /* κωδικός / κλειδί: όλο επιλεγμένο → η επικόλληση το αντικαθιστά */
+  if(/^(password|email|url)$/.test((el.getAttribute('type')||'').toLowerCase())&&OSK.lang!=='en'){OSK.langWas=OSK.lang;OSK.lang='en';}
+  try{$('oskEye').style.display=(el.getAttribute('type')||'').toLowerCase()==='password'?'':'none';$('oskEye').classList.remove('on');$('oskAll').classList.remove('on');}catch(e){}
+  box.classList.toggle('num',isNum(el));
+  $('oskLbl').textContent=label(el);
+  OSK.shift=!(el.value&&/[a-zα-ωά-ώ]/.test(el.value.slice(-1)));
+  try{var n=el.value.length;el.setSelectionRange(n,n);}catch(e){}
+  render();showVal();box.classList.add('show');box.setAttribute('aria-hidden','false');
+  unlift();requestAnimationFrame(function(){lift(el,box.offsetHeight);});
+}
+function close(commit,cancel,keepFocus){
+  var el=OSK.el;var box=$('oskBox');
+  if(box){box.classList.remove('show');box.setAttribute('aria-hidden','true');}
+  OSK.el=null;unlift();
+  if(OSK.langWas){OSK.lang=OSK.langWas;OSK.langWas=null;}
+  if(!el) return;
+  if(cancel){el.value=OSK.orig;el.dispatchEvent(new Event('input',{bubbles:true}));}
+  else if(commit&&el.value!==OSK.orig) el.dispatchEvent(new Event('change',{bubbles:true}));
+  restore(el);
+  if(!keepFocus&&document.activeElement===el) el.blur();
+}
+var L={
+  el:[['Ε','Ρ','Τ','Υ','Θ','Ι','Ο','Π'],['Α','Σ','Δ','Φ','Γ','Η','Ξ','Κ','Λ'],['Ζ','Χ','Ψ','Ω','Β','Ν','Μ','΄']],
+  en:[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M','.']],
+  sym:[['1','2','3','4','5','6','7','8','9','0'],['-','/','&','.',',','\'','(',')','@'],['#','+','!','?',':','_','"']]
+};
+function render(){
+  var k=$('oskKeys'),el=OSK.el;if(!el) return;
+  var B=function(key,txt,cls){return '<button type="button" class="oskK '+(cls||'')+'" data-k="'+key+'">'+txt+'</button>';};
+  var h='';
+  if(isNum(el)){
+    [['1','2','3'],['4','5','6'],['7','8','9']].forEach(function(r){h+='<div class="oskRow">'+r.map(function(c){return B(c,c);}).join('')+'</div>';});
+    h+='<div class="oskRow">'+(isDec(el)?B('.',',','fn'):B('-','−','fn'))+B('0','0')+B('BS','⌫','fn')+'</div>';
+  }else{
+    var LL=OSK.sym?L.sym:L[OSK.lang];
+    var cs=function(c){return (OSK.sym||OSK.shift)?c:c.toLowerCase();};
+    var em=(el.getAttribute('type')||'')==='email';
+    h+='<div class="oskRow">'+(OSK.sym?'':B(OSK.lang==='el'?';':'-',OSK.lang==='el'?';':'-'))+LL[0].map(function(c){return B(c,cs(c));}).join('')+B('BS','⌫','fn wide')+'</div>';
+    h+='<div class="oskRow">'+LL[1].map(function(c){return B(c,cs(c));}).join('')+(OSK.lang==='el'&&!OSK.sym&&!OSK.shift?B('ς','ς'):'')+(em&&!OSK.sym?B('@','@'):'')+'</div>';
+    h+='<div class="oskRow">'+(OSK.sym?'':B('SH','⇧','fn wide'+(OSK.shift?' on':'')))+LL[2].map(function(c){return B(c,cs(c));}).join('')+(OSK.sym?'':B('SH','⇧','fn wide'+(OSK.shift?' on':'')))+'</div>';
+    h+='<div class="oskRow">'+B('SYM',OSK.sym?'ΑΒΓ':'123','fn wide')+B('LANG',OSK.lang==='el'?'🌐 EN':'🌐 ΕΛ','fn wide')+B(' ','','space')+B('CLR','ΚΑΘΑΡ.','fn')+B('OK','✔','okk wide')+'</div>';
+  }
+  k.innerHTML=h;
+}
+function showVal(){
+  var el=OSK.el,v=$('oskVal');if(!el) return;
+  var val=el.value,ph=el.getAttribute('placeholder')||'';
+  var esc=function(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});};
+  if(!val) OSK.all=false;
+  var shown=(el.type==='password'&&!OSK.eye)?new Array(val.length+1).join('•'):val;
+  v.classList.toggle('all',!!OSK.all);try{$('oskAll').classList.toggle('on',!!OSK.all);}catch(e){}
+  v.innerHTML=(val?(OSK.all?'<b>'+esc(shown)+'</b>':esc(shown)):'<span class="ph">'+esc(ph)+'</span>')+'<i></i>';
+  v.scrollLeft=v.scrollWidth;
+}
+var TONOS={'Α':'Ά','Ε':'Έ','Η':'Ή','Ι':'Ί','Ο':'Ό','Υ':'Ύ','Ω':'Ώ','α':'ά','ε':'έ','η':'ή','ι':'ί','ο':'ό','υ':'ύ','ω':'ώ'};
+function key(k){
+  var el=OSK.el;if(!el) return;
+  if(k==='OK'){close(true);return;}
+  if(k==='SH'){OSK.shift=!OSK.shift;render();return;}
+  if(k==='SYM'){OSK.sym=!OSK.sym;render();return;}
+  if(k==='LANG'){OSK.lang=OSK.lang==='el'?'en':'el';OSK.sym=false;render();return;}
+  var v=el.value;
+  if(OSK.all){OSK.all=false;if(k==='BS'||k==='CLR'||k==='΄'){v='';k='NOP';}else v='';}   // «ΟΛΑ»: το επόμενο πλήκτρο αντικαθιστά όλο το κείμενο
+  if(k==='NOP'){}
+  else if(k==='BS') v=v.slice(0,-1);
+  else if(k==='CLR') v='';
+  else if(k==='΄'){var last=v.slice(-1);if(TONOS[last]) v=v.slice(0,-1)+TONOS[last];}
+  else{
+    var c=k;
+    if(!isNum(el)&&!OSK.sym&&c.length===1&&c!==' ') c=OSK.shift?c.toUpperCase():c.toLowerCase();
+    if(k==='ς') c='ς';
+    var max=+el.getAttribute('maxlength')||0;if(max>0&&v.length>=max) return;
+    v+=c;
+  }
+  if(el.value!==v){
+    var type=(el.getAttribute('type')||'').toLowerCase();
+    if(type==='number'&&(v==='-'||/\.$/.test(v))){try{el.type='text';el.value=v;el.dataset.oskWasNum='1';}catch(e){}}
+    else el.value=v;
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+  try{var n=el.value.length;el.setSelectionRange(n,n);}catch(e){}
+  showVal();
+}
+/* ---- αντιγραφή / επικόλληση (π.χ. κλειδί ροής YouTube) ---- */
+function oskMsg(t){var m=$('oskMsg');if(!m) return;m.textContent=t;m.classList.add('show');clearTimeout(OSK.msgT);OSK.msgT=setTimeout(function(){m.classList.remove('show');},2200);}
+function hiddenTa(){var ta=document.createElement('textarea');ta.setAttribute('data-no-osk','');ta.setAttribute('aria-hidden','true');ta.style.cssText='position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;';$('oskBox').appendChild(ta);return ta;}
+function clipRead(){
+  var D=window.btDesktop;
+  return Promise.resolve().then(function(){if(D&&D.clipRead) return D.clipRead();throw 0;})
+    .catch(function(){if(navigator.clipboard&&navigator.clipboard.readText) return navigator.clipboard.readText();throw 0;})
+    .catch(function(){var el=OSK.el,ta=hiddenTa(),v=null;try{ta.focus();if(document.execCommand('paste')) v=ta.value;}catch(e){}ta.remove();try{if(el) el.focus({preventScroll:true});}catch(e){}if(v==null) throw 0;return v;});
+}
+function clipWrite(t){
+  var D=window.btDesktop;
+  return Promise.resolve().then(function(){if(D&&D.clipWrite) return D.clipWrite(t).then(function(ok){if(!ok) throw 0;});throw 0;})
+    .catch(function(){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(t);throw 0;})
+    .catch(function(){var el=OSK.el,ta=hiddenTa(),ok=false;ta.value=t;try{ta.select();ok=document.execCommand('copy');}catch(e){}ta.remove();try{if(el) el.focus({preventScroll:true});}catch(e){}if(!ok) throw 0;});
+}
+function setVal(el,v){
+  var type=(el.getAttribute('type')||'').toLowerCase();
+  el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));
+  try{if(type!=='number'){var n=el.value.length;el.setSelectionRange(n,n);}}catch(e){}
+  showVal();
+}
+function doPaste(){
+  var el=OSK.el;if(!el) return;
+  clipRead().then(function(t){
+    if(!OSK.el||OSK.el!==el) return;
+    t=String(t==null?'':t).replace(/[\r\n\t]+/g,' ').trim();
+    if(!t){oskMsg('Το πρόχειρο είναι άδειο');return;}
+    if(isNum(el)){t=t.replace(isDec(el)?/[^0-9.,\-]/g:/[^0-9\-]/g,'').replace(',','.');if(!t){oskMsg('Το πρόχειρο δεν έχει αριθμό');return;}}
+    var v=OSK.all?t:(el.value+t);OSK.all=false;
+    var max=+el.getAttribute('maxlength')||0;if(max>0&&v.length>max) v=v.slice(0,max);
+    setVal(el,v);oskMsg('✔ Επικολλήθηκε');
+  }).catch(function(){oskMsg('Δεν επιτρέπεται η επικόλληση εδώ — πατήστε Ctrl+V');});
+}
+function doCopy(){
+  var el=OSK.el;if(!el) return;var t=el.value||'';
+  if(!t){oskMsg('Το πεδίο είναι άδειο');return;}
+  clipWrite(t).then(function(){oskMsg('✔ Αντιγράφηκε');}).catch(function(){oskMsg('Δεν έγινε αντιγραφή');});
+}
+function setMode(m){OSK.mode=m==='off'?'off':m==='always'?'always':'auto';try{localStorage.setItem('bt_osk',OSK.mode);}catch(e){}if(OSK.mode!=='off'){OSK.retreat=false;try{sessionStorage.removeItem('bt_osk_kb');}catch(e){}}if(OSK.mode==='off') close(false);restoreAll();}
+function retreatNow(){OSK.retreat=true;try{sessionStorage.setItem('bt_osk_kb','1');}catch(e){}}
+function init(){
+  var box=build();if(box.dataset.w) return;box.dataset.w='1';
+  // 1) πάτημα σε πεδίο: κλείνει προσωρινά το πληκτρολόγιο των Windows και ανοίγει το δικό μας στο «click»
+  document.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='touch'||e.pointerType==='pen') OSK.touchSeen=true;
+    if(box.contains(e.target)) return;
+    var el=target(e.target);
+    if(!el||OSK.skip===el||!wants()) return;
+    noNative(el);OSK.pend=el;OSK.pendAt=Date.now();
+    setTimeout(function(){if(OSK.pend===el&&OSK.el!==el){restore(el);OSK.pend=null;}},900);   // δεν άνοιξε το δικό μας → επιστρέφει το των Windows
+  },true);
+  document.addEventListener('click',function(e){
+    if(box.contains(e.target)) return;
+    var el=target(e.target);
+    if(!el){ if(OSK.el) close(true); return; }
+    if(OSK.skip===el) return;
+    if(OSK.pend===el&&Date.now()-OSK.pendAt<1500){OSK.pend=null;if(document.activeElement!==el) try{el.focus();}catch(_){}open(el);}
+  },true);
+  document.addEventListener('focusin',function(e){var el=target(e.target);if(!el) return;if(OSK.skip&&OSK.skip!==el) OSK.skip=null;
+    if(OSK.pend===el&&Date.now()-OSK.pendAt<1500&&OSK.el!==el){setTimeout(function(){if(OSK.pend===el){OSK.pend=null;open(el);}},250);}
+    if(OSK.winKb>0) setTimeout(relift,60);});
+  document.addEventListener('focusout',function(e){
+    try{var t=e.target;if(t&&t.dataset&&t.dataset.oskWasNum==='1'){t.type='number';delete t.dataset.oskWasNum;}}catch(_){}
+    setTimeout(function(){var a=document.activeElement;if(OSK.skip&&a!==OSK.skip){restore(OSK.skip);OSK.skip=null;}
+    if(!OSK.el) return;if(a===OSK.el||box.contains(a)) return;close(true);},150);});
+  // 2) γράφετε με πραγματικό πληκτρολόγιο / των Windows → το δικό μας αποσύρεται για όλη τη συνεδρία
+  var foreign=function(e){if(!e.isTrusted||OSK.ours) return;var el=OSK.el;
+    if(el&&e.target!==el) return;
+    if(!el&&!target(e.target)) return;
+    if(!el&&OSK.mode!=='always'&&!isTouch()) return;
+    retreatNow();
+    if(el){OSK.skip=el;close(false,false,true);restore(el);}
+    restoreAll();};
+  document.addEventListener('beforeinput',foreign,true);
+  document.addEventListener('keydown',function(e){if(e.key&&(e.key.length===1||e.key==='Backspace'||e.key==='Delete')&&!e.ctrlKey&&!e.metaKey&&!e.altKey) foreign(e);},true);
+  box.addEventListener('pointerdown',function(e){e.preventDefault();},true);
+  box.addEventListener('mousedown',function(e){e.preventDefault();},true);
+  $('oskX').addEventListener('click',function(){close(false,true);});
+  $('oskAll').addEventListener('click',function(){if(!OSK.el) return;OSK.all=!OSK.all&&!!OSK.el.value;showVal();});
+  $('oskCopy').addEventListener('click',doCopy);
+  $('oskPaste').addEventListener('click',doPaste);
+  $('oskEye').addEventListener('click',function(){OSK.eye=!OSK.eye;$('oskEye').classList.toggle('on',OSK.eye);showVal();});
+  $('oskOk').addEventListener('click',function(){close(true);});
+  $('oskKeys').addEventListener('click',function(e){var b=e.target.closest('.oskK');if(!b) return;OSK.ours=true;try{key(b.dataset.k);}finally{OSK.ours=false;}});
+  window.addEventListener('resize',function(){if(OSK.el) setTimeout(relift,80);});
+  // 3) πληκτρολόγιο των Windows / Android: το πεδίο ανεβαίνει πάνω του
+  try{
+    if(navigator.virtualKeyboard){
+      navigator.virtualKeyboard.overlaysContent=true;
+      navigator.virtualKeyboard.addEventListener('geometrychange',function(ev){var r=ev.target.boundingRect;OSK.winKb=r&&r.height>60?Math.round(r.height):0;if(OSK.el) return;unlift();if(OSK.winKb) lift(target(document.activeElement),OSK.winKb);});
+    }else if(window.visualViewport){
+      var vv=window.visualViewport;vv.addEventListener('resize',function(){var h=Math.round(window.innerHeight-vv.height-vv.offsetTop);OSK.winKb=h>120?h:0;if(OSK.el) return;unlift();if(OSK.winKb) lift(target(document.activeElement),OSK.winKb);});
+    }
+  }catch(e){}
+}
+window.BTOSK={open:open,close:close,setMode:setMode,isTouch:isTouch,wants:wants,target:target,state:OSK,relift:relift};
+// συμβατότητα με παλιές κλήσεις του Scoreboard
+window.oskOpen=open;window.oskClose=close;window.oskWants=function(){return wants();};
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
+<script>
+/* ===== Billiard Traveller · ΜΕΤΑΦΡΑΣΗ ΣΕΛΙΔΑΣ (κοινή μηχανή — Τουρνουά, Πίνακας Ελέγχου, BT Setup) =====
+   Μεταφράζεται ό,τι φαίνεται: κείμενα, placeholder / title, κουμπιά, μηνύματα (alert / confirm / btAsk …).
+   1) ακριβές κείμενο → λεξικό · 2) αλλιώς κάθε γνωστό κομμάτι μέσα στο κείμενο (μηνύματα που φτιάχνονται από κομμάτια + ονόματα / αριθμούς)
+   Ό,τι γράφει ο χρήστης (πεδία, textarea, ονόματα παικτών) ΔΕΝ πειράζεται. Νέα γλώσσα = νέο λεξικό. */
+(function(){
+if(window.BTI18N) return;
+var GR=/[Ͱ-Ͽἀ-῿]/, LET=/[A-Za-zͰ-Ͽἀ-῿]/;
+var D={}, RE=null, on=false, busy=false, ORIG=new WeakMap(), TRV=new WeakMap(), LIST=[], MO=null, SKIP='script,style,textarea,[data-no-i18n],[contenteditable="true"]';
+function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function setDict(d){D=d||{};var ks=Object.keys(D).filter(function(k){return k.length>=2&&GR.test(k);}).sort(function(a,b){return b.length-a.length;});
+  RE=ks.length?new RegExp(ks.map(esc).join('|'),'g'):null;}
+function tr(s){
+  if(!on||s==null) return s; s=String(s); if(!GR.test(s)) return s;
+  var m=s.match(/^(\s*)([\s\S]*?)(\s*)$/), core=m[2].replace(/[ \t ]+/g,' ');
+  if(D[core]!=null) return m[1]+D[core]+m[3];
+  var cq=core.replace(/\s?[;\u037e]$/,'');if(cq!==core&&D[cq]!=null) return m[1]+D[cq]+'?'+m[3];
+  var out=core.replace(/(\d+)\s?άδα(ς)?/g,'$1');
+  if(D[out]!=null) return m[1]+D[out]+m[3];
+  if(!RE) return s;
+  out=core;
+  // πολυγραμμα μηνύματα: κάθε γραμμή χωριστά
+  if(out.indexOf('\n')>=0) return m[1]+out.split('\n').map(function(l){return tr(l);}).join('\n')+m[3];
+  out=out.replace(RE,function(x,off,str){var b=str.charAt(off-1),a=str.charAt(off+x.length);
+    if((b&&LET.test(b)&&LET.test(x.charAt(0)))||(a&&LET.test(a)&&LET.test(x.charAt(x.length-1)))) return x;
+    return D[x];});
+  out=out.replace(/(\d+)\s?άδα(ς)?/g,'$1');
+  out=out.replace(/([A-Za-z0-9»)…])\s?[;\u037e](?=\s|$)/g,'$1?');   // ελληνικό ερωτηματικό «;» → «?»
+  return m[1]+out+m[3];
+}
+function attrs(el){['placeholder','title','aria-label'].forEach(function(a){var v=el.getAttribute&&el.getAttribute(a);if(v&&GR.test(v)){var t=tr(v);if(t!==v){if(!el.hasAttribute('data-i18n-'+a)) el.setAttribute('data-i18n-'+a,v);el.setAttribute(a,t);}}});
+  if(el.tagName==='INPUT'&&(el.type==='button'||el.type==='submit')&&GR.test(el.value)){var t=tr(el.value);if(t!==el.value){el.setAttribute('data-i18n-value',el.value);el.value=t;}}
+  if(el.tagName==='OPTION'&&GR.test(el.textContent)){} }
+function node(n){
+  if(!on||!n) return;
+  if(n.nodeType===3){var p=n.parentElement;if(!p||p.closest(SKIP)) return;var v=n.nodeValue;if(!GR.test(v)) return;var t=tr(v);
+    if(t!==v){busy=true;if(!ORIG.has(n)) LIST.push(n);ORIG.set(n,v);TRV.set(n,t);n.nodeValue=t;busy=false;}return;}
+  if(n.nodeType===1&&n.tagName==='TEXTAREA'){attrs(n);return;}   // μόνο το placeholder — ποτέ το κείμενο του χρήστη
+  if(n.nodeType!==1||(n.closest&&n.closest(SKIP))) return;
+  attrs(n);
+  var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT),c;
+  while((c=w.nextNode())){if(c.nodeType===3) node(c);else if(c.tagName==='TEXTAREA'||!(c.closest&&c.closest(SKIP))) attrs(c);}
+}
+function revert(){busy=true;LIST.splice(0).forEach(function(n){var o=ORIG.get(n);if(o!=null&&n.isConnected&&n.nodeValue===TRV.get(n)) n.nodeValue=o;ORIG.delete(n);TRV.delete(n);});
+  ['placeholder','title','aria-label','value'].forEach(function(a){document.querySelectorAll('[data-i18n-'+a+']').forEach(function(e){var o=e.getAttribute('data-i18n-'+a);if(a==='value') e.value=o;else e.setAttribute(a,o);e.removeAttribute('data-i18n-'+a);});});
+  busy=false;}
+function set(en){
+  en=!!en; if(en===on&&!en) return;
+  on=en; if(MO) MO.disconnect();
+  document.documentElement.lang=on?'en':'el';
+  if(!on){revert();return;}
+  node(document.body);
+  if(!MO) MO=new MutationObserver(function(recs){if(busy||!on) return;
+    for(var i=0;i<recs.length;i++){var r=recs[i];if(r.type==='characterData') node(r.target);else if(r.type==='attributes'){if(r.attributeName.indexOf('data-i18n')!==0) attrs(r.target);}else r.addedNodes.forEach(node);}
+    if(LIST.length>6000) for(var j=LIST.length-1;j>=0;j--) if(!LIST[j].isConnected) LIST.splice(j,1);});
+  MO.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label']});
+}
+// μηνύματα
+(function(){var A=window.alert,C=window.confirm,P=window.prompt;
+  window.alert=function(m){return A.call(window,tr(String(m==null?'':m)));};
+  window.confirm=function(m){return C.call(window,tr(String(m==null?'':m)));};
+  window.prompt=function(m,d){return P.call(window,tr(String(m==null?'':m)),d);};})();
+function wrapDlg(){['btAlert','btAsk','btPrompt'].forEach(function(k){var f=window[k];if(typeof f==='function'&&!f.__i18n){var g=function(m,d){return f.call(window,tr(m==null?'':String(m)),d);};g.__i18n=1;window[k]=g;}});
+  var ch=window.btChoose;if(typeof ch==='function'&&!ch.__i18n){var g2=function(m,o){return ch.call(window,tr(m==null?'':String(m)),(o||[]).map(function(x){return tr(x);}));};g2.__i18n=1;window.btChoose=g2;}}
+wrapDlg();if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wrapDlg);
+window.BTI18N={setDict:setDict,set:set,t:tr,on:function(){return on;}};
+})();
+
+BTI18N.setDict({"Τουρνουά μπιλιάρδου — πρόγραμμα & ζωντανά αποτελέσματα": "Billiard tournaments — schedule & live results", "Billiard Traveller — Τουρνουά": "Billiard Traveller — Tournaments", "✔ ΟΚ": "✔ OK", "Αντιγραφή": "Copy", "Δεν επιτρέπεται η επικόλληση εδώ — πατήστε Ctrl+V": "Pasting is not allowed here — press Ctrl+V", "ταμπλό": "bracket", "🔍 Αναζήτηση τουρνουά ή διοργανωτή": "🔍 Search tournament or organiser", "Κρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται.": "It is hidden from the list and the tables disconnect.", "🎯 Γαλλικό · Όμιλοι (3-4)": "🎯 Carom · Groups (3-4)", "Δευ": "Mon", "Τρί": "Tue", "🖨 Εκτύπωση": "🖨 Print", "Επιλογή όλων": "Select all", "παίκτες": "players", "Προσεχώς": "Upcoming", "🏆 Όλα τα τουρνουά": "🏆 All tournaments", "Για τον διοργανωτή": "For the organiser", "ΑΝΤΙΓΡΑΦΗ": "COPY", "Πέμ": "Thu", "Κλείσιμο": "Close", "🌐 ΕΛ": "🌐 EL", "❗ Η επαναφορά δεν έγινε:": "❗ Restore did not happen:", "ή": "or", "Δεν έγινε αντιγραφή": "Copy failed", "Κυρ": "Sun", "»; Κρύβεται από τη λίστα και τα τραπέζια αποσυνδέονται. Τα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».": "»? It is hidden from the list and the tables disconnect. The data is SAVED — restore from «♻ Deleted».", "Τα δεδομένα ΑΠΟΘΗΚΕΥΟΝΤΑΙ — επαναφορά από «♻ Διαγραμμένα».": "The data is SAVED — restore from «♻ Deleted».", "🎯 Γαλλικό · Διπλή πυραμίδα": "🎯 Carom · Double elimination", "❗ Η διαγραφή δεν έγινε:": "❗ Deletion did not happen:", "✔ Επικολλήθηκε": "✔ Pasted", "👤 Σύνδεση": "👤 Log in", "🏆 Νικητής:": "🏆 Winner:", "Δωρεάν": "Free", "· πατήστε για επαναφορά": "· tap to restore", "Σύνδεση διοργανωτή για διαγραφή / επαναφορά": "Organiser sign-in for delete / restore", "Αμερικάνικο": "Pool", "📅 Προσεχώς": "📅 Upcoming", "Τετ": "Wed", "Ενημέρωση:": "Updated:", "Σάβ": "Sat", "Άκυρο": "Cancel", "♻ Διαγραμμένα (": "♻ Deleted (", "Δεν υπάρχουν ακόμα δημοσιευμένα τουρνουά.": "No tournaments published yet.", "Π": "P", "ΕΠΙΚΟΛΛΗΣΗ": "PASTE", "Σ": "I", "Ολοκληρώθηκε": "Finished", "⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.": "⚠ Could not connect. Check the internet and reload the page.", "Κανένα τουρνουά δεν ταιριάζει στην αναζήτηση.": "No tournament matches the search.", "Επικόλληση": "Paste", "🏁 Ολοκληρωμένα": "🏁 Finished", "🗑 Διαγραφή του τουρνουά «": "🗑 Delete the tournament «", "⚠ Δεν ήταν δυνατή η ανάγνωση (": "⚠ Could not read (", "Το πρόχειρο είναι άδειο": "The clipboard is empty", "✔ Αντιγράφηκε": "✔ Copied", "σφάλμα": "error", "✔ Το τουρνουά επανήλθε. Άνοιγμα τώρα (για να ξανασυνδεθούν τα τραπέζια)": "✔ The tournament is back. Open it now (so the tables reconnect)", "🟢 Σε εξέλιξη": "🟢 In progress", "Εμφάνιση κωδικού": "Show code", "Γαλλικό": "Carom", "Επαναφορά": "Restore", "Παρ": "Fri", "Η σύνδεση δεν έγινε:": "Connection failed:", "🏆 Mosconi (ομάδες)": "🏆 Mosconi (teams)", "♻ Διαγραμμένα": "♻ Deleted", "Το πεδίο είναι άδειο": "The field is empty", "· Έξοδος": "· Log out", "ΚΑΘΑΡ.": "CLEAR", "Φόρτωση τουρνουά…": "Loading tournaments…", "ΟΛΑ": "ALL", "📣 Προκήρυξη & συμμετοχή →": "📣 Proclamation & entry →", "διαγράφηκε": "deleted", "📍 Όλες οι πόλεις": "📍 All cities", "Διαγραφή (με αποθήκευση — επαναφορά όποτε θέλετε)": "Delete (saved — restore whenever you want)", "⚠ Σφάλμα σύνδεσης.": "⚠ Connection error.", "Το πρόχειρο δεν έχει αριθμό": "The clipboard has no number", "↩ Επαναφορά του τουρνουά «": "↩ Restore the tournament «", "🔑 Σύνδεση με PIN": "🔑 Log in with PIN", "Ζωντανά": "Live", "ΝΑΙ": "YES", "ΑΚΥΡΟ": "CANCEL", "Ομάδα Α": "Team A", "Ομάδα Β": "Team B", "ΟΜΑΔΑ Α": "TEAM A", "ΟΜΑΔΑ Β": "TEAM B"});
+(function(){var K='bt_tour_lang';function lab(){var b=document.getElementById('btLangBtn');if(b) b.textContent=BTI18N.on()?'ΕΛ':'EN';}
+  function go(en){try{localStorage.setItem(K,en?'en':'el');}catch(e){}BTI18N.set(en);lab();}
+  function init(){var L='el';try{L=new URLSearchParams(location.search).get('lang')||localStorage.getItem(K)||'el';}catch(e){}if(L==='en') BTI18N.set(true);lab();
+    var b=document.getElementById('btLangBtn');if(b) b.addEventListener('click',function(){go(!BTI18N.on());});}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();})();
+</script>
 </body>
 </html>

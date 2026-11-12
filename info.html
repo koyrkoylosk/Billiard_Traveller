@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="el">
-<head><!-- Billiard Traveller © 2026 — all rights reserved. Unauthorized copying, modification or redistribution is prohibited. -->
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Billiard Traveller — Τουρνουά</title>
@@ -158,8 +158,217 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px 16px 30p
 <div id="toast" class="toast"></div>
 <div id="printSheet"></div>
 
-<script>(function(){const N={apiKey:"AIzaSyAJmOe7Woh92qMCDTy0HtepvJJDcrFgSfE",authDomain:"billiard-traveller.firebaseapp.com",projectId:"billiard-traveller",storageBucket:"billiard-traveller.firebasestorage.app",messagingSenderId:"481554679650",appId:"1:481554679650:web:d9d13e5d21ca89b11ace3b"},o=e=>document.querySelector(e),h=new URLSearchParams(location.search).get("t")||"";let u="el";try{const e=new URLSearchParams(location.search).get("lang");u=e==="en"||e==="el"?e:localStorage.getItem("bt_tour_lang")||"el"}catch{}u!=="en"&&(u="el");const L={el:{sub:"Τουρνουά μπιλιάρδου",all:"🏆 Όλα τα τουρνουά",loading:"Φόρτωση…",noPoster:"Χωρίς αφίσα",prizes:"🏆 Έπαθλα",rules:"📋 Κανόνες / σύστημα",place:"📍 Πού γίνεται",share:"📤 Κοινοποίηση",copy:"🔗 Αντιγραφή συνδέσμου",qr:"🔳 QR",print:"🖨 Εκτύπωση αφίσας",cal:"📅 Στο ημερολόγιο",close:"Κλείσιμο",notFound:"⚠ Το τουρνουά δεν βρέθηκε.",noId:"⚠ Λείπει ο κωδικός του τουρνουά από τον σύνδεσμο.",net:"⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.",deleted:"🗑 Το τουρνουά δεν είναι πια διαθέσιμο.",live:"Σε εξέλιξη",soon:"Προσεχώς",done:"Ολοκληρώθηκε",regOpen:"Δηλώσεις ανοιχτές",regClosed:"Οι δηλώσεις έκλεισαν",full:"Πλήρες",game:"Παιχνίδι",dates:"Ημερομηνίες",hours:"Ώρες",venue:"Μαγαζί",fee:"Συμμετοχή",spots:"Θέσεις",deadline:"Προθεσμία δηλώσεων",contact:"Επικοινωνία",left:"απομένουν {0}",ofMax:"{0} από {1}",noneLeft:"δεν υπάρχουν ελεύθερες θέσεις",free:"Δωρεάν",inDays:"σε {0} μέρες",inHours:"σε {0} ώρες",today:"σήμερα",ended:"έληξε",regBtn:"✍ Δήλωση συμμετοχής",regSoon:"Η online δήλωση ανοίγει σύντομα. Για συμμετοχή καλέστε το μαγαζί:",call:"📞 Κλήση",results:"📊 Κλήρωση & αποτελέσματα",liveBtn:"🟢 Ζωντανά αποτελέσματα",champ:"🏆 Νικητής: {0}",players:"👥 Δηλωμένοι παίκτες ({0})",teams:"👥 Ομάδες",copied:"✔ Ο σύνδεσμος αντιγράφηκε",directions:"🧭 Οδηγίες στον χάρτη",org:"🎱 Διοργάνωση: {0}",carom:"Γαλλικό",pool:"Αμερικάνικο",mosc:"Mosconi (ομάδες)",groups:"Όμιλοι (3-4)",dbl:"Διπλή πυραμίδα",ko:"νοκ-άουτ {0}",days:["Κυρ","Δευ","Τρί","Τετ","Πέμ","Παρ","Σάβ"],printQr:"Σκανάρετε για όλες τις πληροφορίες και τα ζωντανά αποτελέσματα"},en:{sub:"Billiard tournaments",all:"🏆 All tournaments",loading:"Loading…",noPoster:"No poster",prizes:"🏆 Prizes",rules:"📋 Rules / format",place:"📍 Venue",share:"📤 Share",copy:"🔗 Copy link",qr:"🔳 QR",print:"🖨 Print poster",cal:"📅 Add to calendar",close:"Close",notFound:"⚠ Tournament not found.",noId:"⚠ The tournament code is missing from the link.",net:"⚠ Could not connect. Check the internet and reload the page.",deleted:"🗑 This tournament is no longer available.",live:"In progress",soon:"Upcoming",done:"Finished",regOpen:"Registration open",regClosed:"Registration closed",full:"Full",game:"Game",dates:"Dates",hours:"Hours",venue:"Venue",fee:"Entry fee",spots:"Places",deadline:"Registration deadline",contact:"Contact",left:"{0} left",ofMax:"{0} of {1}",noneLeft:"no places left",free:"Free",inDays:"in {0} days",inHours:"in {0} hours",today:"today",ended:"closed",regBtn:"✍ Register",regSoon:"Online registration opens soon. To take part, call the venue:",call:"📞 Call",results:"📊 Draw & results",liveBtn:"🟢 Live results",champ:"🏆 Winner: {0}",players:"👥 Registered players ({0})",teams:"👥 Teams",copied:"✔ Link copied",directions:"🧭 Directions",org:"🎱 Organiser: {0}",carom:"Carom (French)",pool:"Pool (American)",mosc:"Mosconi (teams)",groups:"Groups (3-4)",dbl:"Double elimination",ko:"knockout {0}",days:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],printQr:"Scan for all the information and live results"}},n=(e,...t)=>{let a=(L[u]||L.el)[e];return a==null&&(a=L.el[e]),typeof a!="string"||t.forEach((r,i)=>{a=a.replace("{"+i+"}",r)}),a},s=e=>String(e??"").replace(/[&<>"']/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[t]);let d=null,y="";function P(e){return"app.html?t="+encodeURIComponent(h)+(e.format==="mosconi"?"&f=mosc":e.format==="groups"?"&f=grp&k="+(e.koSize||16):e.format==="carom"?"&f=car&s="+(e.size||32)+"&k="+(e.koSize||16):"&s="+(e.size||32)+(e.koSize?"&k="+e.koSize:""))}function w(e,t){if(!e)return"";const[a,r,i]=e.split("-").map(Number);if(!a)return"";const l=n("days"),c=new Date(a,r-1,i),p=new Date(a,r-1,i+Math.max(1,t||1)-1),m=f=>l[f.getDay()]+" "+f.getDate()+"/"+(f.getMonth()+1);return(t||1)>1?m(c)+" – "+m(p)+" "+p.getFullYear():m(c)+" "+c.getFullYear()}function x(e){if(e.format==="mosconi")return"🎱 "+n("pool")+" · "+n("mosc");const t=e.game==="pool"?"🎱 "+n("pool")+(e.ball?" "+e.ball+"-ball":""):"🎯 "+n("carom"),a=e.format==="groups"?n("groups"):n("dbl");return t+" · "+a+(e.koSize?" · "+n("ko",e.koSize):"")}function R(e){if(!e.deadline)return{txt:"",past:!1};const t=new Date(e.deadline);if(isNaN(t))return{txt:e.deadline,past:!1};const a=t-Date.now(),i=n("days")[t.getDay()]+" "+t.getDate()+"/"+(t.getMonth()+1)+" "+String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0");let l=a<=0?n("ended"):a<24*36e5?a<36e5?n("today"):n("inHours",Math.ceil(a/36e5)):n("inDays",Math.ceil(a/864e5));return{txt:i,rel:l,past:a<=0}}function O(e){let t=null;try{t=JSON.parse(e.state||"null")}catch{}if(!t)return{list:[],teams:null};if(e.format==="mosconi"&&t.mos){const i=(t.mos.teams||[]).map((l,c)=>({name:String(l&&l.name||"").trim()||(u==="en"?c?"TEAM B":"TEAM A":c?"ΟΜΑΔΑ Β":"ΟΜΑΔΑ Α"),pl:(l&&l.p||[]).map(p=>String(p||"").trim()).filter(Boolean)}));return{list:[],teams:i}}const a={},r=[];return(t.participants||[]).forEach(i=>{if(i=String(i||"").trim(),!i||i.toUpperCase()==="BYE"||/^player\s*\d+$/i.test(i))return;const l=i.toLocaleLowerCase("el");a[l]||(a[l]=1,r.push(i))}),{list:r,teams:null}}function v(e,t,a){return'<div class="fact'+(a?" wide":"")+'"><div class="k">'+s(e)+'</div><div class="v">'+t+"</div></div>"}function I(){document.documentElement.lang=u,document.querySelectorAll("[data-t]").forEach(g=>{g.textContent=n(g.dataset.t)}),o("#langBtn").textContent=u==="el"?"EN":"ΕΛ";const e=d;if(!e)return;const t=e.promo&&e.promo.on?e.promo:{},a=e.title||h;document.title=a+" — Billiard Traveller",o("#title").textContent=a,o("#org").textContent=e.organizer?n("org",e.organizer):"";const r=O(e),i=r.teams?0:r.list.length||+e.entries||0,l=parseInt(t.max,10)||0,c=l?Math.max(0,l-i):0,p=R(t),m=e.champion?"finished":e.status||"upcoming",f=m==="upcoming"&&!p.past&&(!l||c>0);let b=m==="live"?'<span class="badge b-live">● '+s(n("live"))+"</span>":m==="finished"?'<span class="badge b-done">'+s(n("done"))+"</span>":'<span class="badge b-soon">📅 '+s(n("soon"))+"</span>";m==="upcoming"&&e.promo&&e.promo.on&&(b+=l&&!c?'<span class="badge b-red">'+s(n("full"))+"</span>":f?'<span class="badge b-live">'+s(n("regOpen"))+"</span>":'<span class="badge b-red">'+s(n("regClosed"))+"</span>"),o("#badges").innerHTML=b;const C=[t.venue,t.addr,t.city].filter(Boolean);let D=v(n("game"),s(x(e)),!0)+v(n("dates"),s(w(e.startDate,e.days)))+(t.hours?v(n("hours"),s(t.hours)):"")+(C.length?v(n("venue"),s(t.venue||"")+"<small>"+s([t.addr,t.city].filter(Boolean).join(", "))+"</small>"):"")+(e.promo&&e.promo.on?v(n("fee"),+t.fee?s(String(+t.fee).replace(".",",")+" €"):s(n("free"))):"");l&&(D+=v(n("spots"),s(n("ofMax",i,l))+"<small>"+s(c?n("left",c):n("noneLeft"))+'</small><div class="bar"><i class="'+(c?"":"full")+'" style="width:'+Math.min(100,Math.round(i/l*100))+'%"></i></div>')),p.txt&&(D+=v(n("deadline"),s(p.txt)+"<small>"+s(p.rel||"")+"</small>")),t.phone&&(D+=v(n("contact"),'<a href="tel:'+s(String(t.phone).replace(/[^\d+]/g,""))+'">'+s(t.phone)+"</a>")),o("#facts").innerHTML=D;let S="";if(e.champion&&(S+='<div style="font-weight:800;font-size:17px">'+s(n("champ",e.champion))+"</div>"),m==="upcoming"&&e.promo&&e.promo.on&&(S+='<div class="row"><button class="btn main off" type="button" disabled>'+s(n("regBtn"))+"</button>"+(t.phone?'<a class="btn" href="tel:'+s(String(t.phone).replace(/[^\d+]/g,""))+'">'+s(n("call"))+" "+s(t.phone)+"</a>":"")+"</div>",S+="<small>"+s(n("regSoon"))+" "+s(t.phone||"")+"</small>"),S+='<div class="row"><a class="btn '+(m==="live"?"live":"")+'" href="'+s(P(e))+'">'+s(n(m==="live"?"liveBtn":"results"))+"</a></div>",o("#cta").innerHTML=S,o("#prizes").textContent=t.prizes||"",o("#sPrizes").style.display=t.prizes?"":"none",o("#rules").textContent=t.rules||"",o("#sRules").style.display=t.rules?"":"none",C.length){const g=encodeURIComponent(C.join(", "));o("#place").innerHTML="<b>"+s(t.venue||"")+"</b><br>"+s([t.addr,t.city].filter(Boolean).join(", "))+'<br><a href="https://www.google.com/maps/search/?api=1&query='+g+'" target="_blank" rel="noopener">'+s(n("directions"))+"</a>";const k=o("#map"),M="https://maps.google.com/maps?q="+g+"&z=16&output=embed";k.dataset.src!==M&&(k.dataset.src=M,k.src=M),o("#sPlace").style.display=""}else o("#sPlace").style.display="none";r.teams?(o("#hPlayers").textContent=n("teams"),o("#players").innerHTML=r.teams.map(g=>'<li style="white-space:normal"><b>'+s(g.name)+"</b>: "+s(g.pl.join(", "))+"</li>").join(""),o("#sPlayers").style.display=""):(o("#hPlayers").textContent=n("players",r.list.length),o("#players").innerHTML=r.list.map(g=>'<li title="'+s(g)+'">'+s(g)+"</li>").join(""),o("#sPlayers").style.display=r.list.length?"":"none");const E=location.href.split("#")[0].replace(/[?&]lang=(el|en)/,""),z=a+" — "+w(e.startDate,e.days)+(t.city?" · "+t.city:"");o("#shFb").href="https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(E),o("#shVb").href="viber://forward?text="+encodeURIComponent(z+" "+E),o("#shWa").href="https://wa.me/?text="+encodeURIComponent(z+" "+E),o("#shCal").style.display=e.startDate?"":"none",B(e,t,E),o("#status").style.display="none",o("#page").style.display=""}function A(e,t,a){e.innerHTML="";try{if(typeof QRCode<"u"){new QRCode(e,{text:t,width:a||220,height:a||220});return}}catch{}const r=document.createElement("img");r.width=a||220,r.height=a||220,r.alt="QR",r.src="https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data="+encodeURIComponent(t),e.appendChild(r)}function B(e,t,a){const r=o("#printSheet"),i=[[n("game"),x(e)],[n("dates"),w(e.startDate,e.days)],[n("hours"),t.hours],[n("venue"),[t.venue,t.addr,t.city].filter(Boolean).join(", ")],[n("fee"),e.promo&&e.promo.on?+t.fee?String(+t.fee).replace(".",",")+" €":n("free"):""],[n("spots"),t.max],[n("deadline"),R(t).txt],[n("contact"),t.phone],[n("prizes").replace(/^\S+\s/,""),t.prizes]].filter(l=>l[1]);r.innerHTML='<div class="ph"><b>🎱 Billiard Traveller</b><span>'+s(e.organizer||"")+"</span></div><h1>"+s(e.title||h)+"</h1>"+(y?'<div class="pimg"><img src="'+y+'" alt=""></div>':"")+"<table>"+i.map(l=>'<tr><td class="k">'+s(l[0])+'</td><td style="white-space:pre-wrap">'+s(l[1])+"</td></tr>").join("")+'</table><div class="pq"><div id="pqr"></div><div>'+s(n("printQr"))+"<br><small>"+s(a)+"</small></div></div>",A(r.querySelector("#pqr"),a,120)}function U(){const e=d,t=e.promo&&e.promo.on?e.promo:{};if(!e||!e.startDate)return;const[a,r,i]=e.startDate.split("-").map(Number),l=new Date(a,r-1,i+Math.max(1,e.days||1)),c=b=>b.getFullYear()+String(b.getMonth()+1).padStart(2,"0")+String(b.getDate()).padStart(2,"0"),p=b=>String(b||"").replace(/\\/g,"\\\\").replace(/[,;]/g,C=>"\\"+C).replace(/\n/g,"\\n"),m=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Billiard Traveller//Tournament//EL","BEGIN:VEVENT","UID:"+h+"@billiard-traveller","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+Z$/,"Z"),"DTSTART;VALUE=DATE:"+e.startDate.replace(/-/g,""),"DTEND;VALUE=DATE:"+c(l),"SUMMARY:"+p(e.title||h),"LOCATION:"+p([t.venue,t.addr,t.city].filter(Boolean).join(", ")),"DESCRIPTION:"+p((t.hours?t.hours+`
-`:"")+location.href),"URL:"+location.href,"END:VEVENT","END:VCALENDAR"].join(`\r
-`),f=document.createElement("a");f.href=URL.createObjectURL(new Blob([m],{type:"text/calendar"})),f.download=(h||"tournament")+".ics",document.body.appendChild(f),f.click(),f.remove()}function T(e){const t=o("#toast");t.textContent=e,t.style.display="block",clearTimeout(T.t),T.t=setTimeout(()=>t.style.display="none",2200)}function F(){o("#langBtn").addEventListener("click",()=>{u=u==="el"?"en":"el";try{localStorage.setItem("bt_tour_lang",u)}catch{}I(),d||document.querySelectorAll("[data-t]").forEach(e=>{e.textContent=n(e.dataset.t)})}),o("#poster").addEventListener("click",()=>{y&&(o("#imgBig").src=y,o("#imgModal").classList.remove("hidden"))}),o("#imgModal").addEventListener("click",()=>o("#imgModal").classList.add("hidden")),o("#shCopy").addEventListener("click",async()=>{const e=location.href.split("#")[0];try{await navigator.clipboard.writeText(e)}catch{const a=document.createElement("textarea");a.value=e,document.body.appendChild(a),a.select();try{document.execCommand("copy")}catch{}a.remove()}T(n("copied"))}),o("#shQr").addEventListener("click",()=>{const e=location.href.split("#")[0];o("#qrTitle").textContent=d&&d.title||h,A(o("#qrBox"),e),o("#qrUrl").textContent=e,o("#qrModal").classList.remove("hidden")}),o("#qrClose").addEventListener("click",()=>o("#qrModal").classList.add("hidden")),o("#shPrint").addEventListener("click",()=>window.print()),o("#shCal").addEventListener("click",U),document.addEventListener("keydown",e=>{e.key==="Escape"&&document.querySelectorAll(".modal").forEach(t=>t.classList.add("hidden"))})}function q(){if(F(),document.querySelectorAll("[data-t]").forEach(e=>{e.textContent=n(e.dataset.t)}),o("#langBtn").textContent=u==="el"?"EN":"ΕΛ",!h){o("#status").textContent=n("noId");return}if(typeof firebase>"u"){o("#status").textContent=n("net");return}try{firebase.apps.length||firebase.initializeApp(N);const e=firebase.firestore().collection("tournaments").doc(h);e.onSnapshot(t=>{if(!t.exists){d=null,o("#page").style.display="none",o("#status").style.display="",o("#status").textContent=n("notFound");return}const a=t.data();if(a.deleted){d=null,o("#page").style.display="none",o("#status").style.display="",o("#status").textContent=n("deleted");return}const r=a.promo&&a.promo.posterAt,i=d&&d.promo&&d.promo.posterAt;d=a,I(),r&&r!==i&&e.collection("pub").doc("poster").get().then(l=>{const c=l.exists?l.data():null;y=c&&c.img||"",o("#poster").innerHTML=y?'<img alt="">':"<span>"+s(n("noPoster"))+"</span>",y&&(o("#poster img").src=y),B(d,d.promo&&d.promo.on?d.promo:{},location.href.split("#")[0])}).catch(()=>{})},t=>{o("#status").textContent=n("net")+" ("+(t.code||"")+")"})}catch{o("#status").textContent=n("net")}}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",q):q(),"serviceWorker"in navigator&&location.protocol==="https:"&&navigator.serviceWorker.register("sw.js").catch(function(){})})();</script>
+<script>
+(function(){
+  const FB_CONFIG = {
+    apiKey: "AIzaSyAJmOe7Woh92qMCDTy0HtepvJJDcrFgSfE",
+    authDomain: "billiard-traveller.firebaseapp.com",
+    projectId: "billiard-traveller",
+    storageBucket: "billiard-traveller.firebasestorage.app",
+    messagingSenderId: "481554679650",
+    appId: "1:481554679650:web:d9d13e5d21ca89b11ace3b"
+  };
+  const $ = s => document.querySelector(s);
+  const TID = new URLSearchParams(location.search).get('t') || '';
+  let LANG = 'el';
+  try{ const q = new URLSearchParams(location.search).get('lang'); LANG = q==='en'||q==='el' ? q : (localStorage.getItem('bt_tour_lang') || 'el'); }catch(e){}
+  if(LANG!=='en') LANG = 'el';
+  const TX = {
+    el:{sub:'Τουρνουά μπιλιάρδου', all:'🏆 Όλα τα τουρνουά', loading:'Φόρτωση…', noPoster:'Χωρίς αφίσα', prizes:'🏆 Έπαθλα', rules:'📋 Κανόνες / σύστημα', place:'📍 Πού γίνεται',
+      share:'📤 Κοινοποίηση', copy:'🔗 Αντιγραφή συνδέσμου', qr:'🔳 QR', print:'🖨 Εκτύπωση αφίσας', cal:'📅 Στο ημερολόγιο', close:'Κλείσιμο',
+      notFound:'⚠ Το τουρνουά δεν βρέθηκε.', noId:'⚠ Λείπει ο κωδικός του τουρνουά από τον σύνδεσμο.', net:'⚠ Δεν ήταν δυνατή η σύνδεση. Έλεγξε το internet και ανανέωσε τη σελίδα.',
+      deleted:'🗑 Το τουρνουά δεν είναι πια διαθέσιμο.', live:'Σε εξέλιξη', soon:'Προσεχώς', done:'Ολοκληρώθηκε', regOpen:'Δηλώσεις ανοιχτές', regClosed:'Οι δηλώσεις έκλεισαν', full:'Πλήρες',
+      game:'Παιχνίδι', dates:'Ημερομηνίες', hours:'Ώρες', venue:'Μαγαζί', fee:'Συμμετοχή', spots:'Θέσεις', deadline:'Προθεσμία δηλώσεων', contact:'Επικοινωνία',
+      left:'απομένουν {0}', ofMax:'{0} από {1}', noneLeft:'δεν υπάρχουν ελεύθερες θέσεις', free:'Δωρεάν', inDays:'σε {0} μέρες', inHours:'σε {0} ώρες', today:'σήμερα', ended:'έληξε',
+      regBtn:'✍ Δήλωση συμμετοχής', regSoon:'Η online δήλωση ανοίγει σύντομα. Για συμμετοχή καλέστε το μαγαζί:', call:'📞 Κλήση', results:'📊 Κλήρωση & αποτελέσματα', liveBtn:'🟢 Ζωντανά αποτελέσματα',
+      champ:'🏆 Νικητής: {0}', players:'👥 Δηλωμένοι παίκτες ({0})', teams:'👥 Ομάδες', copied:'✔ Ο σύνδεσμος αντιγράφηκε', directions:'🧭 Οδηγίες στον χάρτη', org:'🎱 Διοργάνωση: {0}',
+      carom:'Γαλλικό', pool:'Αμερικάνικο', mosc:'Mosconi (ομάδες)', groups:'Όμιλοι (3-4)', dbl:'Διπλή πυραμίδα', ko:'νοκ-άουτ {0}', days:['Κυρ','Δευ','Τρί','Τετ','Πέμ','Παρ','Σάβ'],
+      printQr:'Σκανάρετε για όλες τις πληροφορίες και τα ζωντανά αποτελέσματα'},
+    en:{sub:'Billiard tournaments', all:'🏆 All tournaments', loading:'Loading…', noPoster:'No poster', prizes:'🏆 Prizes', rules:'📋 Rules / format', place:'📍 Venue',
+      share:'📤 Share', copy:'🔗 Copy link', qr:'🔳 QR', print:'🖨 Print poster', cal:'📅 Add to calendar', close:'Close',
+      notFound:'⚠ Tournament not found.', noId:'⚠ The tournament code is missing from the link.', net:'⚠ Could not connect. Check the internet and reload the page.',
+      deleted:'🗑 This tournament is no longer available.', live:'In progress', soon:'Upcoming', done:'Finished', regOpen:'Registration open', regClosed:'Registration closed', full:'Full',
+      game:'Game', dates:'Dates', hours:'Hours', venue:'Venue', fee:'Entry fee', spots:'Places', deadline:'Registration deadline', contact:'Contact',
+      left:'{0} left', ofMax:'{0} of {1}', noneLeft:'no places left', free:'Free', inDays:'in {0} days', inHours:'in {0} hours', today:'today', ended:'closed',
+      regBtn:'✍ Register', regSoon:'Online registration opens soon. To take part, call the venue:', call:'📞 Call', results:'📊 Draw & results', liveBtn:'🟢 Live results',
+      champ:'🏆 Winner: {0}', players:'👥 Registered players ({0})', teams:'👥 Teams', copied:'✔ Link copied', directions:'🧭 Directions', org:'🎱 Organiser: {0}',
+      carom:'Carom (French)', pool:'Pool (American)', mosc:'Mosconi (teams)', groups:'Groups (3-4)', dbl:'Double elimination', ko:'knockout {0}', days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+      printQr:'Scan for all the information and live results'}
+  };
+  const t = (k,...a)=>{ let v = (TX[LANG]||TX.el)[k]; if(v==null) v = TX.el[k]; if(typeof v!=='string') return v; a.forEach((x,i)=>{ v = v.replace('{'+i+'}', x); }); return v; };
+  const esc = x => String(x==null?'':x).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let DOC = null, POSTER = '';
+
+  function appLink(d){
+    return 'app.html?t='+encodeURIComponent(TID)+(d.format==='mosconi'?'&f=mosc':d.format==='groups'?'&f=grp&k='+(d.koSize||16):d.format==='carom'?'&f=car&s='+(d.size||32)+'&k='+(d.koSize||16):'&s='+(d.size||32)+(d.koSize?'&k='+d.koSize:''));
+  }
+  function dateRange(start, days){
+    if(!start) return '';
+    const [y,m,d] = start.split('-').map(Number); if(!y) return '';
+    const D = t('days'), a = new Date(y,m-1,d), b = new Date(y,m-1,d+Math.max(1,days||1)-1);
+    const f = x => D[x.getDay()]+' '+x.getDate()+'/'+(x.getMonth()+1);
+    return (days||1)>1 ? f(a)+' – '+f(b)+' '+b.getFullYear() : f(a)+' '+a.getFullYear();
+  }
+  function gameLabel(d){
+    if(d.format==='mosconi') return '🎱 '+t('pool')+' · '+t('mosc');
+    const base = d.game==='pool' ? '🎱 '+t('pool')+(d.ball?' '+d.ball+'-ball':'') : '🎯 '+t('carom');
+    const fmt = d.format==='groups' ? t('groups') : t('dbl');
+    return base+' · '+fmt+(d.koSize?' · '+t('ko', d.koSize):'');
+  }
+  function deadlineInfo(p){
+    if(!p.deadline) return {txt:'', past:false};
+    const dl = new Date(p.deadline); if(isNaN(dl)) return {txt:p.deadline, past:false};
+    const ms = dl - Date.now(), D = t('days');
+    const base = D[dl.getDay()]+' '+dl.getDate()+'/'+(dl.getMonth()+1)+' '+String(dl.getHours()).padStart(2,'0')+':'+String(dl.getMinutes()).padStart(2,'0');
+    let rel = ms<=0 ? t('ended') : ms<24*3600e3 ? (ms<3600e3 ? t('today') : t('inHours', Math.ceil(ms/3600e3))) : t('inDays', Math.ceil(ms/86400e3));
+    return {txt:base, rel, past:ms<=0};
+  }
+  function playersOf(d){
+    let st = null; try{ st = JSON.parse(d.state||'null'); }catch(e){}
+    if(!st) return {list:[], teams:null};
+    if(d.format==='mosconi' && st.mos){
+      const tm = (st.mos.teams||[]).map((x,i)=>({name:String((x&&x.name)||'').trim()||(LANG==='en'?(i?'TEAM B':'TEAM A'):(i?'ΟΜΑΔΑ Β':'ΟΜΑΔΑ Α')), pl:((x&&x.p)||[]).map(p=>String(p||'').trim()).filter(Boolean)}));
+      return {list:[], teams:tm};
+    }
+    const seen = {}, out = [];
+    (st.participants||[]).forEach(n=>{ n = String(n||'').trim(); if(!n || n.toUpperCase()==='BYE' || /^player\s*\d+$/i.test(n)) return; const k = n.toLocaleLowerCase('el'); if(seen[k]) return; seen[k]=1; out.push(n); });
+    return {list:out, teams:null};
+  }
+  function fact(k, v, wide){ return '<div class="fact'+(wide?' wide':'')+'"><div class="k">'+esc(k)+'</div><div class="v">'+v+'</div></div>'; }
+
+  function render(){
+    document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-t]').forEach(e=>{ e.textContent = t(e.dataset.t); });
+    $('#langBtn').textContent = LANG==='el' ? 'EN' : 'ΕΛ';
+    const d = DOC; if(!d) return;
+    const p = d.promo && d.promo.on ? d.promo : {};
+    const title = d.title || TID;
+    document.title = title+' — Billiard Traveller';
+    $('#title').textContent = title;
+    $('#org').textContent = d.organizer ? t('org', d.organizer) : '';
+    const pl = playersOf(d), count = pl.teams ? 0 : (pl.list.length || +d.entries || 0);
+    const max = parseInt(p.max,10)||0, left = max ? Math.max(0, max-count) : 0;
+    const dl = deadlineInfo(p);
+    const status = d.champion ? 'finished' : (d.status||'upcoming');
+    const regOpen = status==='upcoming' && !dl.past && (!max || left>0);
+    // σήματα
+    let b = status==='live' ? '<span class="badge b-live">● '+esc(t('live'))+'</span>' : status==='finished' ? '<span class="badge b-done">'+esc(t('done'))+'</span>' : '<span class="badge b-soon">📅 '+esc(t('soon'))+'</span>';
+    if(status==='upcoming' && d.promo && d.promo.on) b += max && !left ? '<span class="badge b-red">'+esc(t('full'))+'</span>' : regOpen ? '<span class="badge b-live">'+esc(t('regOpen'))+'</span>' : '<span class="badge b-red">'+esc(t('regClosed'))+'</span>';
+    $('#badges').innerHTML = b;
+    // στοιχεία
+    const loc = [p.venue, p.addr, p.city].filter(Boolean);
+    let f = fact(t('game'), esc(gameLabel(d)), true)
+      + fact(t('dates'), esc(dateRange(d.startDate, d.days)))
+      + (p.hours ? fact(t('hours'), esc(p.hours)) : '')
+      + (loc.length ? fact(t('venue'), esc(p.venue||'')+'<small>'+esc([p.addr,p.city].filter(Boolean).join(', '))+'</small>') : '')
+      + (d.promo && d.promo.on ? fact(t('fee'), (+p.fee ? esc(String(+p.fee).replace('.',',')+' €') : esc(t('free')))) : '');
+    if(max) f += fact(t('spots'), esc(t('ofMax', count, max))+'<small>'+esc(left ? t('left', left) : t('noneLeft'))+'</small><div class="bar"><i class="'+(left?'':'full')+'" style="width:'+Math.min(100, Math.round(count/max*100))+'%"></i></div>');
+    if(dl.txt) f += fact(t('deadline'), esc(dl.txt)+'<small>'+esc(dl.rel||'')+'</small>');
+    if(p.phone) f += fact(t('contact'), '<a href="tel:'+esc(String(p.phone).replace(/[^\d+]/g,''))+'">'+esc(p.phone)+'</a>');
+    $('#facts').innerHTML = f;
+    // κουμπιά
+    let c = '';
+    if(d.champion) c += '<div style="font-weight:800;font-size:17px">'+esc(t('champ', d.champion))+'</div>';
+    if(status==='upcoming' && d.promo && d.promo.on){
+      c += '<div class="row"><button class="btn main off" type="button" disabled>'+esc(t('regBtn'))+'</button>'+(p.phone?'<a class="btn" href="tel:'+esc(String(p.phone).replace(/[^\d+]/g,''))+'">'+esc(t('call'))+' '+esc(p.phone)+'</a>':'')+'</div>';
+      c += '<small>'+esc(t('regSoon'))+' '+esc(p.phone||'')+'</small>';
+    }
+    c += '<div class="row"><a class="btn '+(status==='live'?'live':'')+'" href="'+esc(appLink(d))+'">'+esc(status==='live' ? t('liveBtn') : t('results'))+'</a></div>';
+    $('#cta').innerHTML = c;
+    // κείμενα
+    $('#prizes').textContent = p.prizes || ''; $('#sPrizes').style.display = p.prizes ? '' : 'none';
+    $('#rules').textContent = p.rules || ''; $('#sRules').style.display = p.rules ? '' : 'none';
+    if(loc.length){
+      const q = encodeURIComponent(loc.join(', '));
+      $('#place').innerHTML = '<b>'+esc(p.venue||'')+'</b><br>'+esc([p.addr,p.city].filter(Boolean).join(', '))+'<br><a href="https://www.google.com/maps/search/?api=1&query='+q+'" target="_blank" rel="noopener">'+esc(t('directions'))+'</a>';
+      const mp = $('#map'), src = 'https://maps.google.com/maps?q='+q+'&z=16&output=embed';
+      if(mp.dataset.src!==src){ mp.dataset.src = src; mp.src = src; }
+      $('#sPlace').style.display = '';
+    } else $('#sPlace').style.display = 'none';
+    // παίκτες
+    if(pl.teams){
+      $('#hPlayers').textContent = t('teams');
+      $('#players').innerHTML = pl.teams.map(x=>'<li style="white-space:normal"><b>'+esc(x.name)+'</b>: '+esc(x.pl.join(', '))+'</li>').join('');
+      $('#sPlayers').style.display = '';
+    } else {
+      $('#hPlayers').textContent = t('players', pl.list.length);
+      $('#players').innerHTML = pl.list.map(n=>'<li title="'+esc(n)+'">'+esc(n)+'</li>').join('');
+      $('#sPlayers').style.display = pl.list.length ? '' : 'none';
+    }
+    // κοινοποίηση
+    const url = location.href.split('#')[0].replace(/[?&]lang=(el|en)/,'');
+    const msg = title+' — '+dateRange(d.startDate, d.days)+(p.city?' · '+p.city:'');
+    $('#shFb').href = 'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url);
+    $('#shVb').href = 'viber://forward?text='+encodeURIComponent(msg+' '+url);
+    $('#shWa').href = 'https://wa.me/?text='+encodeURIComponent(msg+' '+url);
+    $('#shCal').style.display = d.startDate ? '' : 'none';
+    buildPrint(d, p, url);
+    $('#status').style.display = 'none'; $('#page').style.display = '';
+  }
+  function drawQR(el, text, size){
+    el.innerHTML='';
+    try{ if(typeof QRCode!=='undefined'){ new QRCode(el,{text,width:size||220,height:size||220}); return; } }catch(e){}
+    const img=document.createElement('img'); img.width=size||220; img.height=size||220; img.alt='QR';
+    img.src='https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data='+encodeURIComponent(text);
+    el.appendChild(img);
+  }
+  function buildPrint(d, p, url){
+    const ps = $('#printSheet');
+    const rows = [[t('game'), gameLabel(d)], [t('dates'), dateRange(d.startDate, d.days)], [t('hours'), p.hours], [t('venue'), [p.venue,p.addr,p.city].filter(Boolean).join(', ')],
+      [t('fee'), d.promo && d.promo.on ? (+p.fee ? String(+p.fee).replace('.',',')+' €' : t('free')) : ''], [t('spots'), p.max], [t('deadline'), deadlineInfo(p).txt], [t('contact'), p.phone], [t('prizes').replace(/^\S+\s/,''), p.prizes]]
+      .filter(r=>r[1]);
+    ps.innerHTML = '<div class="ph"><b>🎱 Billiard Traveller</b><span>'+esc(d.organizer||'')+'</span></div><h1>'+esc(d.title||TID)+'</h1>'
+      + (POSTER ? '<div class="pimg"><img src="'+POSTER+'" alt=""></div>' : '')
+      + '<table>'+rows.map(r=>'<tr><td class="k">'+esc(r[0])+'</td><td style="white-space:pre-wrap">'+esc(r[1])+'</td></tr>').join('')+'</table>'
+      + '<div class="pq"><div id="pqr"></div><div>'+esc(t('printQr'))+'<br><small>'+esc(url)+'</small></div></div>';
+    drawQR(ps.querySelector('#pqr'), url, 120);
+  }
+  function icsDownload(){
+    const d = DOC, p = (d.promo && d.promo.on) ? d.promo : {}; if(!d || !d.startDate) return;
+    const [y,m,dd] = d.startDate.split('-').map(Number), e = new Date(y, m-1, dd + Math.max(1, d.days||1));
+    const fmt = x => x.getFullYear()+String(x.getMonth()+1).padStart(2,'0')+String(x.getDate()).padStart(2,'0');
+    const escI = x => String(x||'').replace(/\\/g,'\\\\').replace(/[,;]/g,m=>'\\'+m).replace(/\n/g,'\\n');
+    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Billiard Traveller//Tournament//EL','BEGIN:VEVENT','UID:'+TID+'@billiard-traveller',
+      'DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z'),'DTSTART;VALUE=DATE:'+d.startDate.replace(/-/g,''),'DTEND;VALUE=DATE:'+fmt(e),
+      'SUMMARY:'+escI(d.title||TID),'LOCATION:'+escI([p.venue,p.addr,p.city].filter(Boolean).join(', ')),'DESCRIPTION:'+escI((p.hours?p.hours+'\n':'')+location.href),'URL:'+location.href,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download = (TID||'tournament')+'.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  function toast(m){ const e=$('#toast'); e.textContent=m; e.style.display='block'; clearTimeout(toast.t); toast.t=setTimeout(()=>e.style.display='none', 2200); }
+  function wire(){
+    $('#langBtn').addEventListener('click', ()=>{ LANG = LANG==='el' ? 'en' : 'el'; try{ localStorage.setItem('bt_tour_lang', LANG); }catch(e){} render(); if(!DOC) document.querySelectorAll('[data-t]').forEach(e=>{ e.textContent = t(e.dataset.t); }); });
+    $('#poster').addEventListener('click', ()=>{ if(!POSTER) return; $('#imgBig').src = POSTER; $('#imgModal').classList.remove('hidden'); });
+    $('#imgModal').addEventListener('click', ()=>$('#imgModal').classList.add('hidden'));
+    $('#shCopy').addEventListener('click', async ()=>{ const u = location.href.split('#')[0]; try{ await navigator.clipboard.writeText(u); }catch(e){ const ta=document.createElement('textarea'); ta.value=u; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} ta.remove(); } toast(t('copied')); });
+    $('#shQr').addEventListener('click', ()=>{ const u = location.href.split('#')[0]; $('#qrTitle').textContent = (DOC&&DOC.title)||TID; drawQR($('#qrBox'), u); $('#qrUrl').textContent = u; $('#qrModal').classList.remove('hidden'); });
+    $('#qrClose').addEventListener('click', ()=>$('#qrModal').classList.add('hidden'));
+    $('#shPrint').addEventListener('click', ()=>window.print());
+    $('#shCal').addEventListener('click', icsDownload);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden')); });
+  }
+  function start(){
+    wire();
+    document.querySelectorAll('[data-t]').forEach(e=>{ e.textContent = t(e.dataset.t); });
+    $('#langBtn').textContent = LANG==='el' ? 'EN' : 'ΕΛ';
+    if(!TID){ $('#status').textContent = t('noId'); return; }
+    if(typeof firebase==='undefined'){ $('#status').textContent = t('net'); return; }
+    try{
+      if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+      const ref = firebase.firestore().collection('tournaments').doc(TID);
+      ref.onSnapshot(ds=>{
+        if(!ds.exists){ DOC = null; $('#page').style.display='none'; $('#status').style.display=''; $('#status').textContent = t('notFound'); return; }
+        const d = ds.data();
+        if(d.deleted){ DOC = null; $('#page').style.display='none'; $('#status').style.display=''; $('#status').textContent = t('deleted'); return; }
+        const pa = d.promo && d.promo.posterAt, old = DOC && DOC.promo && DOC.promo.posterAt;
+        DOC = d; render();
+        if(pa && pa!==old){ ref.collection('pub').doc('poster').get().then(ps=>{ const x = ps.exists ? ps.data() : null; POSTER = (x && x.img) || '';
+          $('#poster').innerHTML = POSTER ? '<img alt="">' : '<span>'+esc(t('noPoster'))+'</span>'; if(POSTER) $('#poster img').src = POSTER; buildPrint(DOC, (DOC.promo&&DOC.promo.on)?DOC.promo:{}, location.href.split('#')[0]); }).catch(()=>{}); }
+      }, err=>{ $('#status').textContent = t('net')+' ('+(err.code||'')+')'; });
+    }catch(e){ $('#status').textContent = t('net'); }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
+  if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+})();
+</script>
 </body>
 </html>
