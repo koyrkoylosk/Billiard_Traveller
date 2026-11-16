@@ -1,6 +1,7 @@
 <!doctype html>
 <!--
   Billiard Traveller 32 PRO — ΙΣΤΟΡΙΚΟ ΕΚΔΟΣΕΩΝ (αλλάζει ο αριθμός σε κάθε αναβάθμιση)
+  v77 (16/11/2026) — ✖ Ακύρωση ανάθεσης τραπεζιού → ερώτηση «να μείνει σε ΑΝΑΜΟΝΗ;» · οι αγώνες σε αναμονή δεν στέλνονται αυτόματα (κάρτα «⏸ Σε αναμονή» → ▶ Ξανά στη σειρά· ή ➡ Αγώνας… σε τραπέζι).
   v76 (12/11/2026) — 📇 ΑΠΟΘΗΚΗ ΟΝΟΜΑΤΩΝ ΤΟΥΡΝΟΥΑ: όταν γράφεις όνομα (συμμετοχές / αγώνες) βγαίνουν προτάσεις — πρώτα του μαγαζιού, μετά από όλα τα μαγαζιά. Τα ονόματα που γράφει ο admin μπαίνουν μόνα τους στην αποθήκη (βάση Scoreboard: clubs/{κλαμπ}/tnames). ΔΕΝ μπαίνουν στη λίστα παικτών του μαγαζιού.
   v75 (05/11/2026) — 📣 ΠΡΟΚΗΡΥΞΗ ΤΟΥΡΝΟΥΑ: Μενού → «Προκήρυξη» (όλα τα πεδία υποχρεωτικά: όνομα, ημερομηνία, μέρες, ώρες, μαγαζί, διεύθυνση, πόλη, τηλέφωνο, κόστος, θέσεις, προθεσμία, έπαθλα, κανόνες, αφίσα) → δημόσια σελίδα info.html?t=… (στοιχεία, χάρτης, θέσεις, προθεσμία, δηλωμένοι, κοινοποίηση Facebook/Viber/WhatsApp, QR, εκτύπωση αφίσας, ημερολόγιο) · «Όλα τα τουρνουά»: μαγαζί/πόλη/κόστος/θέσεις + φίλτρο πόλης · ΑΓΓΛΙΚΑ σε όλη την εφαρμογή (EN / GR, θυμάται την επιλογή, ?lang=en) · ΧΡΕΙΑΖΟΝΤΑΙ νέοι κανόνες Firebase (pub/poster).
   v74 (30/10/2026) — 📌 Κράτηση τραπεζιού: ο admin ορίζει ζευγάρι (αγώνα) σε συγκεκριμένο τραπέζι (π.χ. τηλεοπτικό) — παίζεται ΜΟΝΟ εκεί, και σε 🚫 τραπέζι, μέσα στην ώρα του · το τραπέζι δεν παίρνει άλλο αγώνα της ίδιας/μεταγενέστερης ώρας όσο περιμένει ο κρατημένος · σήμα «📌 Τ2» στον αγώνα · «➡ Αγώνας…» κρατά επίσης τον αγώνα στο τραπέζι.
@@ -1877,7 +1878,7 @@ try{var t=localStorage.getItem("BT32_THEME");if(t)document.documentElement.setAt
   <div class="topbar">
     <div class="brand">
     <h1>🎱 Billiard Traveller 32 PRO — Full Flow 1–55</h1>
-      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v76</span>
+      <span class="verBadge" id="appVersion" title="Έκδοση εφαρμογής">v77</span>
     </div>
     <div class="topbar-right">
       <button id="tbChip" class="toggle" type="button" style="display:none" title="Τραπέζια — σύνδεση με το Scoreboard"></button>
@@ -5812,6 +5813,7 @@ function syncFinal16ToKO(seeds){
     const consider = no=>{
       const x = tblMatchInfo(no);
       if(!x || x.done || x.running || x.ff || busy.has(no)) return;
+      if(TBL.cfg.hold && TBL.cfg.hold[no]) return;   // v77: «σε αναμονή» από τον admin — δεν στέλνεται αυτόματα
       if(!tblRealPlayer(x.a) || !tblRealPlayer(x.b)) return;
       const key = (x.date && x.time) ? (x.date.trim()+' '+x.time.trim()) : '';
       const sv = key ? slotSortVal(key) : Number.MAX_SAFE_INTEGER;
@@ -5870,6 +5872,7 @@ function syncFinal16ToKO(seeds){
     }
   }
   async function tblAssign(tno, mno){
+    if(TBL.cfg.hold && TBL.cfg.hold[mno]) delete TBL.cfg.hold[mno];   // v77: χειροκίνητη αποστολή = τέλος αναμονής
     const x = tblMatchInfo(mno);
     if(!x){ tblMsg('⚠ Δεν υπάρχει αγώνας #'+mno); return; }
     if(x.done){ tblMsg('⚠ Ο αγώνας #'+mno+' έχει ήδη τελειώσει'); return; }
@@ -6088,6 +6091,9 @@ function syncFinal16ToKO(seeds){
         return h+'</div>';
       }).join('');
     }
+    // v77: αγώνες «σε αναμονή» (✖ Ακύρωση → αναμονή) — ▶ για να ξαναμπούν στη σειρά
+    { const H=Object.keys(TBL.cfg.hold||{}).map(Number).filter(n=>{const x=tblMatchInfo(n);return x&&!x.done;});
+      if(H.length) list.insertAdjacentHTML('afterbegin','<div class="tbl-card" style="border-color:#f4b400"><div class="tc-h"><span>⏸ Σε αναμονή</span></div>'+H.map(n=>{const x=tblMatchInfo(n);return '<div class="tc-m">#'+n+' <b>'+esc(x.a||'?')+'</b> – <b>'+esc(x.b||'?')+'</b>'+(ADMIN?' <button type="button" class="btn" data-thold="'+n+'">▶ Ξανά στη σειρά</button>':'')+'</div>';}).join('')+'</div>'); }
     tblDecorate();
   }
   // μικρή ένδειξη «🎱 Τ2» δίπλα στην ώρα του αγώνα
@@ -6224,7 +6230,11 @@ function syncFinal16ToKO(seeds){
       if(b.dataset.toff){ const n=+b.dataset.toff; TBL.cfg.off = Object.assign({}, TBL.cfg.off||{}); if(TBL.cfg.off[n]) delete TBL.cfg.off[n]; else TBL.cfg.off[n] = true;
         tblMsg(TBL.cfg.off[n] ? '🚫 Τραπέζι '+n+': δεν παίρνει νέους αγώνες (όποιος παίζεται ολοκληρώνεται κανονικά)' : '✅ Τραπέζι '+n+': παίρνει ξανά αγώνες');
         saveAutosaveSnapshot(); tblRender(); tblScheduleDispatch(); return; }
-      if(b.dataset.tclr){ const n=+b.dataset.tclr; if((await btAsk('Ακύρωση ανάθεσης στο τραπέζι '+n+';'))) tblClear(n); }
+      if(b.dataset.tclr){ const n=+b.dataset.tclr; if((await btAsk('Ακύρωση ανάθεσης στο τραπέζι '+n+';'))){ const mno=tblAssignedMatch(n);
+          // v77: να μείνει σε αναμονή; (αλλιώς η αυτόματη αποστολή μπορεί να τον ξαναστείλει αμέσως)
+          if(mno && (await btAsk('Ο αγώνας #'+mno+' να μείνει σε ΑΝΑΜΟΝΗ μέχρι να τον ξαναστείλεις;\n(ΟΚ = αναμονή · Άκυρο = γυρνάει στη σειρά του)'))){ TBL.cfg.hold=TBL.cfg.hold||{}; TBL.cfg.hold[mno]=Date.now(); tblMsg('⏸ Αγώνας #'+mno+' σε αναμονή — πάτα ▶ για να ξαναμπεί στη σειρά'); }
+          await tblClear(n); saveAutosaveSnapshot(); tblRender(); tblScheduleDispatch(); } }
+      if(b.dataset.thold){ const mno=+b.dataset.thold; if(TBL.cfg.hold) delete TBL.cfg.hold[mno]; tblMsg('▶ Αγώνας #'+mno+' ξαναμπήκε στη σειρά'); saveAutosaveSnapshot(); tblRender(); tblScheduleDispatch(); }
       if(b.dataset.tset){
         const n = +b.dataset.tset;
         const v = (await btPrompt('Ποιον αγώνα να στείλω στο τραπέζι '+n+'; (αριθμός αγώνα)', ''));
